@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module myenv mzscheme
+#lang mzscheme
+
 (require (lib "defmacro.ss"))
 
 ;; $Id: myenv.ss,v 1.14 2002/03/28 22:23:06 nwv Exp $
@@ -378,4 +378,4 @@
 (define-macro include (lambda (file) #f))
 (define-macro declare (lambda x #f))
 
-(provide (all-defined)))
+(provide (all-defined))

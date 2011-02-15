@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module look-for-str mzscheme
+#lang mzscheme
+
 (require "common.ss")
 (require "myenv.ss")
 
@@ -104,4 +104,4 @@
 
 ; moved to vinput-parse.scm
 
-(provide (all-defined)))
+(provide (all-defined))

@@ -1,7 +1,9 @@
-; Module header is generated automatically
-#cs(module srfi-12 mzscheme
+#lang mzscheme
+
 (require (lib "defmacro.ss"))
 (require "myenv.ss")
+
+;; oog, change to use racket exceptions.... -- JBC, 2011-02-15
 
 ;************************************************************************
 ; srfi-12.scm
@@ -321,4 +323,4 @@
 
 
 
-(provide (all-defined)))
+(provide (all-defined))

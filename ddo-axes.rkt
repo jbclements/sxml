@@ -1,7 +1,7 @@
-; Module header is generated automatically
-#cs(module ddo-axes mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
+(require "ssax/ssax.rkt")
 (require "sxml-tools.ss")
 (require "xpath-context_xlink.ss")
 

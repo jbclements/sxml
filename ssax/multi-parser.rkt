@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module multi-parser mzscheme
+#lang mzscheme
+
 (require "myenv.ss")
 (require (lib "string.ss" "srfi/13"))
 (require "input-parse.ss")
@@ -468,4 +468,4 @@
           initial-seed))))))
 ))))
 
-(provide (all-defined)))
+(provide (all-defined))

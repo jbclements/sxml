@@ -1,17 +1,14 @@
+#lang mzscheme
+
 ; Module header is generated automatically
-#cs(module sxml-tools mzscheme
 (require (lib "defmacro.ss"))
 (require (lib "string.ss" "srfi/13"))
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
+  
+(require "ssax/ssax.rkt")
 
-;;                            S X M L   T o o l s               
-; $Revision: 3.14 $ from $Date: 2003/12/23 05:39:31 $:
 ;
 ; This software is in Public Domain.
 ; IT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
-;
-; Please send bug reports and comments to lisovsky@acm.org
-;           Kirill Lisovsky
 ;
 ;   SXML normal form used for normalization-dependent functions:
 ; If attr-list is present it's always the second in SXML element.
@@ -922,4 +919,4 @@
     (else (sxml:error "sxml->html - unexpected type of node: " tree))))
 
 
-(provide (all-defined)))
+(provide (all-defined))

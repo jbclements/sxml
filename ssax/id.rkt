@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module id mzscheme
+#lang mzscheme
+
 (require "common.ss")
 (require "myenv.ss")
 (require "access-remote.ss")
@@ -559,4 +559,4 @@
                       
 
 
-(provide (all-defined)))
+(provide (all-defined))

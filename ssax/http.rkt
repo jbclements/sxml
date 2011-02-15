@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module http mzscheme
+#lang mzscheme
+
 (require (lib "defmacro.ss"))
 (require "common.ss")
 (require "myenv.ss")
@@ -324,4 +324,4 @@
       ))))
 )
 
-(provide (all-defined)))
+(provide (all-defined))

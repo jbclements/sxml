@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module sxpathlib mzscheme
+#lang mzscheme
+
 (require (rename (lib "pretty.ss") pp pretty-print))
 (require "common.ss")
 (require "myenv.ss")
@@ -533,4 +533,4 @@
 (define sxml:child-elements (select-kids sxml:element?))
 
 
-(provide (all-defined)))
+(provide (all-defined))

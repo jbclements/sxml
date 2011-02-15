@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module util mzscheme
+#lang mzscheme
+
 (require "common.ss")
 (require "myenv.ss")
 (require (lib "string.ss" "srfi/13"))
@@ -316,4 +316,4 @@
 ))
 
 
-(provide (all-defined)))
+(provide (all-defined))

@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module SXML-tree-trans mzscheme
+#lang mzscheme
+
 (require "myenv.ss")
 
 ;		XML/HTML processing in Scheme
@@ -262,4 +262,4 @@
    (lambda (new-forest keep?)
      new-forest)))
 
-(provide (all-defined)))
+(provide (all-defined))

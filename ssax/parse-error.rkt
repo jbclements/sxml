@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module parse-error mzscheme
+#lang mzscheme
+
 (require "myenv.ss")
 
 ; This code provides informative error messages
@@ -45,4 +45,4 @@
 ; Alias
 (define ssax:warn SSAX:warn)
 
-(provide (all-defined)))
+(provide (all-defined))

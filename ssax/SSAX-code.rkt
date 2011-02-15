@@ -1,5 +1,8 @@
-; Module header is generated automatically
-#cs(module SSAX-code mzscheme
+#lang mzscheme
+
+;; looks like this was generated automatically.  I don't see the sources that it 
+;; used... -- JBC, 2011-02-15
+
 (require (lib "defmacro.ss"))
 (require "common.ss")
 (require "myenv.ss")
@@ -58,4 +61,4 @@
 (define (ssax:reverse-collect-str-drop-ws fragments) (cond ((null? fragments) (quote ())) ((null? (cdr fragments)) (if (and (string? (car fragments)) (string-whitespace? (car fragments))) (quote ()) fragments)) (else (let loop ((fragments fragments) (result (quote ())) (strs (quote ())) (all-whitespace? #t)) (cond ((null? fragments) (if all-whitespace? result (cons (string-concatenate/shared strs) result))) ((string? (car fragments)) (loop (cdr fragments) result (cons (car fragments) strs) (and all-whitespace? (string-whitespace? (car fragments))))) (else (loop (cdr fragments) (cons (car fragments) (if all-whitespace? result (cons (string-concatenate/shared strs) result))) (quote ()) #t)))))))
 (define (ssax:xml->sxml port namespace-prefix-assig) (letrec ((namespaces (map (lambda (el) (cons* #f (car el) (ssax:uri-string->symbol (cdr el)))) namespace-prefix-assig)) (RES-NAME->SXML (lambda (res-name) (string->symbol (string-append (symbol->string (car res-name)) ":" (symbol->string (cdr res-name))))))) (let ((result (reverse ((ssax:make-parser NEW-LEVEL-SEED (lambda (elem-gi attributes namespaces expected-content seed) (quote ())) FINISH-ELEMENT (lambda (elem-gi attributes namespaces parent-seed seed) (let ((seed (ssax:reverse-collect-str-drop-ws seed)) (attrs (attlist-fold (lambda (attr accum) (cons (list (if (symbol? (car attr)) (car attr) (RES-NAME->SXML (car attr))) (cdr attr)) accum)) (quote ()) attributes))) (cons (cons (if (symbol? elem-gi) elem-gi (RES-NAME->SXML elem-gi)) (if (null? attrs) seed (cons (cons (quote @) attrs) seed))) parent-seed))) CHAR-DATA-HANDLER (lambda (string1 string2 seed) (if (string-null? string2) (cons string1 seed) (cons* string2 string1 seed))) DOCTYPE (lambda (port docname systemid internal-subset? seed) (when internal-subset? (ssax:warn port "Internal DTD subset is not currently handled ") (ssax:skip-internal-dtd port)) (ssax:warn port "DOCTYPE DECL " docname " " systemid " found and skipped") (values #f (quote ()) namespaces seed)) UNDECL-ROOT (lambda (elem-gi seed) (values #f (quote ()) namespaces seed)) PI ((*DEFAULT* lambda (port pi-tag seed) (cons (list (quote *PI*) pi-tag (ssax:read-pi-body-as-string port)) seed)))) port (quote ()))))) (cons (quote *TOP*) (if (null? namespace-prefix-assig) result (cons (list (quote @) (cons (quote *NAMESPACES*) (map (lambda (ns) (list (car ns) (cdr ns))) namespace-prefix-assig))) result))))))
 
-(provide (all-defined)))
+(provide (all-defined))

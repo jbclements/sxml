@@ -1,8 +1,8 @@
-; Module header is generated automatically
-#cs(module xpath-parser mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
-(require "sxml-tools.ss")
+(require "ssax/ssax.rkt")
+(require "sxml-tools.rkt")
 
 ;; XPath/XPointer grammar parser.
 ;
@@ -1565,4 +1565,4 @@
       (expr ,txp:parse-xpath-expression))
     ))
 
-(provide (all-defined)))
+(provide (all-defined))

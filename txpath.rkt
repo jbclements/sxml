@@ -1,10 +1,10 @@
-; Module header is generated automatically
-#cs(module txpath mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
-(require "sxml-tools.ss")
-(require "sxpath-ext.ss")
-(require "xpath-parser.ss")
+(require "ssax/ssax.rkt")
+(require "sxml-tools.rkt")
+(require "sxpath-ext.rkt")
+(require "xpath-parser.rkt")
 
 ;; Classic TXPath implementation based on sxpathlib, sxpath-ext and txp-parser
 ;
@@ -1111,4 +1111,4 @@
 (define sxml:xpointer+index
   (sxml:api-index-helper (cadr (assq 'xpointer sxml:classic-res))))
 
-(provide (all-defined)))
+(provide (all-defined))

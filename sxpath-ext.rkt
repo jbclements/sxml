@@ -1,8 +1,8 @@
-; Module header is generated automatically
-#cs(module sxpath-ext mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
-(require "sxml-tools.ss")
+(require "ssax/ssax.rkt")
+(require "sxml-tools.rkt")
 
 ;; W3C compliant extensions to SXPathlib
 ; $Id: sxpath-ext.scm,v 1.911 2002/12/06 22:10:53 kl Exp kl $:
@@ -622,4 +622,4 @@
 		((eq? (car seq) node) ((sxml:filter test-pred?) (cdr seq)))
 		(else (rpt (cdr seq)))))))))))
 
-(provide (all-defined)))
+(provide (all-defined))

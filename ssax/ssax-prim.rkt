@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module ssax-prim mzscheme
+#lang mzscheme
+
 (require "SSAX-code.ss")
 
 ;=========================================================================
@@ -68,4 +68,4 @@
                 '() #t)))))))
 
 
-(provide (all-defined)))
+(provide (all-defined))

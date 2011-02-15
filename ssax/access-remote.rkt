@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module access-remote mzscheme
+#lang mzscheme
+
 (require "common.ss")
 (require "myenv.ss")
 (require "http.ss")
@@ -311,4 +311,4 @@
                   req-query
                   req-fragment)))))))))))))
 
-(provide (all-defined)))
+(provide (all-defined))

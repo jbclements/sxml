@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module char-encoding mzscheme
+#lang mzscheme
+
 (require "common.ss")
 (require "myenv.ss")
 
@@ -63,4 +63,4 @@
 (define char-newline (ascii->char 10)) ; a.k.a. #\newline, per R5RS
 (define char-space (ascii->char 32))
 
-(provide (all-defined)))
+(provide (all-defined))

@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module xlink-parser mzscheme
+#lang mzscheme
+
 (require "common.ss")
 (require "myenv.ss")
 (require "util.ss")
@@ -1279,4 +1279,4 @@
            (xlink:set-uri-for-sxlink-arcs uri sxlink-arcs)
            sxlink-arcs)))))
 
-(provide (all-defined)))
+(provide (all-defined))

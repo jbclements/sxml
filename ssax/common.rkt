@@ -1,18 +1,10 @@
-; Module header is generated automatically
-#cs(module common mzscheme
-
-;; For PLT Schemes v.200
+#lang mzscheme
 
 (require 
   (lib "defmacro.ss")
   (lib "string.ss")
   (rename (lib "pretty.ss") pp pretty-print))
   
-(define (command-line)
-  (cons "plt" (vector->list (current-command-line-arguments)
-	;	argv
-		)))
-
  ;(define (call-with-input-string str fun)
  ;   (fun (open-input-string str)))
  ;
@@ -46,4 +38,4 @@
 		))                  
 
 
-(provide (all-defined)))
+(provide (all-defined))

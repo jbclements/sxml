@@ -1,5 +1,5 @@
-; Module header is generated automatically
-#cs(module mime mzscheme
+#lang mzscheme
+
 (require "common.ss")
 (require "myenv.ss")
 (require "input-parse.ss")
@@ -162,4 +162,4 @@
       ))
 
 
-(provide (all-defined)))
+(provide (all-defined))
