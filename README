@@ -1,0 +1,5 @@
+This repository contains the sources for the SXML family of tools. I believe that
+Oleg Kiselyov is directly or indirectly responsible for nearly all of this code,
+aided by Kirill Lisovsky and Dmitry Lizorkin.
+
+It's a safe bet that this repository does or will contain Racket-specific code.
