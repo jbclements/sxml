@@ -1,12 +1,12 @@
-; Module header is generated automatically
-#cs(module xpath-context_xlink mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require "sxml-tools.ss")
-(require "sxpath-ext.ss")
-(require "xpath-parser.ss")
-(require "txpath.ss")
-(require "xpath-ast.ss")
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
+(require "sxml-tools.rkt")
+(require "sxpath-ext.rkt")
+(require "xpath-parser.rkt")
+(require "txpath.rkt")
+(require "xpath-ast.rkt")
+(require "ssax/ssax.rkt")
 
 ;; Context-based XPath implementation
 ;
@@ -2972,4 +2972,4 @@
         (xlink:docs-variable var-binding)
         num-anc)))))
 
-(provide (all-defined)))
+(provide (all-defined))

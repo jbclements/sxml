@@ -1,11 +1,11 @@
-; Module header is generated automatically
-#cs(module sxpath mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require "sxml-tools.ss")
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
-(require "sxpath-ext.ss")
-(require "txpath.ss")
-(require "xpath-parser.ss")
+(require "sxml-tools.rkt")
+(require "ssax/ssax.rkt")
+(require "sxpath-ext.rkt")
+(require "txpath.rkt")
+(require "xpath-parser.rkt")
 
 ;; $Id: sxpath.scm,v 1.5 2005/09/07 09:27:34 lizorkin Exp $
 ;; Highghest level SXPath 
@@ -222,4 +222,4 @@
       lpaths)))
 
 
-(provide (all-defined)))
+(provide (all-defined))

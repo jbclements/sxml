@@ -1,11 +1,11 @@
-; Module header is generated automatically
-#cs(module modif mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
-(require "sxml-tools.ss")
-(require "xpath-context_xlink.ss")
-(require "xpath-ast.ss")
-(require "ddo-txpath.ss")
+(require "ssax/ssax.rkt")
+(require "sxml-tools.rkt")
+(require "xpath-context_xlink.rkt")
+(require "xpath-ast.rkt")
+(require "ddo-txpath.rkt")
 
 ;; A tool for making functional-style modifications to SXML documents
 ;
@@ -856,4 +856,4 @@
 
 ))
 
-(provide (all-defined)))
+(provide (all-defined))

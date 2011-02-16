@@ -1,7 +1,7 @@
-; Module header is generated automatically
-#cs(module xpath-ast mzscheme
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
-(require "xpath-parser.ss")
+#lang mzscheme
+
+(require "ssax/ssax.rkt")
+(require "xpath-parser.rkt")
 
 ;; XPath/XPointer -> Abstract Syntax Tree parser
 ;
@@ -466,4 +466,4 @@
             (lambda (pred-expr) `(predicate ,pred-expr))
             pred-expr-list)))
 
-(provide (all-defined)))
+(provide (all-defined))

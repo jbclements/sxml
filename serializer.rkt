@@ -1,6 +1,6 @@
-; Module header is generated automatically
-#cs(module serializer mzscheme
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
+#lang mzscheme
+
+(require "ssax/ssax.rkt")
 
 ;; SXML serializer into XML and HTML
 ;
@@ -1524,4 +1524,4 @@
       (srl:display-sxml sxml-obj (car port-or-filename)
                         '() #f 'html '() #t 'omit "4.0")))
 
-(provide (all-defined)))
+(provide (all-defined))

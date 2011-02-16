@@ -1,14 +1,14 @@
-; Module header is generated automatically
-#cs(module lazy-ssax mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
-(require "sxml-tools.ss")
-(require "sxpath-ext.ss")
-(require "xpath-parser.ss")
-(require "txpath.ss")
-(require "xpath-ast.ss")
-(require "xpath-context_xlink.ss")
-(require "lazy-xpath.ss")
+(require "ssax/ssax.rkt")
+(require "sxml-tools.rkt")
+(require "sxpath-ext.rkt")
+(require "xpath-parser.rkt")
+(require "txpath.rkt")
+(require "xpath-ast.rkt")
+(require "xpath-context_xlink.rkt")
+(require "lazy-xpath.rkt")
 
 ;; A specialized lazy XML->SXML parser
 ; Is heavily based on continuations
@@ -213,4 +213,4 @@
              1  ; level for the document element
              )))))))
 
-(provide (all-defined)))
+(provide (all-defined))

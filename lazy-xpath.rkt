@@ -1,13 +1,13 @@
-; Module header is generated automatically
-#cs(module lazy-xpath mzscheme
+#lang mzscheme
+
 (require (lib "string.ss" "srfi/13"))
-(require (planet "ssax.ss" ("lizorkin" "ssax.plt" 2 0)))
-(require "sxml-tools.ss")
-(require "sxpath-ext.ss")
-(require "xpath-parser.ss")
-(require "txpath.ss")
-(require "xpath-ast.ss")
-(require "xpath-context_xlink.ss")
+(require "ssax/ssax.rkt")
+(require "sxml-tools.rkt")
+(require "sxpath-ext.rkt")
+(require "xpath-parser.rkt")
+(require "txpath.rkt")
+(require "xpath-ast.rkt")
+(require "xpath-context_xlink.rkt")
 
 ;; This module implements lazy SXPath evaluation over lazy SXML documents
 ;
@@ -2321,4 +2321,4 @@
 ; Support for native sxpath syntax
 (define lazy:sxpath (lazy:api-helper txp:sxpath->ast lazy:ast-expr))
 
-(provide (all-defined)))
+(provide (all-defined))
