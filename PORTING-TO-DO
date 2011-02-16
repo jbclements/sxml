@@ -1,8 +1,9 @@
-1) actually look at this file.
+8) ADD DOCUMENTATION !!!
+4) add a test suite-- what's in the CVS repo?
+
 2) use Racket exceptions instead of srfi 12
 3) get rid of all of the cross-platform macros?
-4) ADD A !@#$ TEST SUITE.
 5) #lang mzscheme -> #lang racket
 6) decide what to do with all the version strings
 7) remove the "bug reports to lisovsky/lizorkin" messages
-8) ADD DOCUMENTATION !!!
+- bundle as a planet package
