@@ -25,4 +25,4 @@
 (provide (all-from-out "lazy-xpath.rkt"))
 (provide (all-from-out "lazy-ssax.rkt"))
 (provide (all-from-out "modif.rkt"))
-(provide (all-from-out "serializer.rkt")))
+(provide (all-from-out "serializer.rkt"))
