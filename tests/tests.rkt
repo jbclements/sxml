@@ -12,6 +12,9 @@
 (define (read-from-string str)
   (ssax:xml->sxml (open-input-string str) `()))
 
+(define (read-from-string/ns str ns)
+  (ssax:xml->sxml (open-input-string str) ns))
+
 ;; a plain tag:
 (check-equal? (read-from-string "<a />")
               `(*TOP* (a)))
@@ -34,6 +37,13 @@
 
 (check-equal? (read-from-string "<ns:a xmlns:ns=\"gooble\" ><b /></ns:a>")
               `(*TOP* (gooble:a (b))))
+
+;; you can use the namespace argument to shorten the prefix tag:
+(check-equal? (read-from-string/ns "<ns:a xmlns:ns=\"gooble\" ><b /></ns:a>"
+                                   `((g . "gooble")))
+              `(*TOP* (@ (*NAMESPACES* (g "gooble")))
+                      (g:a (b))))
+
 
 ;; empty tags are indistinguishable from tags with empty strings:
 (check-equal? (read-from-string "<a></a>")

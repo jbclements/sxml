@@ -17,7 +17,7 @@
 
 @(section "SSAX-code.rkt")
   
-@defproc[(ssax:xml->sxml [port port?] [namespace-prefix-assig (listof (list symbol? string?))]) sxml?]{
+@defproc[(ssax:xml->sxml [port port?] [namespace-prefix-assig (listof (cons symbol? string?))]) sxml?]{
  Reads a single xml element from the given @racket[port], and returns the 
  corresponding sxml representation.  The @racket[namespace-prefix-assig]
  association list provides shortened forms to be used in place of 
