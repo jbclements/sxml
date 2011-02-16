@@ -26,3 +26,6 @@
 (provide (all-from-out "lazy-ssax.rkt"))
 (provide (all-from-out "modif.rkt"))
 (provide (all-from-out "serializer.rkt"))
+
+(require "ssax/ssax.rkt")
+(provide (all-from-out "ssax/ssax.rkt"))

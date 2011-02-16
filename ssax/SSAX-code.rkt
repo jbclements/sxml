@@ -1,19 +1,14 @@
 #lang mzscheme
 
-;; looks like this was generated automatically.  I don't see the sources that it 
-;; used... -- JBC, 2011-02-15
-
 (require (lib "defmacro.ss"))
-(require "common.ss")
 (require "myenv.ss")
 (require (lib "string.ss" "srfi/13"))
-(require "util.ss")
 (require "parse-error.ss")
 (require "input-parse.ss")
 (require "look-for-str.ss")
 (require "char-encoding.ss")
 
-(define-syntax run-test (syntax-rules (define) ((run-test "scan-exp" (define vars body)) (define vars (run-test "scan-exp" body))) ((run-test "scan-exp" ?body) (letrec-syntax ((scan-exp (syntax-rules (quote quasiquote !) ((scan-exp (quote ()) (k-head ! . args)) (k-head (quote ()) . args)) ((scan-exp (quote (hd . tl)) k) (scan-lit-lst (hd . tl) (do-wrap ! quasiquote k))) ((scan-exp (quasiquote (hd . tl)) k) (scan-lit-lst (hd . tl) (do-wrap ! quasiquote k))) ((scan-exp (quote x) (k-head ! . args)) (k-head (if (string? (quote x)) (string->symbol (quote x)) (quote x)) . args)) ((scan-exp (hd . tl) k) (scan-exp hd (do-tl ! scan-exp tl k))) ((scan-exp x (k-head ! . args)) (k-head x . args)))) (do-tl (syntax-rules (!) ((do-tl processed-hd fn () (k-head ! . args)) (k-head (processed-hd) . args)) ((do-tl processed-hd fn old-tl k) (fn old-tl (do-cons ! processed-hd k))))) (do-cons (syntax-rules (!) ((do-cons processed-tl processed-hd (k-head ! . args)) (k-head (processed-hd . processed-tl) . args)))) (do-wrap (syntax-rules (!) ((do-wrap val fn (k-head ! . args)) (k-head (fn val) . args)))) (do-finish (syntax-rules () ((do-finish new-body) new-body))) (scan-lit-lst (syntax-rules (quote unquote unquote-splicing !) ((scan-lit-lst (quote ()) (k-head ! . args)) (k-head (quote ()) . args)) ((scan-lit-lst (quote (hd . tl)) k) (do-tl quote scan-lit-lst ((hd . tl)) k)) ((scan-lit-lst (unquote x) k) (scan-exp x (do-wrap ! unquote k))) ((scan-lit-lst (unquote-splicing x) k) (scan-exp x (do-wrap ! unquote-splicing k))) ((scan-lit-lst (quote x) (k-head ! . args)) (k-head (unquote (if (string? (quote x)) (string->symbol (quote x)) (quote x))) . args)) ((scan-lit-lst (hd . tl) k) (scan-lit-lst hd (do-tl ! scan-lit-lst tl k))) ((scan-lit-lst x (k-head ! . args)) (k-head x . args))))) (scan-exp ?body (do-finish !)))) ((run-test body ...) (begin (run-test "scan-exp" body) ...))))
+
 (define (make-xml-token kind head) (cons kind head))
 (define xml-token? pair?)
 (define-syntax xml-token-kind (syntax-rules () ((xml-token-kind token) (car token))))
