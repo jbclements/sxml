@@ -1,0 +1,1151 @@
+<lab xmlns="http://www.web-ide.org/namespaces/labs/1" name="Facebook: Selection" defaultpath="http://184.73.238.21/webide/evaluators/">
+  <description>
+      Facebook has hired you to help write programs that interact with the user and his or her friends. 
+      Your boss has asked you to write a program that will automatically group your friends into different
+      categories.
+   </description>
+  <step name="Review">
+      Let's review if statements.<br /><b>Basic Format</b><code>
+         if( age &lt; 18 )
+         {
+            eligible = false; 
+         }
+      </code><br />
+      age &lt; 18 is the <i>condition</i> in the above example.  If age <b>is</b> less than 18, then we set the variable 
+      eligible to false.  If age <b>is not</b> less than 18, then we don't set eligible to false.<br /><br />
+     
+      We can also add an <b>else</b> or an <b>else if</b> clause on the end of our if statement.<br /><br /><b>Example:</b>
+       The following series of if statements will assign a rotation for class registration based on a student's initial.<br /><code>
+          if( initial &lt; 'G')
+          {
+             rotation = 1;
+          }
+          else if ( initial &gt; 'M' )
+          {
+             rotation = 3;
+          }
+          else
+          {
+             rotation = 2;
+          }
+       </code></step>
+  <step name="Age Groups- Input/Output" buttonName="Check">
+      Your first task is to group friends by age into 5 categories.
+      <br /><dl>
+    <dt>A) Under 13</dt>
+    <dt>B) 13-17</dt>
+    <dt>C) 18-21</dt>
+    <dt>D) 22-30</dt>
+    <dt>E) 31+</dt>
+  </dl><br />
+      Let's review some examples to make sure we understand how this should work.  Given an input age, what is the expected category?
+      <br /><labtable rows="4" cols="2" border="1">
+    <add>
+      <b>Age (Input)</b>
+    </add>
+    <add>
+      <b>Expected Category (Output)</b>
+    </add>
+    <add> 14 </add>
+    <add> B </add>
+    <add> 50 </add>
+    <add> E	</add>
+    <add> 12 </add>
+    <add> A </add>
+  </labtable><br />
+
+      Now it's your turn.  Enter the category that corresponds with the given age: 
+      <labtable rows="6" cols="2" border="1">
+    <add>
+      <b>Age (Input)</b>
+    </add>
+    <add>
+      <b>Expected Category (Output)</b>
+    </add>
+    <add> 13 </add>
+    <add>
+      <segment width="50" id="group1" height="1" />
+    </add>
+    <add> 17 </add>
+    <add>
+      <segment width="50" id="group2" height="1" />
+    </add>
+    <add> 30 </add>
+    <add>
+      <segment width="50" id="group3" height="1" />
+    </add>
+    <add> 40 </add>
+    <add>
+      <segment width="50" id="group4" height="1" />
+    </add>
+    <add> 9 </add>
+    <add>
+      <segment width="50" id="group5" height="1" />
+    </add>
+  </labtable><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*B\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry, the first row of the first table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>group1</id>
+    </segid>
+  </evaluator><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*B\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry, the 2nd row of the first table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>group2</id>
+    </segid>
+  </evaluator><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*D\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry, the 3rd row of the first table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>group3</id>
+    </segid>
+  </evaluator><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*E\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry, the 4th row of the first table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>group4</id>
+    </segid>
+  </evaluator><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*A\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry, the last row of the first table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>group5</id>
+    </segid>
+  </evaluator><hint /><br />
+
+      Now let's go the other way.  Enter an age that would correspond with the given category. 
+      <labtable rows="6" cols="2" border="1">
+    <add>
+      <b>Age</b>
+    </add>
+    <add>
+      <b>Expected Category</b>
+    </add>
+    <add>
+      <segment width="50" id="age1" height="1" />
+    </add>
+    <add> A </add>
+    <add>
+      <segment width="50" id="age2" height="1" />
+    </add>
+    <add> B </add>
+    <add>
+      <segment width="50" id="age3" height="1" />
+    </add>
+    <add> C </add>
+    <add>
+      <segment width="50" id="age4" height="1" />
+    </add>
+    <add> D </add>
+    <add>
+      <segment width="50" id="age5" height="1" />
+    </add>
+    <add> E </add>
+  </labtable><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*[0-9]|10|11|12\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry the first row of the 2nd table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>age1</id>
+    </segid>
+  </evaluator><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*13|14|15|16|17\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry the 2nd row of the 2nd table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>age2</id>
+    </segid>
+  </evaluator><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*18|19|20|21\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry the 3rd row of the 2nd table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>age3</id>
+    </segid>
+  </evaluator><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*22|23|24|25|26|27|28|29|30\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry the 4th row of the 2nd table is incorrect.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>age4</id>
+    </segid>
+  </evaluator><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>^\s*[3][1-9]|[4-9][0-9]|[1-9][1-9][0-9]\s*$</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry the last row of the 2nd table is incorrect, or you                     have inputted a vastly unrealistic human age.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value>Good Job!</value>
+    </arg>
+    <segid>
+      <id>age5</id>
+    </segid>
+  </evaluator><hint /></step>
+  <step name="Age Groups- Basic" buttonName="Check"><dependency stepName="Age Groups- Input/Output" />
+      How can we put friends of different ages into different groups?
+      <br />
+      You can use an <b>if statement</b> to assign friends of specific ages to a certain group.
+      Assume that the variables age and group have been defined as int and char respectively.
+      <br />
+      For example: under 13
+      <code>
+         if ( age &lt; 13 )
+         {
+            group = 'A';
+         }
+      </code><br />
+      Notice that the expression within the <b>if statement</b> determines which friends belong 
+      in the group and the <b>assignment</b> inside the then block tells in which group these friends belong.
+      <br /><br />
+      Now write the if statement for Group E (ages 31+).  Remember to include age 31 in your expression!
+      <segment width="350" id="groupE" height="150" /><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>\s*if\s*\(\s*age\s*((&gt;=\s*31)|(&gt;\s*30))\s*\)\s*\{\s*group\s*=\s*'E'\s*;\s*\}\s*</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry your if statement is incorrect, please try again.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value>Good Job!</value>
+    </arg>
+    <segid>
+      <id>groupE</id>
+    </segid>
+  </evaluator><hint /></step>
+  <step name="Age Groups- Advanced"><dependency stepName="Age Groups- Basic" />
+      Great job! Now let's try to group some of our other friends. 
+      <br />
+      For example: ages 13-17
+      <code>
+         if ( age &gt;= 13 &amp;&amp; age &lt;= 17)
+         {
+            group = 'B';
+         }
+      </code><br />
+
+      Notice that we have to make a <b>separate comparison</b> for each condition that we want to check. 
+      We also used the <b>&amp;&amp; operator</b> to make multiple comparisons. 
+      <br /><br />
+      Now write the if statements for the other groups.
+      <br />
+      Group C (ages 18-21)
+      <segment width="350" id="groupC" height="150">
+    <evaluator name="Java Evaluator" labid="Facebook: Selection" href="JavaEvaluator/JavaEvaluator.php">
+      <arg>
+        <name>function</name>
+        <value>
+              public char assignGroup(int age) {
+                char group = 'x';
+                @groupC
+                return group;
+              }
+          </value>
+      </arg>
+      <arg>
+        <name>functionCall</name>
+        <value>assignGroup(18)</value>
+      </arg>
+      <arg>
+        <name>expectedOutput</name>
+        <value>'C'</value>
+      </arg>
+      <arg>
+        <name>smessage</name>
+        <value>Good Job!</value>
+      </arg>
+      <arg>
+        <name>fmessage</name>
+        <value>I'm sorry, your if statement for group C is incorrect.</value>
+      </arg>
+      <segid>
+        <id>groupC</id>
+      </segid>
+    </evaluator>
+  </segment><br />
+      Group D (ages 22-30)
+      <segment width="350" id="groupD" height="150">
+    <evaluator name="Java Evaluator" labid="Facebook: Selection" href="JavaEvaluator/JavaEvaluator.php">
+      <arg>
+        <name>function</name>
+        <value>
+              public char assignGroup(int age) {
+                char group = 'x';
+                @groupD
+                return group;
+              }
+          </value>
+      </arg>
+      <arg>
+        <name>functionCall</name>
+        <value>assignGroup(22)</value>
+      </arg>
+      <arg>
+        <name>expectedOutput</name>
+        <value>'D'</value>
+      </arg>
+      <arg>
+        <name>smessage</name>
+        <value>Good Job!</value>
+      </arg>
+      <arg>
+        <name>fmessage</name>
+        <value>I'm sorry, your if statement for group D is incorrect.</value>
+      </arg>
+      <segid>
+        <id>groupD</id>
+      </segid>
+    </evaluator>
+  </segment></step>
+  <step name="Age Groups- Final" buttonName="Check"><dependency stepName="Age Groups- Advanced" />
+      Great!  When we put all these if statements together, we can use <b>else if</b> since the conditions are 
+      mutually exclusive.  You should get something that looks like this:
+      <code>
+         if ( age &lt; 13 )
+         {
+            group = 'A';
+         } else if ( age &gt;= 13 &amp;&amp; age &lt;= 17)
+         {
+            group = 'B';
+         } else if ( age &gt;= 18 &amp;&amp; age &lt;= 21)
+         {
+            group = 'C';
+         } else if ( age &gt;= 22 &amp;&amp; age &lt;= 30)
+         {
+            group = 'D';
+         } else if ( age &gt;= 31 )  //could even leave off this last if and just set group to 'E'
+         {
+            group = 'E';
+         }
+      </code></step>
+  <step name="Alphabetic Groups- Input/Output" buttonName="Check"><dependency stepName="Age Groups- Final" />
+      Next you want to sort friends into groups by the first letter of their name.
+      <br /><dl>
+    <dt>a) A-G</dt>
+    <dt>b) H-M</dt>
+    <dt>c) N-Z</dt>
+  </dl><br />
+      Test and Check!<br />
+      Input proper values for both initial and group in the format: <b>Initial, group</b>. 
+      <br /><labtable rows="5" cols="2" border="1">
+    <add>
+      <b>Input (initial)</b>
+    </add>
+    <add>
+      <b>Expected Ouput (group)</b>
+    </add>
+    <add> A </add>
+    <add> a </add>
+    <add>
+      <segment width="50" id="test1" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="testb1" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="test2" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="testb2" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="test3" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="testb3" height="1" />
+    </add>
+  </labtable><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public int assignGroup(char initial, char group)                                      {                                         if(group == 'a')                                         {                                             if(initial &lt; 'G')                                                return 1;                                         }                                         if (group == 'b')                                         {                                            if(initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')                                               return 1;                                         }                                         if (group == 'c')                                         {                                            if(initial &gt;= 'N' &amp;&amp; initial &lt;= 'Z')                                               return 1;                                         }                                         return 0;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup('@test1', '@testb1')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>1</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your test is incorrect</value>
+    </arg>
+    <segid>
+      <id>test1</id>
+    </segid>
+    <segid>
+      <id>testb1</id>
+    </segid>
+  </evaluator><hint /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public int assignGroup(char initial, char group)                                      {                                         if(group == 'a')                                         {                                             if(initial &lt; 'G')                                                return 1;                                         }                                         if (group == 'b')                                         {                                            if(initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')                                               return 1;                                         }                                         if (group == 'c')                                         {                                            if(initial &gt;= 'N' &amp;&amp; initial &lt;= 'Z')                                               return 1;                                         }                                         return 0;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup('@test2', '@testb2')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>1</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your test is incorrect</value>
+    </arg>
+    <segid>
+      <id>test2</id>
+    </segid>
+    <segid>
+      <id>testb2</id>
+    </segid>
+  </evaluator><hint /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public int assignGroup(char initial, char group)                                      {                                         if(group == 'a')                                         {                                             if(initial &lt; 'G')                                                return 1;                                         }                                         if (group == 'b')                                         {                                            if(initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')                                               return 1;                                         }                                         if (group == 'c')                                         {                                            if(initial &gt;= 'N' &amp;&amp; initial &lt;= 'Z')                                               return 1;                                         }                                         return 0;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup('@test3', '@testb3')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>1</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value>Good Job!</value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your test is incorrect</value>
+    </arg>
+    <segid>
+      <id>test3</id>
+    </segid>
+    <segid>
+      <id>testb3</id>
+    </segid>
+  </evaluator><hint /></step>
+  <step name="Alphabetic Groups" buttonName="Check"><dependency stepName="Alphabetic Groups- Input/Output" />
+      We can use <b>if statements</b> to assign friends with different names to different groups.
+      Assume we have a char variable named initial that contains the first initial of our friend's last name.
+      <br />
+      For example: A-G
+      <code>
+         if ( initial &lt;=  'G')
+         {
+            group = 'a';
+         }
+      </code><br />
+      Again, the expression within the if statement determines which friends belong in the group, 
+      and the assignment inside the then block tells in which group these friends belong.
+      <br />
+      Now you write the if statement for Group b (H-M)
+      Recall!
+      In the previous exercise we used <br /><code>age &gt;= 13 &amp;&amp; age &lt;= 17</code><br /> for friends ages 13 to 17.<br /> 
+      This one is similar!<br /><b>Group b (H-M)</b><segment width="350" id="groupb" height="150" /><evaluator name="Java Evaluator" labid="Facebook: Selection" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public char assignGroup(char initial)                                      {                                        char group = 'x';                                        @groupb;                                        return group;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup('M')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>'b'</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your if statement for group b is incorrect</value>
+    </arg>
+    <segid>
+      <id>groupb</id>
+    </segid>
+  </evaluator><hint /><b>Group c (N-Z)</b><segment width="350" id="groupc" height="150" /><evaluator name="Java Evaluator" labid="Facebook: Selection" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public char assignGroup(char initial)                                      {                                        char group = 'x';                                        @groupc                                        return group;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup('Z')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>'c'</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value>Good Job!</value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your if statement for group c is incorrect</value>
+    </arg>
+    <segid>
+      <id>groupc</id>
+    </segid>
+  </evaluator><hint /></step>
+  <step name="Age and Alphabetic- Input/Output" buttonName="Check"><dependency stepName="Alphabetic Groups" />
+      Great! Now let's sort our friends by age and by name.
+      <br />
+      We will use the same age groupings.
+      <dl>
+    <dt>A) Under 13</dt>
+    <dt>B) 13-17</dt>
+    <dt>C) 18-21</dt>
+    <dt>D) 22-30</dt>
+    <dt>E) 31+</dt>
+    <dd>and within each group you will have alphabetic groups</dd>
+    <dd>a) A-G</dd>
+    <dd>b) H-M</dd>
+    <dd>c) N-Z</dd>
+  </dl><br />
+      Our group names will now be a string that is the combination of the age and alphabetic group characters.<br /><br />
+      Test and Check!  
+      Example:
+      <br /><labtable rows="4" cols="3" border="1">
+    <add>
+      <b>Age (Input)</b>
+    </add>
+    <add>
+      <b>Initial (Input)</b>
+    </add>
+    <add>
+      <b>Group (Expected Output)</b>
+    </add>
+    <add> 14 </add>
+    <add> A </add>
+    <add> Ba </add>
+    <add> 50 </add>
+    <add> M </add>
+    <add> Eb </add>
+    <add> 12 </add>
+    <add> S </add>
+    <add> Ac </add>
+  </labtable><br />
+      Enter the correct group that corresponds with the age and initial inputted. 
+      <labtable rows="6" cols="3" border="1">
+    <add>
+      <b>Age (Input)</b>
+    </add>
+    <add>
+      <b>Initial (Input)</b>
+    </add>
+    <add>
+      <b>Group (Expected Output)</b>
+    </add>
+    <add>
+            12
+         </add>
+    <add>
+            R
+         </add>
+    <add>
+      <segment width="50" id="groupAc" height="1" />
+    </add>
+    <add>
+            17
+         </add>
+    <add>
+            S
+         </add>
+    <add>
+      <segment width="50" id="groupBc" height="1" />
+    </add>
+    <add>      
+            30
+         </add>
+    <add>
+            C
+         </add>
+    <add>
+      <segment width="50" id="groupDa" height="1" />
+    </add>
+    <add>
+            40
+          </add>
+    <add>
+             L
+          </add>
+    <add>
+      <segment width="50" id="groupEb" height="1" />
+    </add>
+    <add>
+            21
+          </add>
+    <add>
+             M
+          </add>
+    <add>
+      <segment width="50" id="groupCb" height="1" />
+    </add>
+  </labtable><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>\s*Ac\s*</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry your first line of input is incorrect, please try again.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>groupAc</id>
+    </segid>
+  </evaluator><hint /><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>\s*Bc\s*</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry your 2nd line of input is incorrect, please try again.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>groupBc</id>
+    </segid>
+  </evaluator><hint /><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>\s*Da\s*</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry your 3rd line of input is incorrect, please try again.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>groupDa</id>
+    </segid>
+  </evaluator><hint /><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>\s*Eb\s*</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry your 4th line of input is incorrect, please try again.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value></value>
+    </arg>
+    <segid>
+      <id>groupEb</id>
+    </segid>
+  </evaluator><hint /><evaluator name="regex" labid="Facebook: Selection" href="evaluator://RegExEvaluator">
+    <arg>
+      <name>regex</name>
+      <value>\s*Cb\s*</value>
+    </arg>
+    <arg>
+      <name>failed-message</name>
+      <value>I'm sorry your last line of input is incorrect, please try again.</value>
+    </arg>
+    <arg>
+      <name>success-message</name>
+      <value>Good Job!</value>
+    </arg>
+    <segid>
+      <id>groupCb</id>
+    </segid>
+  </evaluator><hint /><br />
+      Enter an age and initial that would correspond with the group output given. <br /><labtable rows="6" cols="3" border="1">
+    <add>
+      <b>Age (Input)</b>
+    </add>
+    <add>
+      <b>Initial (Input)</b>
+    </add>
+    <add>
+      <b>Group (Expected Output)</b>
+    </add>
+    <add>
+      <segment width="50" id="input1" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="inputb1" height="1" />
+    </add>
+    <add>
+            Ac
+         </add>
+    <add>
+      <segment width="50" id="input2" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="inputb2" height="1" />
+    </add>
+    <add>
+            Ba
+         </add>
+    <add>
+      <segment width="50" id="input3" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="inputb3" height="1" />
+    </add>
+    <add>
+            Ca
+          </add>
+    <add>
+      <segment width="50" id="input4" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="inputb4" height="1" />
+    </add>
+    <add>
+            Db
+          </add>
+    <add>
+      <segment width="50" id="input5" height="1" />
+    </add>
+    <add>
+      <segment width="50" id="inputb5" height="1" />
+    </add>
+    <add>
+            Ec
+          </add>
+  </labtable><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public boolean assignGroup(int age, char initial)                                      {                                        if(age &lt; 13)                                        {                                           if(initial &gt;= 'N')                                              return true;                                        }                                        return false;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(@input1, '@inputb1')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>true</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your first row of table 2 is incorrect</value>
+    </arg>
+    <segid>
+      <id>input1</id>
+    </segid>
+    <segid>
+      <id>inputb1</id>
+    </segid>
+  </evaluator><hint /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public boolean assignGroup(int age, char initial)                                      {                                        if(age &gt;= 13 &amp;&amp; age &lt;= 17)                                        {                                           if(initial &lt;= 'G')                                              return true;                                        }                                        return false;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(@input2, '@inputb2')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>true</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your 2nd row of table 2 is incorrect</value>
+    </arg>
+    <segid>
+      <id>input2</id>
+    </segid>
+    <segid>
+      <id>inputb2</id>
+    </segid>
+  </evaluator><hint /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public boolean assignGroup(int age, char initial)                                      {                                        if(age &gt;= 18 &amp;&amp; age &lt;= 21)                                        {                                           if(initial &lt;= 'G')                                              return true;                                        }                                        return false;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(@input3, '@inputb3')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>true</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your 3rd row of table 2 is incorrect</value>
+    </arg>
+    <segid>
+      <id>input3</id>
+    </segid>
+    <segid>
+      <id>inputb3</id>
+    </segid>
+  </evaluator><hint /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public boolean assignGroup(int age, char initial)                                      {                                        if(age &gt;= 22 &amp;&amp; &lt;= 30)                                        {                                           if(inital &gt;= 'H' &amp;&amp; initial &lt;= 'M')                                              return true;                                        }                                        return false;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(@input4, '@inputb4')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>true</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your 4th row of table 2 is incorrect</value>
+    </arg>
+    <segid>
+      <id>input4</id>
+    </segid>
+    <segid>
+      <id>inputb4</id>
+    </segid>
+  </evaluator><hint /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public boolean assignGroup(int age, char initial)                                      {                                        if(age &gt;= 31)                                        {                                           if(initial &gt;= 'N')                                              return true;                                        }                                        return false;                                      }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(@input5, '@inputb5')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>true</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value>Good Job!</value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your last row of table 2 is incorrect</value>
+    </arg>
+    <segid>
+      <id>input5</id>
+    </segid>
+    <segid>
+      <id>inputb5</id>
+    </segid>
+  </evaluator><hint /></step>
+  <step name="Age and Alphabetic" buttonName="Check"><dependency stepName="Age and Alphabetic- Input/Output" />
+      How can we categorize friends by two different factors?
+      <br /><br />
+      You can use nested if statements to examine friends with multiple characteristics. 
+      Since our group variable now contains two characters, we will assume it has been declared as a String, 
+      and we will use double quotes.
+      <br />
+      For example: under 13
+      <code>
+         if ( age &lt; 13 )
+         {
+            if( initial &lt;= 'G')
+            {
+               group = "Aa";
+            } else if( initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')
+            {
+               group = "Ab";
+            } else if( initial &gt;= 'N')
+            {
+               group = "Ac";
+            }
+         }
+      </code><br />
+      You know the drill.  Now it is your turn to write the if statements for all of your friends using both age and initial.
+      <br /><b>Group B (ages 13-17)</b><segment width="350" id="groupB2" height="300" /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public String assignGroup(int age, char initial)                                      {                                        String group = "blah";                                        @groupB2                                        return group;                                       }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(13, 'B')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>"Ba"</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your if statement for group b is incorrect</value>
+    </arg>
+    <segid>
+      <id>groupB2</id>
+    </segid>
+  </evaluator><hint /><b>Group C (ages 18-21)</b><segment width="350" id="groupC2" height="300" /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public String assignGroup(int age, char initial)                                      {                                        String group = "blah";                                        @groupC2                                        return group;                                       }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(19, 'Z')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>"Cc"</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your if statement for group c is incorrect</value>
+    </arg>
+    <segid>
+      <id>groupC2</id>
+    </segid>
+  </evaluator><hint /><b>Group D (ages 22-30)</b><segment width="350" id="groupD2" height="300" /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public String assignGroup(int age, char initial)                                      {                                        String group = "blah";                                        @groupD2                                        return group;                                       }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(30, 'M')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>"Db"</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value></value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your if statement for group d is incorrect</value>
+    </arg>
+    <segid>
+      <id>groupD2</id>
+    </segid>
+  </evaluator><hint /><b>Group E (ages 31+)</b><segment width="350" id="groupE2" height="300" /><evaluator name="Java Evaluator" labid="Facebook: If Statements" href="JavaEvaluator/JavaEvaluator.php">
+    <arg>
+      <name>function</name>
+      <value>public String assignGroup(int age, char initial)                                      {                                        String group = "blah";                                        @groupE2                                        return group;                                       }</value>
+    </arg>
+    <arg>
+      <name>functionCall</name>
+      <value>assignGroup(31, 'Z')</value>
+    </arg>
+    <arg>
+      <name>expectedOutput</name>
+      <value>"Ec"</value>
+    </arg>
+    <arg>
+      <name>smessage</name>
+      <value>Good Job!</value>
+    </arg>
+    <arg>
+      <name>fmessage</name>
+      <value>I'm sorry, your if statement for group e is incorrect</value>
+    </arg>
+    <segid>
+      <id>groupE2</id>
+    </segid>
+  </evaluator><hint /></step>
+  <step name="Age/Alpha Groups- Final"><dependency stepName="Age and Alphabetic" />
+      Great!  When we put all these if statements together, you should get something that looks like this:
+      <code>
+         if ( age &lt; 13 )
+         {
+            if( initial &lt;= 'G')
+            {
+               group = "Aa";
+            } else if( initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')
+            {
+               group = "Ab";
+            } else if( initial &gt;= 'N')
+            {
+               group = "Ac";
+            }
+         } else if ( age &gt;= 13 &amp;&amp; age &lt;= 17)
+         {
+            if( initial &lt;= 'G')
+            {
+               group = "Ba";
+            } else if( initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')
+            {
+               group = "Bb";
+            } else if( initial &gt;= 'N')
+            {
+               group = "Bc";
+            }
+         } else if ( age &gt;= 18 &amp;&amp; age &lt;= 21)
+         {
+            if( initial &lt;= 'G')
+            {
+               group = "Ca";
+            } else if( initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')
+            {
+               group = "Cb";
+            } else if( initial &gt;= 'N')
+            {
+               group = "Cc";
+            }
+         } else if ( age &gt;= 22 &amp;&amp; age &lt;= 30)
+         {
+            if( initial &lt;= 'G')
+            {
+               group = "Da";
+            } else if( initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')
+            {
+               group = "Db";
+            } else if( initial &gt;= 'N')
+            {
+               group = "Dc";
+            }
+         } else if ( age &gt;= 31 )  
+         {
+            if( initial &lt;= 'G')
+            {
+               group = "Ea";
+            } else if( initial &gt;= 'H' &amp;&amp; initial &lt;= 'M')
+            {
+               group = "Eb";
+            } else if( initial &gt;= 'N')
+            {
+               group = "Ec";
+            }
+         }
+      </code></step>
+</lab>
