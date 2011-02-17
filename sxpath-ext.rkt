@@ -4,6 +4,8 @@
 (require "ssax/ssax.rkt")
 (require "sxml-tools.rkt")
 
+(require (only racket/port call-with-input-string))
+
 ;; W3C compliant extensions to SXPathlib
 ; $Id: sxpath-ext.scm,v 1.911 2002/12/06 22:10:53 kl Exp kl $:
 ;

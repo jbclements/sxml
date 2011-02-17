@@ -1,4 +1,4 @@
-#lang mzscheme
+#lang racket
 
 ; Module header is generated automatically
 (require (lib "defmacro.ss"))
@@ -447,7 +447,7 @@
 ; Former name sxml:content!
 (cond-expand
  (plt
-  #f  ; set-cdr removed from plt
+  (void)  ; set-cdr removed from plt
   )
  (else
   (define (sxml:change-content! obj new-content)
@@ -486,7 +486,7 @@
 ; Former name sxml:attrlist!
 (cond-expand
  (plt
-  #f  ; set-cdr removed from plt
+  (void)  ; set-cdr removed from plt
   )
  (else
   (define (sxml:change-attrlist! obj new-attrlist)
@@ -506,7 +506,7 @@
 ; Former name was 'sxml:name!'
 (cond-expand
  (plt
-  #f  ; set-car removed from plt
+  (void)  ; set-car removed from plt
   )
  (else
   (define (sxml:change-name! obj new-name)
@@ -536,7 +536,7 @@
 ; Linear update counterpart to sxml:add-attr
 (cond-expand
  (plt
-  #f  ; set-cdr removed from plt
+  (void)  ; set-cdr removed from plt
   )
  (else
   (define (sxml:add-attr! obj attr)
@@ -581,7 +581,7 @@
 ; Returns #f if where is no such attribute
 (cond-expand
  (plt
-  #f  ; set-cdr removed from plt
+  (void)  ; set-cdr removed from plt
   )
  (else
   (define (sxml:change-attr! obj attr)
@@ -623,7 +623,7 @@
 ; If there is no such attribute the new one is added
 (cond-expand
  (plt
-  #f  ; set-cdr removed from plt
+  (void)  ; set-cdr removed from plt
   )
  (else
   (define (sxml:set-attr! obj attr)
@@ -648,7 +648,7 @@
 ; Add an auxiliary node <aux-node> for an element <obj>
 (cond-expand
  (plt
-  #f  ; set-cdr removed from plt
+  (void)  ; set-cdr removed from plt
   )
  (else
   (define (sxml:add-aux! obj aux-node)
@@ -665,7 +665,7 @@
 ; Returns: minimized and normalized SXML element
 (cond-expand
  (plt
-  #f  ; set-cdr removed from plt
+  (void)  ; set-cdr removed from plt
   )
  (else
   (define (sxml:squeeze! obj)
@@ -793,7 +793,7 @@
 
 (cond-expand
  (plt
-  #f  ; set-cdr removed from plt
+  (void)  ; set-cdr removed from plt
   )
  (else
   (define (sxml:add-parents obj . top-ptr)
@@ -919,4 +919,4 @@
     (else (sxml:error "sxml->html - unexpected type of node: " tree))))
 
 
-(provide (all-defined))
+(provide (all-defined-out))

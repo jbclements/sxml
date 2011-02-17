@@ -1,5 +1,12 @@
 #lang scribble/doc
 
+@(require scribble/manual)
+
+@section{Raw Lists of Exported Identifiers}
+
+These lists appear without documentation.  Searching this page is probably better
+than trawling through the source, and perhaps you'll consider extracting or 
+contributing documentation for them.
 
 
 @(section "SSAX-code.rkt")
@@ -55,17 +62,15 @@
    ssax:make-elem-parser)]
   
 @(section "common.rkt")
-@racketblock[(#%provide close-output-string filter and-let*)]
+@racketblock[(#%provide close-output-string and-let*)]
   @(section "myenv.rkt")
   @racketblock[(#%provide
-   with-input-from-string
    cerr
    assert
    cond-expand
    inc
    dec
    ++!
-   include
    push!
    assq-def
    nl
@@ -82,7 +87,6 @@
    env.find
    env.demand
    cons*
-   call-with-input-string
    let-values*
    ++
    --!)]

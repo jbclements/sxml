@@ -8,6 +8,8 @@
 (require "look-for-str.ss")
 (require "char-encoding.ss")
 
+(require (only racket/port call-with-input-string))
+
 
 (define (make-xml-token kind head) (cons kind head))
 (define xml-token? pair?)

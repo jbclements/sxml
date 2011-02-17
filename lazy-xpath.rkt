@@ -9,6 +9,8 @@
 (require "xpath-ast.rkt")
 (require "xpath-context_xlink.rkt")
 
+(require (only racket filter call-with-input-string))
+
 ;; This module implements lazy SXPath evaluation over lazy SXML documents
 ;
 ; This software is in Public Domain.

@@ -5,6 +5,8 @@
 (require "sxml-tools.ss")
 (require "xpath-context_xlink.ss")
 
+(require (only racket filter))
+
 ;; The implementation of SXPath axes with support for distinct document order
 ;
 ; This software is in Public Domain.

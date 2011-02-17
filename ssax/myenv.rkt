@@ -339,27 +339,6 @@
 	    cmd-or-defs*)
 	   (else (loop (cdr clauses))))))))
 
-;; [ssax-plt] Begin misc. other definitions needed by other modules.
-
-(define (call-with-input-string str proc)
-  (proc (open-input-string str)))
-
-; I guess there's only one way to write this... :)
-;(define (string-index str chr)
-;  (let ((len (string-length str)))
-;    (let search ((i 0))
-;      (cond ((= i len)                       #f)
-;            ((char=? chr (string-ref str i)) i)
-;            (else                            (search (+ i 1)))))))
- 
-(define (with-input-from-string str thunk)
-  (parameterize ((current-input-port (open-input-string str)))
-    (thunk)))
-
-;; [ssax-plt] End misc. other definitions needed by other modules.
-
-;; [ssax-plt] Finish module.
-;(provide (all-defined) pp))
 
 
 ;==============================================================================
@@ -373,9 +352,5 @@
   (if (null? rest)
       (cons a1 a2)
       (cons a1 (apply cons* (cons a2 rest)))))
-
-;; Gambit's include and declare are disabled
-(define-macro include (lambda (file) #f))
-(define-macro declare (lambda x #f))
 
 (provide (all-defined))

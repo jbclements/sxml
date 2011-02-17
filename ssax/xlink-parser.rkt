@@ -7,6 +7,8 @@
 (require "access-remote.ss")
 (require "sxpathlib.ss")
 
+(require (only scheme filter))
+
 ;; Parser for XML documents that contain XLink elements
 ;
 ; This software is in Public Domain.

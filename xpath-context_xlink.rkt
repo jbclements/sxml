@@ -8,6 +8,8 @@
 (require "xpath-ast.rkt")
 (require "ssax/ssax.rkt")
 
+(require (only racket filter))
+
 ;; Context-based XPath implementation
 ;
 ; This software is in Public Domain.

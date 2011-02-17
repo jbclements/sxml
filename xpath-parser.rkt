@@ -4,6 +4,8 @@
 (require "ssax/ssax.rkt")
 (require "sxml-tools.rkt")
 
+(require (only racket filter))
+
 ;; XPath/XPointer grammar parser.
 ;
 ; This software is in Public Domain.

@@ -7,6 +7,6 @@
 (define primary-file "main.rkt")
 (define homepage "http://modis.ispras.ru/Lizorkin/sxml-tutorial.html")
 (define categories '(xml))
-(define compile-omit-paths '("tests"))
+(define compile-omit-paths '("tests/" "ssax/tests/"))
 (define repositories '("4.x"))
 (define release-notes (list "rackety, moved to github, sucked in ssax"))

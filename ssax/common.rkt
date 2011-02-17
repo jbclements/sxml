@@ -15,14 +15,6 @@
 
 (define close-output-string get-output-string)
 
-; 
-(define (filter pred lis)			
-  (let rpt ((l lis))		
-    (if (null? l) 
-      '()
-       (if (pred (car l))
-	 (cons (car l) (rpt (cdr l)))
-	 (rpt (cdr l))))))
 
 (define-syntax and-let*                                                            
   (syntax-rules ()                   

@@ -5,6 +5,8 @@
 (require "input-parse.ss")
 (require (lib "string.ss" "srfi/13"))
 
+(require (only racket/port call-with-input-string))
+
 ;	Handling of MIME Entities and their parts
 ;
 ; According to RFC 2045, "Multipurpose Internet Mail Extensions (MIME)

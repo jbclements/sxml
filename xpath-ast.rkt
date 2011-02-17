@@ -3,6 +3,8 @@
 (require "ssax/ssax.rkt")
 (require "xpath-parser.rkt")
 
+(require (only racket filter))
+
 ;; XPath/XPointer -> Abstract Syntax Tree parser
 ;
 ; This software is in Public Domain.

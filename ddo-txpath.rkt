@@ -10,6 +10,8 @@
 (require "xpath-context_xlink.rkt")
 (require "ddo-axes.rkt")
 
+(require (only racket filter))
+
 ;; XPath implementation with distinct document order support
 ;
 ; This software is in Public Domain.

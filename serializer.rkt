@@ -2,6 +2,8 @@
 
 (require "ssax/ssax.rkt")
 
+(require (only racket filter))
+
 ;; SXML serializer into XML and HTML
 ;
 ; Partial conformance with

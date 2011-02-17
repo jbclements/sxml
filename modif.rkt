@@ -7,6 +7,8 @@
 (require "xpath-ast.rkt")
 (require "ddo-txpath.rkt")
 
+(require (only racket filter))
+
 ;; A tool for making functional-style modifications to SXML documents
 ;
 ; This software is in Public Domain.

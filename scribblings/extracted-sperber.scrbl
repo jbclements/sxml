@@ -1,7 +1,19 @@
+#lang scribble/doc
+
+@require[scribble/manual]
+
+@section{Automatically Extracted Comments}
+
+The following "documentation" was generated automatically, using 
+a script that I believe is due to Mike Sperber. This documentation
+has not been read or formatted for scribble, 
+and should be considered only as raw material
+for use in creating actual documentation.
+
 @section{ssax.ss}
 
 
-@defproc[(make-xml-token KIND HEAD) ???]{
+@defproc[(make-xml-token [KIND KIND] [HEAD HEAD]) ???]{
 This creates an XML token.
 }
 
@@ -62,7 +74,7 @@ The current pos in the port is inside an internal DTD subset
 Skip until the "]>" combination that terminates this DTD
 }
 
-@defproc[(ssax:read-cdata-body [PORT port?] [STR-HANDLER procedure?] SEED) ???]{
+@defproc[(ssax:read-cdata-body [PORT port?] [STR-HANDLER procedure?] [SEED SEED]) ???]{
 
 This procedure must be called after we have read a string "<![CDATA["
 that begins a CDATA section. The current position must be the first
@@ -89,7 +101,7 @@ Note, &lt; and &amp; are not specially recognized (and are not expanded)!
 
 }
 
-@defproc[(ssax:read-char-ref PORT) ???]{
+@defproc[(ssax:read-char-ref [PORT port?]) ???]{
 
 [66]  CharRef ::=  '&#' [0-9]+ ';' 
                  | '&#x' [0-9a-fA-F]+ ';'
@@ -113,7 +125,7 @@ encoding of the input stream.
 
 }
 
-@defproc[(ssax:handle-parsed-entity [PORT port?] NAME ENTITIES ) ???]{
+@defproc[(ssax:handle-parsed-entity [PORT port?] [NAME ???] [ENTITIES ???] ) ???]{
 	CONTENT-HANDLER [STR-HANDLER procedure?] SEED
 
 Expand and handle a parsed-entity reference
@@ -139,17 +151,17 @@ order of NAMES.
 
 }
 
-@defproc[(attlist-add ATTLIST NAME-VALUE-PAIR) ???]{
+@defproc[(attlist-add [ATTLIST ???] [NAME-VALUE-PAIR ???]) ???]{
 Add a name-value pair to the existing attlist preserving the order
 Return the new list, in the sorted ascending order.
 Return #f if a pair with the same name already exists in the attlist
 
 }
 
-@defproc[(attlist-null? ATTLIST) ???]{
+@defproc[(attlist-null? [ATTLIST ???]) ???]{
 }
 
-@defproc[(attlist-remove-top ATTLIST) ???]{
+@defproc[(attlist-remove-top [ATTLIST ???]) ???]{
 Given an non-null attlist, return a pair of values: the top and the rest
 }
 
@@ -159,7 +171,7 @@ Given an non-null attlist, return a pair of values: the top and the rest
 @defproc[(attlist-fold) ???]{
 }
 
-@defproc[(ssax:read-attributes [PORT port?] ENTITIES) ???]{
+@defproc[(ssax:read-attributes [PORT port?] [ENTITIES ???]) ???]{
 
 This procedure reads and parses a production Attribute*
 [41] Attribute ::= Name Eq AttValue
@@ -193,11 +205,11 @@ WFC: XML-Spec.html#uniqattspec
 
 }
 
-@defproc[(ssax:uri-string->symbol URI-STR) ???]{
+@defproc[(ssax:uri-string->symbol [URI-STR string?]) ???]{
 Convert a URI-STR to an appropriate symbol
 }
 
-@defproc[(ssax:complete-start-tag TAG [PORT port?] ELEMS ENTITIES NAMESPACES) ???]{
+@defproc[(ssax:complete-start-tag [TAG symbol?] [PORT port?] [ELEMS ???] [ENTITIES ???] [NAMESPACES ???]) ???]{
 
 This procedure is to complete parsing of a start-tag markup. The
 procedure must be called after the start tag token has been
@@ -235,20 +247,22 @@ Procedure:  ssax:complete-start-tag tag-head port elems entities namespaces
 @defproc[(ssax:read-external-id [PORT port?]) ???]{
 
 This procedure parses an ExternalID production:
-[75] ExternalID ::= 'SYSTEM' S SystemLiteral
+@verbatim{[75] ExternalID ::= 'SYSTEM' S SystemLiteral
 	| 'PUBLIC' S PubidLiteral S SystemLiteral
 [11] SystemLiteral ::= ('"' [^"]* '"') | ("'" [^']* "'") 
 [12] PubidLiteral ::=  '"' PubidChar* '"' | "'" (PubidChar - "'")* "'"
 [13] PubidChar ::=  #x20 | #xD | #xA | [a-zA-Z0-9]
-                        | [-'()+,./:=?;!*#@$_%]
-
+                        | [-'()+,./:=?;!*#@"@"$_%]
+}
 This procedure is supposed to be called when an ExternalID is expected;
 that is, the current character must be either #\S or #\P that start
 correspondingly a SYSTEM or PUBLIC token. This procedure returns the
 SystemLiteral as a string. A PubidLiteral is disregarded if present.
 }
 
-@defproc[(ssax:read-char-data PORT EXPECT-EOF? [STR-HANDLER procedure?] SEED) ???]{
+@defproc[(ssax:read-char-data [PORT port?] 
+                              [EXPECT-EOF? boolean?] 
+                              [STR-HANDLER procedure?] [SEED ???]) ???]{
 
 This procedure is to read the character content of an XML document
 or an XML element.
@@ -293,7 +307,7 @@ the canonical XML Recommendation.
 
 }
 
-@defproc[(ssax:assert-token TOKEN KIND GI) ???]{
+@defproc[(ssax:assert-token [TOKEN ???] [KIND ???] [GI ???]) ???]{
 Make sure that TOKEN is of anticipated KIND and has anticipated GI
 Note GI argument may actually be a pair of two symbols, Namespace
 URI or the prefix, and of the localname.
@@ -301,7 +315,7 @@ If the assertion fails, error-cont is evaluated by passing it
 three arguments: token kind gi. The result of error-cont is returned.
 }
 
-@defproc[(ssax:make-pi-parser my-pi-handlers) ???]{
+@defproc[(ssax:make-pi-parser [my-pi-handlers ???]) ???]{
 Create a parser to parse and process one Processing Element (PI).
 
 my-pi-handlers
@@ -322,6 +336,7 @@ PORT PI-TAG SEED
 that will parse the current PI according to the user-specified handlers.
 
 The previous version of ssax:make-pi-parser was a low-level macro:
+@racketblock[
 (define-macro ssax:make-pi-parser
   (lambda (my-pi-handlers)
   `(lambda (port target seed)
@@ -341,10 +356,11 @@ The previous version of ssax:make-pi-parser was a low-level macro:
 	   (cons
 	    `((,(caar pi-handlers)) (,(cdar pi-handlers) port target seed))
 	    (loop (cdr pi-handlers) default)))))))))
-
+]
 }
 
-@defproc[(ssax:make-elem-parser my-new-level-seed my-finish-element) ???]{
+@defproc[(ssax:make-elem-parser [my-new-level-seed ???]
+                                [my-finish-element ???]) ???]{
 			my-char-data-handler my-pi-handlers
 
 Create a parser to parse and process one element, including its
@@ -395,7 +411,8 @@ WFC: XML-Spec.html#GIMatch
 
 }
 
-@defproc[(ssax:make-parser user-handler-tag user-handler-proc ...) ???]{
+@defproc[(ssax:make-parser [user-handler-tag ???]
+                           [user-handler-proc ???] ...) ???]{
 
 Create an XML parser, an instance of the XML parsing framework.
 This will be a SAX, a DOM, or a specialized parser depending
@@ -456,7 +473,7 @@ handler-procedure: see ssax:make-pi-parser
 The default value is '()
 }
 
-@defproc[(ssax:reverse-collect-str LIST-OF-FRAGS -> LIST-OF-FRAGS) ???]{
+@defproc[(ssax:reverse-collect-str [LIST-OF-FRAGS ???]) ???]{
 given the list of fragments (some of which are text strings)
 reverse the list and concatenate adjacent text strings.
 We can prove from the general case below that if LIST-OF-FRAGS
@@ -464,24 +481,13 @@ has zero or one element, the result of the procedure is equal?
 to its argument. This fact justifies the shortcut evaluation below.
 }
 
-@defproc[(ssax:xml->sxml [PORT port?] NAMESPACE-PREFIX-ASSIG) ???]{
-
-This is an instance of a SSAX parser above that returns an SXML
-representation of the XML document to be read from PORT.
-NAMESPACE-PREFIX-ASSIG is a list of (USER-PREFIX . URI-STRING)
-that assigns USER-PREFIXes to certain namespaces identified by
-particular URI-STRINGs. It may be an empty list.
-The procedure returns an SXML tree. The port points out to the
-first character after the root element.
-
-}
 
 
 
 @section{input-parse.ss}
 
 
-@defproc[(parser-error [PORT port?] MESSAGE SPECIALISING-MSG*) ???]{
+@defproc[(parser-error [PORT port?] [MESSAGE ???] [SPECIALISING-MSG* ???]) ???]{
 Many procedures of this package call parser-error to report a parsing
 error.  The first argument is a port, which typically points to the
 offending character or its neighborhood. Most of the Scheme systems
@@ -496,7 +502,7 @@ the problem.
 @section{sxml-tree-trans.ss}
 
 
-@defproc[(SRV:send-reply FRAGMENT ...) ???]{
+@defproc[(SRV:send-reply [FRAGMENT ???] ...) ???]{
 
 Output the 'fragments'
 The fragments are a list of strings, characters,
@@ -511,7 +517,7 @@ but causes the result of SRV:send-reply to be #t
 
 }
 
-@defproc[(pre-post-order TREE BINDINGS) ???]{
+@defproc[(pre-post-order [TREE ???] [BINDINGS ???]) ???]{
 
           Traversal of an SXML tree or a grove:
 		a <Node> or a <Nodelist>
@@ -525,7 +531,7 @@ Nodelists, and Nodes other than text strings are both lists. A
 <Nodelist> however is either an empty list, or a list whose head is
 not a symbol (an atom in general). A symbol at the head of a node is
 either an XML name (in which case it's a tag of an XML element), or
-an administrative name such as '@'.
+an administrative name such as '@"@"'.
 See SXPath.scm and SSAX.scm for more information on SXML.
 
 
@@ -566,7 +572,7 @@ is re-processed again, with the current stylesheet.
 
 }
 
-@defproc[(post-order TREE BINDINGS) ???]{
+@defproc[(post-order [TREE ???] [BINDINGS ???]) ???]{
 post-order is a strict subset of pre-post-order without *preorder*
 (let alone *macro*) traversals. 
 Now pre-post-order is actually faster than the old post-order.
@@ -574,7 +580,8 @@ The function post-order is deprecated and is aliased below for
 backward compatibility.
 }
 
-@defproc[(replace-range:: BEG-PRED x END-PRED x FOREST -> FOREST) ???]{
+@defproc[(replace-range:: [BEG-PRED ???] [END-PRED ???] 
+                          [FOREST ???] ) ???]{
 Traverse a forest depth-first and cut/replace ranges of nodes.
 
 The nodes that define a range don't have to have the same immediate
@@ -612,7 +619,7 @@ is marked as the beginning of the range.
 @section{sxml-to-html.ss}
 
 
-@defproc[(SXML->HTML TREE) ???]{
+@defproc[(SXML->HTML [TREE ???]) ???]{
 
 The following procedure is the most generic transformation of SXML
 into the corresponding HTML document. The SXML tree is traversed
@@ -620,20 +627,20 @@ post-oder (depth-first) and transformed into another tree, which,
 written in a depth-first fashion, results in an HTML document.
 }
 
-@defproc[(entag TAG ELEMS) ???]{
+@defproc[(entag [TAG symbol?] [ELEMS (listof sxml?)]) ???]{
 Create the HTML markup for tags.
 This is used in the node handlers for the post-order function, see
 above.
 
 }
 
-@defproc[(enattr ATTR-KEY VALUE) ???]{
+@defproc[(enattr [ATTR-KEY ???] [VALUE ???]) ???]{
 Create the HTML markup for attributes.
 This and entag are being used in the node handlers for the post-order function, see
 above.
 }
 
-@defproc[(string->goodHTML STRING) ???]{
+@defproc[(string->goodHTML [STRING string?]) ???]{
 Given a string, check to make sure it does not contain characters
 such as '<' or '&' that require encoding. Return either the original
 string, or a list of string fragments with special characters
@@ -646,7 +653,7 @@ replaced by appropriate character entities.
 @section{sxml-to-html-ext.ss}
 
 
-@defproc[(make-header HEAD-PARMS) ???]{
+@defproc[(make-header [HEAD-PARMS (listof (list/c symbol? any/c))]) ???]{
 Create the 'head' SXML/HTML tag. HEAD-PARMS is an assoc list of
 (h-key h-value), where h-value is a typically string;
 h-key is a symbol:
@@ -661,13 +668,13 @@ start, contents, prev, next, top, home
 
 }
 
-@defproc[(make-navbar: HEAD-PARMS) ???]{
+@defproc[(make-navbar: [HEAD-PARMS ???]) ???]{
 Create a navigational bar. The argument head-parms is the same
 as the one passed to make-header. We're only concerned with the
 h-value Links
 }
 
-@defproc[(make-footer HEAD-PARMS) ???]{
+@defproc[(make-footer [HEAD-PARMS ???]) ???]{
 Create a footer. The argument head-parms is the same
 as passed to make-header.
 }
@@ -690,9 +697,6 @@ useful when the tree of fragments has to be traversed one more time.
 The following rules define the identity transformation
 }
 
-
-
-@section{serializer.rkt}
 
 
 
