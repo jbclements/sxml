@@ -114,7 +114,94 @@ readability by a human.
  Serializes the @racket[sxml-obj] into HTML, without indentation.
 
 }
-                                    
+      
+@section{Search (SXPATH)}
+
+@defproc[(sxpath [path abbr-sxpath?] [ns-binding ns-binding? '()]) procedure?]{
+ Given a path, produces a procedure that accepts an sxml document and returns 
+ a list of matches. Note that the @racket[*TOP*] node of the document is required.
+                            
+@verbatim{
+AbbrPath is a list. It is translated to the full SXPath according
+to the following rewriting rules
+(sxpath '()) -> (node-join)
+(sxpath '(path-component ...)) ->
+	(node-join (sxpath1 path-component) (sxpath '(...)))
+(sxpath1 '//) -> (sxml:descendant-or-self sxml:node?)
+(sxpath1 '(equal? x)) -> (select-kids (node-equal? x))
+(sxpath1 '(eq? x))    -> (select-kids (node-eq? x))
+(sxpath1 '(*or* ...))  -> (select-kids (ntype-names??
+                                         (cdr '(*or* ...))))
+(sxpath1 '(*not* ...)) -> (select-kids (sxml:complement 
+                                        (ntype-names??
+                                         (cdr '(*not* ...)))))
+(sxpath1 '(ns-id:* x)) -> (select-kids 
+                                     (ntype-namespace-id?? x))
+(sxpath1 ?symbol)     -> (select-kids (ntype?? ?symbol))
+(sxpath1 ?string)     -> (txpath ?string)
+(sxpath1 procedure)   -> procedure
+(sxpath1 '(?symbol ...)) -> (sxpath1 '((?symbol) ...))
+(sxpath1 '(path reducer ...)) ->
+	(node-reduce (sxpath path) (sxpathr reducer) ...)
+(sxpathr number)      -> (node-pos number)
+(sxpathr path-filter) -> (filter (sxpath path-filter))
+}
+
+Examples:
+
+All cells of an html table:
+
+@racketblock[
+(define table
+  `(*TOP*
+    (table 
+     (tr (td "a") (td "b"))
+     (tr (td "c") (td "d")))))
+
+((sxpath '(table tr td)) table)]
+
+... produces:
+
+@racketblock['((td "a") (td "b") (td "c") (td "d"))]
+
+All cells anywhere in a document:
+
+@racketblock[
+(define table
+  `(*TOP*
+    (div
+     (p (table 
+         (tr (td "a") (td "b"))
+         (tr (td "c") (td "d"))))
+     (table
+      (tr (td "e"))))))
+
+((sxpath '(// td)) table)]
+
+... produces:
+
+@racketblock['((td "a") (td "b") (td "c") (td "d") (td "e"))]
+
+One result may be nested in another one:
+
+@racketblock[
+(define doc
+  `(*TOP*
+    (div
+     (p (div "3")
+        (div (div "4"))))))
+
+((sxpath '(// div)) table)
+]
+
+... produces:
+
+@racketblock[
+'((div (p (div "3") (div (div "4")))) (div "3") (div (div "4")) (div "4"))]
+
+
+
+}
                                     
 @section{Transformation (SXSLT)}
 
