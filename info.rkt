@@ -9,6 +9,6 @@
 (define categories '(xml))
 (define compile-omit-paths '("tests/" "ssax/tests/"))
 (define repositories '("4.x"))
-(define release-notes (list "rackety, moved to github, sucked in ssax"))
+(define release-notes (list "first release to PLaneT"))
 
 (define scribblings '(("scribblings/sxml.scrbl")))

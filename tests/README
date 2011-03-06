@@ -1,1 +1,2 @@
-No tests here yet... regression test for if.xml?
+This directory will contain tests.  Right now, there's a bunch of goo pasted from the main trunk, and a short file (tests.rkt)
+containing working tests. Test coverage is somewhere between wretched and inadequate.
