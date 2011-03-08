@@ -1,7 +1,7 @@
 #lang scheme
 
 (require "../main.rkt"
-         (except-in rackunit foldts))
+         rackunit)
 
 
 ;; this set of tests is wildly inadequate.
@@ -73,6 +73,7 @@ t
 
 (check-equal? (srl:sxml->xml `(*TOP* (p))) "<p />")
 
-
+;; this error message should be better...
+(check-exn? (lambda (x) #t) (lambda () (srl:sxml->xml '(foo (@ (bar (13)))))))
 
 

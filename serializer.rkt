@@ -208,8 +208,8 @@
     ((boolean? obj)
      (if obj "true" "false"))
     (else  ; unexpected type
-     ; ATTENTION: should probably raise an error here
-     obj)))
+     ;; made this an error, per comment in earlier version of code
+     (error 'srl:atomic->string "expected atomic object, got: ~s" obj))))
 
 ; Whether an SXML element is empty
 (define (srl:empty-elem? elem)
