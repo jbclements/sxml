@@ -17,7 +17,7 @@
  
  @itemize[#:style 'ordered
  @item{It contains some documentation (here it is!),}
- @item{it contains some tests,}
+ @item{it contains some tests that run in Racket,}
  @item{it has only one require point (ssax & sxml are both included), and}
  @item{it doesn't depend on schemeunit:3, so it compiles quickly.}]
  
