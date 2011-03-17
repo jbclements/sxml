@@ -1,12 +1,13 @@
 #lang scribble/doc
 
-@(require scribble/manual)
+@(require scribble/manual
+          planet/scribble)
 
 @title{@bold{SXML}: The S-Expression representation of XML terms}
 
 @;{@author[(author+email "John Clements" "clements@racket-lang.org")]}
 
-@(require (planet cce/scheme:7:2/require-provide))
+@;@(require (planet cce/scheme:7:2/require-provide))
 
 @(require (for-label racket
                      (this-package-in main)))
@@ -31,6 +32,37 @@
  be fairly easy to find.  Patches gratefully accepted.
  
  --John Clements, 2011-02-17}
+
+@section{SXML}
+
+SXML is a representation of XML elements using s-expressions. Specifically, an XML
+element containing some content is represented as an s-expression whose first
+element is a symbol containing the tag name, and whose remaining elements are
+the SXML representation of the original content.
+
+To be more specific, the XML element
+
+@commandline{<abc>def<ghi />jkl</abc>}
+
+corresponds to the SXML value
+
+@racketblock['(abc "def" (ghi) "jkl")]
+
+XML attributes are represented using an optional second element of the s-expression
+whose "tag" is "@"@"".
+
+So, the xml element
+
+@commandline{<customer specialness="gazonga">Barry White</customer>}
+
+corresponds to the XML element
+
+@racketblock['(customer (|@| (specialness "gazonga")) "Barry White")]
+
+That's the easy part.  Things get more icky when you start talking about documents 
+and namespaces.
+
+
 
 @section{SAX Parsing (input)}
 
@@ -191,7 +223,7 @@ One result may be nested in another one:
      (p (div "3")
         (div (div "4"))))))
 
-((sxpath '(// div)) table)
+((sxpath '(// div)) doc)
 ]
 
 ... produces:
@@ -200,7 +232,95 @@ One result may be nested in another one:
 '((div (p (div "3") (div (div "4")))) (div "3") (div (div "4")) (div "4"))]
 
 
+There's also a string-based syntax, @racket[txpath]. As shown in the grammar above,
+@racket[sxpath] assumes that any strings in the path are expressed using the 
+@racket[txpath] syntax.  
 
+So, for instance, the prior example could be rewritten using a string:
+
+@racketblock[
+(define doc
+  `(*TOP*
+    (div
+     (p (div "3")
+        (div (div "4"))))))
+
+((sxpath "//div") doc)
+]
+
+... produces:
+
+@racketblock[
+'((div (p (div "3") (div (div "4")))) (div "3") (div (div "4")) (div "4"))]
+
+More generally, lists in the s-expression syntax correspond to string concatenation
+in the txpath syntax.
+
+So, to find all italics that appear at top level within a paragraph:
+
+@racketblock[(define doc
+  `(*TOP*
+    (div
+     (p (i "3")
+        (froogy (i "4"))))))
+                            
+((sxpath "//p/i") doc)
+]
+
+... produces: 
+
+@racketblock['((i "3"))]
+
+
+
+Handling of namespaces in @racket[sxpath] is a bit surprising.  In particular,
+it appears to me that sxpath's model is that namespaces must appear fully expanded
+in the matched source.
+
+For instance, this call:
+
+@racketblock[((sxpath "//ns:p" `((ns . "http://example.com")))
+  '(*TOP* (html (|http://example.com:body| 
+                 (|http://example.com:p| "first para") 
+                 (|http://example.com:p| 
+                  "second para containing" 
+                  (|http://example.com:p| "third para") "inside it")))))]
+
+... produces:
+
+@racketblock[
+ '((|http://example.com:p| "first para") 
+                (|http://example.com:p| "second para containing" 
+                                        (|http://example.com:p| "third para") "inside it")
+                (|http://example.com:p| "third para"))]
+
+But the corresponding example where the source document contains a namespace shortcut does 
+not match in the same way.  That is, 
+
+@racketblock[((sxpath "//ns:p" `((ns . "http://example.com")))
+  '(*TOP* (|@| (*NAMESPACES* (ns "http://example.com")))
+          (html (ns:body (ns:p "first para") 
+                         (ns:p "second para containing" 
+                               (ns:p "third para") "inside it")))))]
+
+...produces the empty list. Instead, you must pretend that the shortcut is actually the namespace, so
+that
+
+@racketblock[((sxpath "//ns:p" `((ns . "ns")))
+  '(*TOP* (|@| (*NAMESPACES* (ns "http://example.com")))
+          (html (ns:body (ns:p "first para") 
+                         (ns:p "second para containing" 
+                               (ns:p "third para") "inside it")))))]
+
+... produces:
+
+@racketblock[
+ '((ns:p "first para") 
+   (ns:p "second para containing" 
+         (ns:p "third para") "inside it")
+   (ns:p "third para"))]
+
+Ah well.
 }
                                     
 @section{Transformation (SXSLT)}
