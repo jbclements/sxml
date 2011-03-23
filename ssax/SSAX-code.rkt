@@ -31,10 +31,42 @@
 (define (ssax:skip-pi port) (if (not (find-string-from-port? "?>" port)) (parser-error port "Failed to find ?> terminating the PI")))
 (define (ssax:read-pi-body-as-string port) (ssax:skip-S port) (string-concatenate/shared (let loop () (let ((pi-fragment (next-token (quote ()) (quote (#\?)) "reading PI content" port))) (if (eqv? #\> (peek-next-char port)) (begin (read-char port) (cons pi-fragment (quote ()))) (cons* pi-fragment "?" (loop)))))))
 (define (ssax:skip-internal-dtd port) (if (not (find-string-from-port? "]>" port)) (parser-error port "Failed to find ]> terminating the internal DTD subset")))
-(define ssax:read-cdata-body (let ((cdata-delimiters (list char-return #\newline #\] #\&))) (lambda (port str-handler seed) (let loop ((seed seed)) (let ((fragment (next-token (quote ()) cdata-delimiters "reading CDATA" port))) (case (read-char port) ((#\newline) (loop (str-handler fragment nl seed))) ((#\]) (if (not (eqv? (peek-char port) #\])) (loop (str-handler fragment "]" seed)) (let check-after-second-braket ((seed (if (string-null? fragment) seed (str-handler fragment "" seed)))) (case (peek-next-char port) ((#\>) (read-char port) seed) ((#\]) (check-after-second-braket (str-handler "]" "" seed))) (else (loop (str-handler "]]" "" seed))))))) ((#\&) (let ((ent-ref (next-token-of (lambda (c) (and (not (eof-object? c)) (char-alphabetic? c) c)) port))) (cond ((and (string=? "gt" ent-ref) (eqv? (peek-char port) #\;)) (read-char port) (loop (str-handler fragment ">" seed))) (else (loop (str-handler ent-ref "" (str-handler fragment "&" seed))))))) (else (if (eqv? (peek-char port) #\newline) (read-char port)) (loop (str-handler fragment nl seed)))))))))
+
+(define ssax:read-cdata-body
+  (let ((cdata-delimiters (list char-return #\newline #\] #\&)))
+    (lambda (port str-handler seed) 
+      (let loop ((seed seed))
+        (let ((fragment (next-token (quote ()) cdata-delimiters "reading CDATA" port))) 
+          (case (read-char port) 
+            ((#\newline) (loop (str-handler fragment nl seed)))
+            ((#\]) (if (not (eqv? (peek-char port) #\]))
+                       (loop (str-handler fragment "]" seed))
+                       (let check-after-second-braket ((seed (if (string-null? fragment) seed (str-handler fragment "" seed)))) (case (peek-next-char port) ((#\>) (read-char port) seed) ((#\]) (check-after-second-braket (str-handler "]" "" seed))) (else (loop (str-handler "]]" "" seed)))))))
+            ((#\&) (let ((ent-ref (next-token-of 
+                                   (lambda (c) 
+                                     (and (not (eof-object? c)) (char-alphabetic? c) c))
+                                   port)))
+                     (cond ((and (string=? "gt" ent-ref)
+                                 (eqv? (peek-char port) #\;)) 
+                            (read-char port)
+                            (loop (str-handler fragment ">" seed)))
+                           (else (loop (str-handler ent-ref "" (str-handler fragment "&" seed)))))))
+            (else (if (eqv? (peek-char port) #\newline) (read-char port)) (loop (str-handler fragment nl seed)))))))))
+
+
 (define (ssax:read-char-ref port) (let* ((base (cond ((eqv? (peek-char port) #\x) (read-char port) 16) (else 10))) (name (next-token (quote ()) (quote (#\;)) "XML [66]" port)) (char-code (string->number name base))) (read-char port) (if (integer? char-code) (ucscode->char char-code) (parser-error port "[wf-Legalchar] broken for '" name "'"))))
 (define ssax:predefined-parsed-entities (quasiquote (((unquote (string->symbol "amp")) . "&") ((unquote (string->symbol "lt")) . "<") ((unquote (string->symbol "gt")) . ">") ((unquote (string->symbol "apos")) . "'") ((unquote (string->symbol "quot")) . "\""))))
-(define (ssax:handle-parsed-entity port name entities content-handler str-handler seed) (cond ((assq name entities) => (lambda (decl-entity) (let ((ent-body (cdr decl-entity)) (new-entities (cons (cons name #f) entities))) (cond ((string? ent-body) (call-with-input-string ent-body (lambda (port) (content-handler port new-entities seed)))) ((procedure? ent-body) (let ((port (ent-body))) (begin0 (content-handler port new-entities seed) (close-input-port port)))) (else (parser-error port "[norecursion] broken for " name)))))) ((assq name ssax:predefined-parsed-entities) => (lambda (decl-entity) (str-handler (cdr decl-entity) "" seed))) (else (parser-error port "[wf-entdeclared] broken for " name))))
+
+(define (ssax:handle-parsed-entity port name entities content-handler str-handler seed)
+  (cond ((assq name entities) 
+         => 
+         (lambda (decl-entity)
+           (let ((ent-body (cdr decl-entity)) (new-entities (cons (cons name #f) entities))) (cond ((string? ent-body) (call-with-input-string ent-body (lambda (port) (content-handler port new-entities seed)))) ((procedure? ent-body) (let ((port (ent-body))) (begin0 (content-handler port new-entities seed) (close-input-port port)))) (else (parser-error port "[norecursion] broken for " name))))))
+        ((assq name ssax:predefined-parsed-entities) 
+         =>
+         (lambda (decl-entity) (str-handler (cdr decl-entity) "" seed)))
+        (else (parser-error port "[wf-entdeclared] broken for " name))))
+
 (define (make-empty-attlist) (quote ()))
 (define (attlist-add attlist name-value) (if (null? attlist) (cons name-value attlist) (case (name-compare (car name-value) (caar attlist)) ((=) #f) ((<) (cons name-value attlist)) (else (cons (car attlist) (attlist-add (cdr attlist) name-value))))))
 (define attlist-null? null?)
