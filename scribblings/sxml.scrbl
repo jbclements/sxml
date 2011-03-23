@@ -7,8 +7,6 @@
 
 @;{@author[(author+email "John Clements" "clements@racket-lang.org")]}
 
-@;@(require (planet cce/scheme:7:2/require-provide))
-
 @(require (for-label racket
                      (this-package-in main)))
 
@@ -19,6 +17,7 @@
  @itemize[#:style 'ordered
  @item{It contains some documentation (here it is!),}
  @item{it contains some tests that run in Racket,}
+ @item{it raises racket exceptions rather than printing to stderr and raising "-1",}
  @item{it has only one require point (ssax & sxml are both included), and}
  @item{it doesn't depend on schemeunit:3, so it compiles quickly.}]
  
