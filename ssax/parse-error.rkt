@@ -1,4 +1,4 @@
-#lang mzscheme
+#lang racket
 
 (require "myenv.ss")
 
@@ -18,19 +18,23 @@
 ; location of the error in input file.
 ; Other parameters are considered as error messages,
 ;  they are printed to stderr as is.
+
+;; NB : updated to signal a racket error rather than printing to stdout.
 (define parser-error
-  (lambda  args
+  (lambda args
     (if
       (port? (car args))
-      (cerr nl "Error at position " 
-	    (file-position (car args)) nl
-	    (cdr args))
-      (cerr nl "Error in error handler: its first parameter is not a port" 
-	    nl args))
-    (cerr nl)
-    ; (exit -1)  ; this exit makes me completely insane!
-    (raise -1)
-))
+      (error 'parser-error (format "Error at position ~s: ~a" 
+                                          (file-position (car args))
+                                          (args->display-string (cdr args))))
+      (error 'parser-error (format 
+                            "Error in error handler: its first parameter is not a port: "
+                            (args->display-string args))))))
+
+;; map args to their display representations, glue them together:
+(define (args->display-string args)
+  (apply string-append (map (lambda (x) (format "~a" x)) args)))
+
 
 (define SSAX:warn
   (lambda  args
@@ -45,4 +49,4 @@
 ; Alias
 (define ssax:warn SSAX:warn)
 
-(provide (all-defined))
+(provide (all-defined-out))
