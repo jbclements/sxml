@@ -9,6 +9,7 @@
 (define categories '(xml))
 (define compile-omit-paths '("tests/" "ssax/tests/"))
 (define repositories '("4.x"))
-(define release-notes (list "first release to PLaneT"))
+(define release-notes (list "doc updates, changed error behavior"))
+(define version "201103230729")
 
 (define scribblings '(("scribblings/sxml.scrbl")))
