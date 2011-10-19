@@ -1,13 +1,9 @@
 #lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
 (require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
 (require "xpath-context_xlink.rkt")
 (require "xpath-ast.rkt")
 (require "ddo-txpath.rkt")
-
-(require (only racket filter))
+(require (only racket/base filter))
 
 ;; A tool for making functional-style modifications to SXML documents
 ;

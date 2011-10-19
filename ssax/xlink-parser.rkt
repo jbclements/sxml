@@ -1,13 +1,9 @@
 #lang mzscheme
-
-(require "common.ss")
 (require "myenv.ss")
 (require "util.ss")
-(require (lib "string.ss" "srfi/13"))
 (require "access-remote.ss")
 (require "sxpathlib.ss")
-
-(require (only scheme filter))
+(require (only racket/base filter))
 
 ;; Parser for XML documents that contain XLink elements
 ;

@@ -1,5 +1,4 @@
 #lang mzscheme
-
 (require (lib "string.ss" "srfi/13"))
 (require "sxml-tools.rkt")
 (require "sxpath-ext.rkt")
@@ -7,8 +6,7 @@
 (require "txpath.rkt")
 (require "xpath-ast.rkt")
 (require "ssax/ssax.rkt")
-
-(require (only racket filter))
+(require (only racket/base filter))
 
 ;; Context-based XPath implementation
 ;

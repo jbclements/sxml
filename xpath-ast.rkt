@@ -1,9 +1,7 @@
 #lang mzscheme
-
 (require "ssax/ssax.rkt")
 (require "xpath-parser.rkt")
-
-(require (only racket filter))
+(require (only racket/base filter))
 
 ;; XPath/XPointer -> Abstract Syntax Tree parser
 ;

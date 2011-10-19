@@ -1,6 +1,4 @@
 #lang mzscheme
-
-(require "common.ss")
 (require "myenv.ss")
 (require "access-remote.ss")
 (require "sxpathlib.ss")

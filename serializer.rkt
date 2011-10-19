@@ -1,8 +1,6 @@
 #lang mzscheme
-
 (require "ssax/ssax.rkt")
-
-(require (only racket filter))
+(require (only racket/base filter))
 
 ;; SXML serializer into XML and HTML
 ;

@@ -1,7 +1,4 @@
 #lang mzscheme
-
-(require (lib "defmacro.ss"))
-(require "common.ss")
 (require "myenv.ss")
 (require "parse-error.ss")
 

@@ -1,7 +1,5 @@
 #lang mzscheme
-
 (require (rename (lib "pretty.ss") pp pretty-print))
-(require "common.ss")
 (require "myenv.ss")
 (require (lib "string.ss" "srfi/13"))
 (require "util.ss")

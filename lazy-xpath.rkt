@@ -1,15 +1,13 @@
 #lang mzscheme
-
 (require (lib "string.ss" "srfi/13"))
 (require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
 (require "sxpath-ext.rkt")
 (require "xpath-parser.rkt")
 (require "txpath.rkt")
 (require "xpath-ast.rkt")
 (require "xpath-context_xlink.rkt")
-
-(require (only racket filter call-with-input-string))
+(require (only racket/base filter)
+         (only racket/port call-with-input-string))
 
 ;; This module implements lazy SXPath evaluation over lazy SXML documents
 ;

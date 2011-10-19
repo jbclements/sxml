@@ -1,11 +1,7 @@
 #lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
 (require "ssax/ssax.rkt")
-(require "sxml-tools.ss")
 (require "xpath-context_xlink.ss")
-
-(require (only racket filter))
+(require (only racket/base filter))
 
 ;; The implementation of SXPath axes with support for distinct document order
 ;

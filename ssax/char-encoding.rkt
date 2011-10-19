@@ -1,6 +1,4 @@
 #lang mzscheme
-
-(require "common.ss")
 (require "myenv.ss")
 
 ;		Character-encoding module

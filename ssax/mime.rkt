@@ -1,6 +1,4 @@
 #lang mzscheme
-
-(require "common.ss")
 (require "myenv.ss")
 (require "input-parse.ss")
 (require (lib "string.ss" "srfi/13"))

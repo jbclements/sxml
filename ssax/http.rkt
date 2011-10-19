@@ -1,7 +1,5 @@
 #lang mzscheme
-
 (require (lib "defmacro.ss"))
-(require "common.ss")
 (require "myenv.ss")
 (require "mime.ss")
 (require "srfi-12.ss")

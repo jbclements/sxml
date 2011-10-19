@@ -1,10 +1,6 @@
 #lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
 (require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
-
-(require (only racket filter))
+(require (only racket/base filter))
 
 ;; XPath/XPointer grammar parser.
 ;

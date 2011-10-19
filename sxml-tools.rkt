@@ -1,9 +1,9 @@
-#lang racket
+#lang racket/base
+(require (for-syntax racket/base))
 
 ; Module header is generated automatically
 (require (lib "defmacro.ss"))
-(require (lib "string.ss" "srfi/13"))
-  
+
 (require "ssax/ssax.rkt")
 
 ;

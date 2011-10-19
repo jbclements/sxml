@@ -1,8 +1,6 @@
 #lang mzscheme
-
 (require "myenv.ss")
 (require (lib "string.ss" "srfi/13"))
-(require "input-parse.ss")
 (require "parse-error.ss")
 (require "SSAX-code.ss")
 (require "ssax-prim.ss")

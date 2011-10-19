@@ -1,6 +1,4 @@
 #lang mzscheme
-
-(require "common.ss")
 (require "myenv.ss")
 
 ; -- Function: find-string-from-port? STR IN-PORT MAX-NO-CHARS

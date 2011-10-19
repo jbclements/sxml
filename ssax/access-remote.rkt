@@ -1,6 +1,4 @@
 #lang mzscheme
-
-(require "common.ss")
 (require "myenv.ss")
 (require "http.ss")
 (require "srfi-12.ss")

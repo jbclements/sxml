@@ -1,13 +1,6 @@
 #lang mzscheme
-
 (require (lib "string.ss" "srfi/13"))
 (require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
-(require "sxpath-ext.rkt")
-(require "xpath-parser.rkt")
-(require "txpath.rkt")
-(require "xpath-ast.rkt")
-(require "xpath-context_xlink.rkt")
 (require "lazy-xpath.rkt")
 
 ;; A specialized lazy XML->SXML parser

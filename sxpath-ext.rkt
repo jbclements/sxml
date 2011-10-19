@@ -1,9 +1,6 @@
 #lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
 (require "ssax/ssax.rkt")
 (require "sxml-tools.rkt")
-
 (require (only racket/port call-with-input-string))
 
 ;; W3C compliant extensions to SXPathlib

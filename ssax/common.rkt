@@ -1,10 +1,5 @@
 #lang mzscheme
 
-(require 
-  (lib "defmacro.ss")
-  (lib "string.ss")
-  (rename (lib "pretty.ss") pp pretty-print))
-  
  ;(define (call-with-input-string str fun)
  ;   (fun (open-input-string str)))
  ;

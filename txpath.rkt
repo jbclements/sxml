@@ -1,5 +1,4 @@
 #lang mzscheme
-
 (require (lib "string.ss" "srfi/13"))
 (require "ssax/ssax.rkt")
 (require "sxml-tools.rkt")
