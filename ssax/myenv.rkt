@@ -20,6 +20,11 @@
 
 (define myenv:error error)
 
+
+#|
+;; ryanc: This assert macro is broken. It sometimes calls cerr on procedures
+;; expecting to print them out, but (cerr proc) applies proc to stderr port!
+
 ; assert the truth of an expression (or of a sequence of expressions)
 ;
 ; syntax: assert ?expr ?expr ... [report: ?r-exp ?r-exp ...]
@@ -95,8 +100,16 @@
 		    (error "assertion failure"))))
        (else (loop (cons (car reported) exprs) (cdr reported)))))))
 )
-    
+|#
+
+(define-syntax-rule (assert e ...)
+  (unless (and e ...)
+    (error "assertion failure: " '(assert e ...))))
+
+#|
+;; ryanc: this macro is unused
 (define-macro (assure exp error-msg) `(assert ,exp report: ,error-msg))
+|#
 
 ;; [ssax-plt] Different definition of `identify-error'.
 
