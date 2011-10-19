@@ -14,4 +14,6 @@
          the-eval)
 
 (define the-eval (make-base-eval))
-(the-eval `(require (planet ,(this-package-version-symbol main))))
+(the-eval `(begin (require (planet ,(this-package-version-symbol main))
+                           racket/pretty)
+                  (current-print pretty-print-handler)))
