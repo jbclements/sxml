@@ -1,6 +1,7 @@
 #lang scribble/doc
 @(require scribble/manual
           planet/scribble
+          "util.rkt"
           (for-label racket/base
                      (this-package-in main)))
 
@@ -42,3 +43,5 @@
 
 @include-section["extracted-sperber.scrbl"]
 @include-section["all-exported.scrbl"]
+
+@(close-eval the-eval)
