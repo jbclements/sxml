@@ -1,4 +1,4 @@
-#lang racket
+#lang racket/base
 
 (require "sxml-tools.rkt")
 (require "sxpath-ext.rkt")

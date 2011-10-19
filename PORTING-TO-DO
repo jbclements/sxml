@@ -8,3 +8,5 @@
 - remove the "bug reports to lisovsky/lizorkin" messages
 - bundle as a planet package
 - change to set-mcar! to get mutation back?
+
+- (ryanc) add (or find?) sxml-top?, sxml-element?, etc predicates
