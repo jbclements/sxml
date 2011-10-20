@@ -2,11 +2,10 @@
 - add a test suite-- what's in the CVS repo?
 
 - use Racket exceptions instead of srfi 12
-- get rid of all of the cross-platform macros?
-- #lang mzscheme -> #lang racket
 - decide what to do with all the version strings
 - remove the "bug reports to lisovsky/lizorkin" messages
 - bundle as a planet package
 - change to set-mcar! to get mutation back?
 
 - (ryanc) add (or find?) sxml-top?, sxml-element?, etc predicates
+- (ryanc) parameters and/or kw args for continuable errors / warnings
