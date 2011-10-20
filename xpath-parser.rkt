@@ -1,6 +1,6 @@
-#lang mzscheme
+#lang racket/base
 (require "ssax/ssax.rkt")
-(require (only racket/base filter))
+(provide (all-defined-out))
 
 ;; XPath/XPointer grammar parser.
 ;
@@ -1562,5 +1562,3 @@
       (xpointer ,txp:parse-xpointer)
       (expr ,txp:parse-xpath-expression))
     ))
-
-(provide (all-defined))

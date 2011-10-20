@@ -1,9 +1,10 @@
-#lang mzscheme
-(require "myenv.ss")
-(require "input-parse.ss")
-(require (lib "string.ss" "srfi/13"))
-
-(require (only racket/port call-with-input-string))
+#lang racket/base
+(require (only-in racket/port call-with-input-string)
+         "myenv.ss"
+         "input-parse.ss"
+         srfi/13/string)
+(provide MIME:parse-content-type
+         MIME:read-headers)
 
 ;	Handling of MIME Entities and their parts
 ;
@@ -118,8 +119,8 @@
 	(let ((c (peek-char http-port)))
 	  (cond
 	   ((eqv? c #\return)		; An empty line, the end of headers
-	    (if (eqv? #\newline (peek-next-char http-port))
-		(read-char http-port))	; skip the following \n if any
+	    (when (eqv? #\newline (peek-next-char http-port))
+              (read-char http-port))	; skip the following \n if any
 	    resp-headers)
 	   ((eqv? c #\newline)	  ; #\return should have been appeared before
 	    (read-char http-port) ; but not all servers are compliant
@@ -160,6 +161,3 @@
       (lambda (http-port)
 	(read-new-header http-port '()))
       ))
-
-
-(provide (all-defined))

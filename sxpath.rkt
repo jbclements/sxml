@@ -1,8 +1,9 @@
-#lang mzscheme
-(require "sxml-tools.rkt")
-(require "ssax/ssax.rkt")
-(require "sxpath-ext.rkt")
-(require "txpath.rkt")
+#lang racket/base
+(require "sxml-tools.rkt"
+         "ssax/ssax.rkt"
+         "sxpath-ext.rkt"
+         "txpath.rkt")
+(provide (all-defined-out))
 
 ;; $Id: sxpath.scm,v 1.5 2005/09/07 09:27:34 lizorkin Exp $
 ;; Highghest level SXPath 
@@ -217,6 +218,3 @@
 				(cddr lpr)))) node))   
 	  ))
       lpaths)))
-
-
-(provide (all-defined))

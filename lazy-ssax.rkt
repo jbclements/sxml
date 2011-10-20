@@ -1,7 +1,9 @@
-#lang mzscheme
-(require (lib "string.ss" "srfi/13"))
-(require "ssax/ssax.rkt")
-(require "lazy-xpath.rkt")
+#lang racket/base
+(require racket/promise
+         srfi/13/string
+         "ssax/ssax.rkt"
+         "lazy-xpath.rkt")
+(provide (all-defined-out))
 
 ;; A specialized lazy XML->SXML parser
 ; Is heavily based on continuations
@@ -205,5 +207,3 @@
              '()
              1  ; level for the document element
              )))))))
-
-(provide (all-defined))

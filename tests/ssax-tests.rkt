@@ -1,15 +1,15 @@
-#lang mzscheme
-(require (all-except "../ssax/myenv.ss" assert))
-(require (lib "string.ss" "srfi/13"))
-(require "../ssax/parse-error.ss")
-(require "../ssax/input-parse.ss")
-(require "../ssax/look-for-str.ss")
-(require "../ssax/char-encoding.ss")
-(require "../ssax/SSAX-code.rkt")
-(require (only racket/port call-with-input-string)
-         (rename racket/pretty pp pretty-write)
-         (rename racket/list list-intersperse add-between))
-(provide (all-defined))
+#lang racket/base
+(require (only-in racket/port call-with-input-string)
+         (only-in racket/pretty [pretty-write pp])
+         (only-in racket/list [add-between list-intersperse])
+         srfi/13/string
+         (except-in "../ssax/myenv.ss" assert)
+         "../ssax/parse-error.rkt"
+         "../ssax/input-parse.rkt"
+         "../ssax/look-for-str.rkt"
+         "../ssax/char-encoding.rkt"
+         "../ssax/SSAX-code.rkt")
+(provide (all-defined-out))
 
 #|
 Current status: a few test blocks fail. I've only looked at the first one,

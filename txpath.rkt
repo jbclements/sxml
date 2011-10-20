@@ -1,9 +1,10 @@
-#lang mzscheme
-(require (lib "string.ss" "srfi/13"))
-(require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
-(require "sxpath-ext.rkt")
-(require "xpath-parser.rkt")
+#lang racket/base
+(require srfi/13/string
+          "ssax/ssax.rkt"
+          "sxml-tools.rkt"
+          "sxpath-ext.rkt"
+          "xpath-parser.rkt")
+(provide (all-defined-out))
 
 ;; Classic TXPath implementation based on sxpathlib, sxpath-ext and txp-parser
 ;
@@ -1109,5 +1110,3 @@
   (sxml:api-index-helper (cadr (assq 'xpath sxml:classic-res))))
 (define sxml:xpointer+index
   (sxml:api-index-helper (cadr (assq 'xpointer sxml:classic-res))))
-
-(provide (all-defined))

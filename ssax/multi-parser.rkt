@@ -1,11 +1,14 @@
-#lang mzscheme
-(require "myenv.ss")
-(require (lib "string.ss" "srfi/13"))
-(require "parse-error.ss")
-(require "SSAX-code.ss")
-(require "ssax-prim.ss")
-(require "id.ss")
-(require "xlink-parser.ss")
+#lang racket/base
+(require "myenv.ss"
+         srfi/13/string
+         "parse-error.ss"
+         "SSAX-code.ss"
+         "ssax-prim.ss"
+         "id.ss"
+         "xlink-parser.ss")
+(provide parent:new-level-seed-handler
+         parent:construct-element
+         ssax:multi-parser)
 
 ;; SSAX multi parser
 ;; Provides ID-index creation, SXML parent pointers and XLink grammar parsing
@@ -49,29 +52,13 @@
 ;  parent:seed - contains a delayed pointer to element's parent
 ;  attrs - element's attributes
 ;  children - a list of child elements
-(cond-expand
- (plt  ; set-cdr removed from plt
-  (define (parent:construct-element parent:parent-seed parent:seed
-                                    attrs children)  
-    (let ((head ((car parent:seed))))
-      (append head
-              (list (cons '@ attrs))
-              children)))
-  )
- (else
-  (define (parent:construct-element parent:parent-seed parent:seed
-                                    attrs children)
-    ; car gets the only element of parent seed - a pointer to a parent
-    (let((parent-ptr (car parent:parent-seed))
-         (head ((car parent:seed))))
-      (set-cdr!
-       head
-       (cons* (cons '@ attrs)
-              `(@@ (*PARENT* ,parent-ptr))
-              children))
-      head))
-  ))
-   
+(define (parent:construct-element parent:parent-seed parent:seed
+                                  attrs children)  
+  (let ((head ((car parent:seed))))
+    (append head
+            (list (cons '@ attrs))
+            children)))
+
 ;=========================================================================
 ; A seed
 ;  seed = (list  original-seed  parent:seed  id:seed  xlink:seed)
@@ -465,5 +452,3 @@
           port
           initial-seed))))))
 ))))
-
-(provide (all-defined))

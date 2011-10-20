@@ -1,6 +1,8 @@
-#lang mzscheme
-(require "myenv.ss")
-(require (lib "string.ss" "srfi/13"))
+#lang racket/base
+(require racket/list
+         srfi/13/string
+         "myenv.ss")
+(provide (all-defined-out))
 
 ;****************************************************************************
 ;			My Scheme misc utility functions
@@ -27,39 +29,16 @@
 ;       the return value from the procedure is #f
 ;       COLLECTION can be a list, a vector, a string, or an input port.
 ; See vmyenv.scm for validation tests.
-(cond-expand
- (bigloo  ; Bigloo provides a native support for `any?',
-          ; however, not such a general one
-  #t)
- (else
-
-(define (any? <pred?> coll)
-  (cond
-    ((list? coll)
-      (let loop ((curr-l coll))
-        (if (null? curr-l) #f
-          (or (<pred?> (car curr-l)) (loop (cdr curr-l))))))
-          
-    ((vector? coll)
-      (let ((len (vector-length coll)))
-       (let loop ((i 0))
-        (if (>= i len) #f
-          (or (<pred?> (vector-ref coll i)) (loop (inc i)))))))
-
-    ((string? coll)
-      (let ((len (string-length coll)))
-       (let loop ((i 0))
-        (if (>= i len) #f
-          (or (<pred?> (string-ref coll i)) (loop (inc i)))))))
-
-    ((input-port? coll)
-      (let loop ((c (read-char coll)))
-        (if (eof-object? c) #f
-          (or (<pred?> c) (loop (read-char coll))))))
-
-    (else (myenv:error "any? on an invalid collection"))))
-
- ))
+(define (any? pred? coll)
+  (cond [(list? coll)
+         (ormap pred? coll)]
+        [(vector? coll)
+         (for/or ([x (in-vector coll)]) (pred? x))]
+        [(string? coll)
+         (for/or ([x (in-string coll)]) (pred? x))]
+        [(input-port? coll)
+         (for/or ([x (in-port read-char coll)]) (pred? x))]
+        [else (error 'any? "invalid collection")]))
 
 
 ;------------------------------------------------------------------------
@@ -70,36 +49,14 @@
 ; list (cells, that is)
       
 (define (list-intersperse src-l elem)
-  (if (null? src-l) src-l
-    (let loop ((l (cdr src-l)) (dest (cons (car src-l) '())))
-      (if (null? l) (reverse dest)
-        (loop (cdr l) (cons (car l) (cons elem dest)))))))
+  (add-between src-l elem))
 
 
-; -- procedure+: list-intersperse! SRC-L ELEM
-; inserts ELEM between elements of the SRC-L inplace
-(cond-expand
- (plt
-  #f  ; set-cdr removed from plt
-  )
- (else
-  
-  (define (list-intersperse! src-l elem)
-    (if (null? src-l) src-l
-        (let loop ((l src-l))
-          (let ((next-l (cdr l)))
-            (if (null? next-l) src-l
-                (begin
-                  (set-cdr! l (cons elem next-l))
-                  (loop next-l)))))))
-  
-  ))
-
-	; List-tail-difference: given two lists, list1 and list2 where
-	; list2 is presumably a tail of list1, return 
-	; a (freshly allocated) list which is a difference between list1 
-	; and list2. If list2 is *not* a tail of list1, the entire list1
-	; is returned.
+; List-tail-difference: given two lists, list1 and list2 where
+; list2 is presumably a tail of list1, return 
+; a (freshly allocated) list which is a difference between list1 
+; and list2. If list2 is *not* a tail of list1, the entire list1
+; is returned.
 (define (list-tail-diff list1 list2)
   (let loop ((l1-curr list1) (difference '()))
     (cond
@@ -143,11 +100,6 @@
 ; representation of an _inexact_ integer (100 to be precise).
 ; Oftentimes we want to be more restrictive about what we consider a
 ; number; we want merely to read an integral label.
-(cond-expand
- (bigloo  ; string->integer is provided in Bigloo natively
-  #t)
- (else
-
 (define (string->integer str start end)
   (and (< -1 start end (inc (string-length str)))
     (let loop ((pos start) (accum 0))
@@ -158,10 +110,7 @@
               (- (char->integer #\0)) (* 10 accum))))
         (else #f)))))
 
- ))
 
-
-; 
 ; -- procedure+: string-split STRING
 ; -- procedure+: string-split STRING '()
 ; -- procedure+: string-split STRING '() MAXSPLIT
@@ -312,6 +261,3 @@
 		       (cons quoted-char (loop (inc to) new-to)))
 		      (cons quoted-char (loop (inc to) new-to))))))))))
 ))
-
-
-(provide (all-defined))

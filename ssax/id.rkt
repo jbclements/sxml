@@ -1,7 +1,8 @@
-#lang mzscheme
+#lang racket/base
 (require "myenv.ss")
 (require "access-remote.ss")
 (require "sxpathlib.ss")
+(provide (all-defined-out))
 
 ;; Creation and manipulation of the ID-index
 ;; Provides the DTD parser for extracting ID attribute declarations
@@ -553,8 +554,3 @@
 (define (id:ending-action id:seed)
   (let((id-index (id:seed-index id:seed)))
     (cons 'id-index id-index)))
-
-                      
-
-
-(provide (all-defined))

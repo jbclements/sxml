@@ -1,12 +1,12 @@
-#lang mzscheme
-(require "myenv.ss")
-(require (lib "string.ss" "srfi/13"))
-(require "parse-error.ss")
-(require "input-parse.ss")
-(require "look-for-str.ss")
-(require "char-encoding.ss")
-(require (only racket/port call-with-input-string))
-(provide (all-defined))
+#lang racket/base
+(require srfi/13/string
+         (only-in racket/port call-with-input-string)
+         "myenv.ss"
+         "parse-error.ss"
+         "input-parse.ss"
+         "look-for-str.ss"
+         "char-encoding.ss")
+(provide (all-defined-out))
 
 ;	Functional XML parsing framework: SAX/DOM and SXML parsers
 ;	      with support for XML Namespaces and validation
@@ -556,7 +556,7 @@
 		; and skipped it.
   (define (skip-comment port)
     (assert-curr-char '(#\-) "XML [15], second dash" port)
-    (if (not (find-string-from-port? "-->" port))
+    (when (not (find-string-from-port? "-->" port))
       (parser-error port "XML [15], no -->"))
     (make-xml-token 'COMMENT #f))
 
@@ -584,7 +584,7 @@
 
 ; The current position is inside a PI. Skip till the rest of the PI
 (define (ssax:skip-pi port)      
-  (if (not (find-string-from-port? "?>" port))
+  (when (not (find-string-from-port? "?>" port))
     (parser-error port "Failed to find ?> terminating the PI")))
 
 
@@ -611,7 +611,7 @@
 ; (e.g., after reading #\[ that begins an internal DTD subset)
 ; Skip until the "]>" combination that terminates this DTD
 (define (ssax:skip-internal-dtd port)      
-  (if (not (find-string-from-port? "]>" port))
+  (when (not (find-string-from-port? "]>" port))
     (parser-error port
 		  "Failed to find ]> terminating the internal DTD subset")))
 
@@ -675,7 +675,7 @@
 	     (str-handler ent-ref ""
 			  (str-handler fragment "&" seed)))))))
        (else		; Must be CR: if the next char is #\newline, skip it
-         (if (eqv? (peek-char port) #\newline) (read-char port))
+         (when (eqv? (peek-char port) #\newline) (read-char port))
          (loop (str-handler fragment nl seed)))
        ))))))
             
@@ -840,7 +840,7 @@
 	((or (eof-object? cterm) (eqv? cterm delimiter))
 	  new-fragments)
 	((eqv? cterm char-return)	; treat a CR and CRLF as a LF
-	  (if (eqv? (peek-char port) #\newline) (read-char port))
+	  (when (eqv? (peek-char port) #\newline) (read-char port))
 	  (read-attrib-value delimiter port entities
 	                     (cons " " new-fragments)))
 	((memv cterm ssax:S-chars)
@@ -1300,8 +1300,8 @@
 			    (handle-fragment fragment str-handler seed)
 			    (make-xml-token 'ENTITY-REF name))))))
 		     (else		; This must be a CR character
-		      (if (eqv? (peek-next-char port) #\newline)
-			  (read-char port))
+		      (when (eqv? (peek-next-char port) #\newline)
+                        (read-char port))
 		      (loop (str-handler fragment (string #\newline) seed))))
 		   ))))))))
 
@@ -1532,7 +1532,7 @@
 			       seed))) ; keep on reading the content after ent
 			 (loop port entities expect-eof? seed)))
 		      ((START)		; Start of a child element
-		       (if (eq? expected-content 'PCDATA)
+		       (when (eq? expected-content 'PCDATA)
 			   (parser-error port "[elementvalid] broken for "
 				  elem-gi
 				  " with char content only; unexpected token "

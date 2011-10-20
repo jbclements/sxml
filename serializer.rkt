@@ -1,6 +1,6 @@
-#lang mzscheme
+#lang racket/base
 (require "ssax/ssax.rkt")
-(require (only racket/base filter))
+(provide (all-defined-out))
 
 ;; SXML serializer into XML and HTML
 ;
@@ -39,36 +39,8 @@
 ; str-lst ::= (listof string)
 ; Concatenates `str-lst' members into a single string
 ; (srl:apply-string-append str-lst) = (apply string-append str-lst)
-(cond-expand
- (chicken
-  ; In Chicken, procedures are generally limited to 126 arguments
-  ; http://www.call-with-current-continuation.org/
-  ; Due to this Chicken limitation, we cannot apply `string-append' directly
-  ; for a potentially long `str-lst'
-  
-  ; Similar to R5RS 'list-tail' but returns the new list consisting of the
-  ; first 'k' members of 'lst'
-  (define (srl:list-head lst k)
-    (if (or (null? lst) (zero? k))
-        '()
-        (cons (car lst) (srl:list-head (cdr lst) (- k 1)))))
-
-  ; Because of Chicken 126-argument limitation, I do not care of intermediate
-  ; garbage produced in the following solution:
-  (define (srl:apply-string-append str-lst)
-    (cond
-      ((null? str-lst) "")
-      ((null? (cdr str-lst)) (car str-lst))
-      (else  ; at least two members
-       (let ((middle (inexact->exact (round (/ (length str-lst) 2)))))
-         (string-append
-          (srl:apply-string-append (srl:list-head str-lst middle))
-          (srl:apply-string-append (list-tail str-lst middle)))))))
-  )
- (else
-  (define (srl:apply-string-append str-lst)
-    (apply string-append str-lst))
-  ))
+(define (srl:apply-string-append str-lst)
+  (apply string-append str-lst))
 
 ; Analogue of `assoc'
 ; However, search is performed by `cdr' of each alist member and `string=?' is
@@ -99,11 +71,7 @@
 ; Borrowed from "char-encoding.scm"
 
 ; The newline character
-(cond-expand
- ((or scheme48 scsh)
-  (define srl:char-nl (ascii->char 10)))
- (else
-  (define srl:char-nl (integer->char 10))))
+(define srl:char-nl (integer->char 10))
 
 ; A string consisting of a single newline character
 (define srl:newline (string srl:char-nl))
@@ -1048,8 +1016,7 @@
                           ns-prefix-assig namespace-assoc declared-ns-prefixes)
          (begin
            (srl:display-fragments-2nesting start-tag port)
-           (if
-            end-tag  ; there exists content
+           (when end-tag  ; there exists content
             (let ((space-preserve?
                    (srl:update-space-specifier node space-preserve?))
                   (text-node-handler
@@ -1109,7 +1076,7 @@
                         indent4recursive space-preserve?
                         cdata-section-elements text-node-handler)))
                     content)
-                   (if indent-here
+                   (when indent-here
                        (begin
                          (display srl:newline port)
                          (for-each
@@ -1211,8 +1178,8 @@
            (for-each
             (lambda (kid put-newline?)
               (begin
-                (if put-newline?
-                    (display srl:newline port))
+                (when put-newline?
+                  (display srl:newline port))
                 (srl:display-node-out-recursive
                  kid port method
                  ns-prefix-assig namespace-assoc '()
@@ -1523,5 +1490,3 @@
       (srl:sxml->string sxml-obj '() #f 'html '() #t 'omit "4.0")
       (srl:display-sxml sxml-obj (car port-or-filename)
                         '() #f 'html '() #t 'omit "4.0")))
-
-(provide (all-defined))

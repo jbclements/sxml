@@ -1,5 +1,6 @@
-#lang mzscheme
+#lang racket/base
 (require "myenv.ss")
+(provide find-string-from-port?)
 
 ; -- Function: find-string-from-port? STR IN-PORT MAX-NO-CHARS
 ;    Looks for a string STR within the first MAX-NO-CHARS chars of the
@@ -94,12 +95,3 @@
     (match-1st-char)))
 
 (define find-string-from-port? MISCIO:find-string-from-port?)
-
-
-;-----------------------------------------------------------------------------
-;   This is a test driver for miscio:find-string-from-port?, to make sure it
-;			really works as intended
-
-; moved to vinput-parse.scm
-
-(provide (all-defined))

@@ -1,7 +1,8 @@
-#lang mzscheme
-(require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
-(require (only racket/port call-with-input-string))
+#lang racket/base
+(require (only-in racket/port call-with-input-string)
+         "ssax/ssax.rkt"
+         "sxml-tools.rkt")
+(provide (all-defined-out))
 
 ;; W3C compliant extensions to SXPathlib
 ; $Id: sxpath-ext.scm,v 1.911 2002/12/06 22:10:53 kl Exp kl $:
@@ -620,5 +621,3 @@
 			 (cdr seqs))))
 		((eq? (car seq) node) ((sxml:filter test-pred?) (cdr seq)))
 		(else (rpt (cdr seq)))))))))))
-
-(provide (all-defined))

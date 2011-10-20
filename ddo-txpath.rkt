@@ -1,11 +1,12 @@
-#lang mzscheme
-(require "ssax/ssax.rkt")
-(require "sxpath-ext.rkt")
-(require "txpath.rkt")
-(require "xpath-ast.rkt")
-(require "xpath-context_xlink.rkt")
-(require "ddo-axes.rkt")
-(require (only racket/base filter))
+#lang racket/base
+(require racket/promise
+         "ssax/ssax.rkt"
+         "sxpath-ext.rkt"
+         "txpath.rkt"
+         "xpath-ast.rkt"
+         "xpath-context_xlink.rkt"
+         "ddo-axes.rkt")
+(provide (all-defined-out))
 
 ;; XPath implementation with distinct document order support
 ;
@@ -2214,5 +2215,3 @@
 (define ddo:txpath (ddo:api-helper txp:xpath->ast ddo:ast-location-path))
 (define ddo:xpath-expr (ddo:api-helper txp:expr->ast ddo:ast-expr))
 (define ddo:sxpath (ddo:api-helper txp:sxpath->ast ddo:ast-expr))
-
-(provide (all-defined))

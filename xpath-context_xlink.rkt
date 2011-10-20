@@ -1,12 +1,12 @@
-#lang mzscheme
-(require (lib "string.ss" "srfi/13"))
-(require "sxml-tools.rkt")
-(require "sxpath-ext.rkt")
-(require "xpath-parser.rkt")
-(require "txpath.rkt")
-(require "xpath-ast.rkt")
-(require "ssax/ssax.rkt")
-(require (only racket/base filter))
+#lang racket/base
+(require srfi/13/string
+         "sxml-tools.rkt"
+         "sxpath-ext.rkt"
+         "xpath-parser.rkt"
+         "txpath.rkt"
+         "xpath-ast.rkt"
+         "ssax/ssax.rkt")
+(provide (all-defined-out))
 
 ;; Context-based XPath implementation
 ;
@@ -2971,5 +2971,3 @@
                 (draft:reach-root (as-nodeset node)))
         (xlink:docs-variable var-binding)
         num-anc)))))
-
-(provide (all-defined))

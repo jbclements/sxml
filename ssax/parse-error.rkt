@@ -1,5 +1,7 @@
 #lang racket/base
 (require "myenv.ss")
+(provide parser-error
+         ssax:warn)
 
 ; This code provides informative error messages
 ;   for SSAX (S)XML parser.
@@ -19,23 +21,22 @@
 ;  they are printed to stderr as is.
 
 ;; NB : updated to signal a racket error rather than printing to stdout.
-(define parser-error
-  (lambda args
-    (if
-      (port? (car args))
-      (error 'parser-error (format "Error at position ~s: ~a" 
-                                          (file-position (car args))
-                                          (args->display-string (cdr args))))
-      (error 'parser-error (format 
-                            "Error in error handler: its first parameter is not a port: "
-                            (args->display-string args))))))
+(define (parser-error arg0 . args)
+  (if (port? arg0)
+      (error 'parser-error
+             "Error at position ~s: ~a" 
+             (file-position arg0)
+             (args->display-string args))
+      (error 'parser-error
+             "Error in error handler: its first parameter is not a port: ~a"
+             (args->display-string (cons arg0 args)))))
 
 ;; map args to their display representations, glue them together:
 (define (args->display-string args)
   (apply string-append (map (lambda (x) (format "~a" x)) args)))
 
 
-(define SSAX:warn
+(define ssax:warn
   (lambda  args
     (if
       (port? (car args))
@@ -44,8 +45,3 @@
 	    (cdr args) nl)
       #f)
     ))
-
-; Alias
-(define ssax:warn SSAX:warn)
-
-(provide (all-defined-out))

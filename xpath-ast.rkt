@@ -1,7 +1,7 @@
-#lang mzscheme
-(require "ssax/ssax.rkt")
-(require "xpath-parser.rkt")
-(require (only racket/base filter))
+#lang racket/base
+(require "ssax/ssax.rkt"
+         "xpath-parser.rkt")
+(provide (all-defined-out))
 
 ;; XPath/XPointer -> Abstract Syntax Tree parser
 ;
@@ -465,5 +465,3 @@
          ,@(map
             (lambda (pred-expr) `(predicate ,pred-expr))
             pred-expr-list)))
-
-(provide (all-defined))

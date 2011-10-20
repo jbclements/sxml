@@ -1,5 +1,10 @@
-#lang mzscheme
-(require "myenv.ss")
+#lang racket/base
+(provide ascii->char
+         ucscode->char
+         char-return
+         char-tab
+         char-newline
+         char-space)
 
 ;		Character-encoding module
 ;
@@ -26,13 +31,7 @@
 ; return a character whose ASCII code is INT
 ; Note, because ascii->char is injective (there are more characters than
 ; ASCII characters), the inverse transformation is not defined.
-(cond-expand
-  (scheme48  #f)		; ascii->char is built into Scheme48
-  (scsh #f)			; ascii->char is built into Scheme48
-  (else
-    (define ascii->char integer->char)
-  )
-)
+(define ascii->char integer->char)
 
 
 ;	ucscode->char INT -> CHAR
@@ -46,13 +45,7 @@
 ;   accessible from available input devices.]"
 
 (define (ucscode->char code)
-  (cond-expand
-    (bigloo
-      (ucs2->char (integer->ucs2 code)))
-    ((or scheme48 scsh)			; Scheme48 has no support for UCS
-      (ascii->char code))
-    (else
-      (integer->char code))))
+  (integer->char code))
 
 ; Commonly used control characters
 
@@ -60,5 +53,3 @@
 (define char-tab    (ascii->char 9))
 (define char-newline (ascii->char 10)) ; a.k.a. #\newline, per R5RS
 (define char-space (ascii->char 32))
-
-(provide (all-defined))

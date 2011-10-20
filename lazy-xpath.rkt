@@ -1,13 +1,14 @@
-#lang mzscheme
-(require (lib "string.ss" "srfi/13"))
-(require "ssax/ssax.rkt")
-(require "sxpath-ext.rkt")
-(require "xpath-parser.rkt")
-(require "txpath.rkt")
-(require "xpath-ast.rkt")
-(require "xpath-context_xlink.rkt")
-(require (only racket/base filter)
-         (only racket/port call-with-input-string))
+#lang racket/base
+(require racket/promise
+         (only-in racket/port call-with-input-string)
+         srfi/13/string
+         "ssax/ssax.rkt"
+         "sxpath-ext.rkt"
+         "xpath-parser.rkt"
+         "txpath.rkt"
+         "xpath-ast.rkt"
+         "xpath-context_xlink.rkt")
+(provide (all-defined-out))
 
 ;; This module implements lazy SXPath evaluation over lazy SXML documents
 ;
@@ -41,46 +42,10 @@
 ;=========================================================================
 ; Misc helpers for working with a lazy nodeset
 
-; Escaping the ## for some Scheme implementations
-(cond-expand
- (gambit
-  ; The following macro constructs Gambit-specific ids on the fly
-  ; Borrowed from "http.scm"
-  (define-macro (_gid id)
-    (string->symbol (string-append "##" (symbol->string id))))
-  )
- (chicken
-  ; The following macro encapsulates the function ##sys#structure?
-  ; Thanks to Thomas Chust and Felix Winkelmann for the explanation of
-  ; qualified symbols in Chicken
-  (define-macro (chk:sys-structure?)
-    (string->symbol
-     (string-append (string (integer->char 3)) "sys" "structure?")))
-  )
- (else
-  #t))
-
 ; Predicate for detecting a promise
 ; There is no such a predicate in R5RS, so different Scheme implementations
 ; use different names for this functionality
-(define lazy:promise?
-  (cond-expand
-   (plt promise?)
-   (bigloo
-    procedure?   ; ATTENTION: returns #t in more general situations
-    )
-   (chicken
-    ; Thanks to Zbigniew Szadkowski <zbigniewsz@gmail.com>
-    ; for the insight of this function
-    (lambda (p) ((chk:sys-structure?) p 'promise))
-    )
-   (gambit
-    (_gid promise?)
-    )
-   (else
-    (lambda (obj) #f)   ; ATTENTION: just makes the approach applicable for
-                        ; conventional SXML documents
-   )))
+(define lazy:promise? promise?)
 
 ;-------------------------------------------------
 ; Lazy analogues for common list operations
@@ -152,8 +117,7 @@
 
 ; Like conventional cdr
 (define (lazy:cdr nodeset)
-  (if
-   (lazy:promise? (car nodeset))
+  (when (lazy:promise? (car nodeset))
    (let ((nset-car (force (car nodeset))))
      (lazy:cdr
       ((if (nodeset? nset-car) append cons)
@@ -2320,5 +2284,3 @@
 
 ; Support for native sxpath syntax
 (define lazy:sxpath (lazy:api-helper txp:sxpath->ast lazy:ast-expr))
-
-(provide (all-defined))
