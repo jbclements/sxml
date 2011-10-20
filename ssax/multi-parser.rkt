@@ -80,8 +80,9 @@
 ; mul:seed-xlink get-xlink-seed
 ; Handler for attempts to access an absent seed.
 (define (bad-accessor type)
-  (lambda x
-  (cerr nl "MURDER!!!  -> " type nl x nl) (exit -1)))
+  (lambda args
+    (error 'ssax:multi-parser "bad accessor; called with ~a"
+           (string-join (map (lambda (x) (format "~e" x)) args) " "))))
 
 ; Seed constructor. #f seeds will be omitted.
 (define (make-seed . seeds)
@@ -92,7 +93,7 @@
        ((car s) (rpt (cdr s) 
 		     (cons (car s) rzt)))
        (else (rpt (cdr s) rzt)))))
-     
+
 ;=========================================================================
 ; This is a multi parser constructor function
 
