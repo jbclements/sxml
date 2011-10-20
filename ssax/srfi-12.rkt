@@ -48,8 +48,7 @@
 
 ; This implementation was borrowed from Gambit's cond-expand branch
 (define (abort obj)
-  (raise (list obj))
-  (exit 4))
+  (raise (list obj)))
 
 ; Procedure: exc:signal OBJ
 ; Raises a continuable exception represented by OBJ.
