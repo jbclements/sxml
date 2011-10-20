@@ -1,5 +1,6 @@
 #lang racket/base
-(require (only-in racket/port call-with-input-string)
+(require (for-syntax racket/base)
+         (only-in racket/port call-with-input-string)
          (only-in racket/pretty [pretty-write pp])
          (only-in racket/list [add-between list-intersperse])
          srfi/13/string
@@ -12,24 +13,28 @@
 (provide (all-defined-out))
 
 #|
-Current status: a few test blocks fail. I've only looked at the first one,
-but I suspect the tests themselves may be wrong. It's hard to tell, though,
-because the relevant function comments are shy about describing what the
-function *returns*.
-
-The tests are noisy: run with "racket tests/ssax-tests.rkt > /dev/null"
-to just see failures (on stderr).
+Current status: all tests pass; some print warnings.
 |#
 
-;; ryanc: Racket is case-sensitive, so use simple version of macro.
+;; ryanc: use syntax-case; easier
 ;; alternative versions, with comments, preserved below
-;; Added: catch errors to continue with other test blocks.
-(define-syntax-rule (run-test e ...)
-  (begin (display "\n-->Test\n")
-         (with-handlers ([exn?
-                          (lambda (exn)
-                            (eprintf "\nTEST FAILURE\n~a" (exn-message exn)))])
-           (let () e ... (void)))))
+(define-syntax (run-test stx)
+  ;; process : syntax -> syntax
+  ;; In the tests below (which were written to work with or without reader case
+  ;; sensitivity for symbols), '<string> is used to indicate a *symbol* with
+  ;; the case as written in <string>.
+  (define (process x)
+    (syntax-case x (quote)
+      [(quote str)
+       (string? (syntax-e #'str))
+       (datum->syntax x (string->symbol (syntax-e #'str)) x x)]
+      [(y . z)
+       (datum->syntax x (cons (process #'y) (process #'z)) x x)]
+      [_ x]))
+  (syntax-case stx ()
+    [(_ e ...)
+     (with-syntax ([(e ...) (process #'(e ...))])
+       #'(begin (display "\n-->Test\n") e ...))]))
 
 ;; ryanc: catch exceptions (simplified from original lib/catch-error.scm)
 (define-syntax failed?
@@ -44,12 +49,12 @@ to just see failures (on stderr).
     [(assert (equal? expected actual))
      (let ([e expected] [a actual])
        (unless (equal? e a)
-         (error 'assert "failure: ~.s\n  wanted: ~e\n  got:    ~e"
-                '(assert (equal? expected actual))
-                e a)))]
+         (eprintf "ASSERTION FAILURE: ~.s\n  wanted: ~e\n  got:    ~e\n"
+                  '(assert (equal? expected actual))
+                  e a)))]
     [(assert e ...)
      (unless (and e ...)
-       (error 'assert "failure: ~.s" '(assert e ...)))]))
+       (eprintf "ASSERTION FAILURE: ~.s\n" '(assert e ...)))]))
 
 ; The following macro runs built-in test cases -- or does not run,
 ; depending on which of the two cases below you commented out
