@@ -5,6 +5,7 @@
          "xpath-parser.rkt"
          "txpath.rkt"
          "xpath-ast.rkt"
+         "ssax/errors-and-warnings.rkt"
          "ssax/ssax.rkt")
 (provide (all-defined-out))
 
@@ -2077,10 +2078,8 @@
 ; Get the document by its URI
 
 ; Handler for error messages
-(define (xlink:api-error . text)
-  (cerr "XLink API error: ")
-  (apply cerr text)
-  (cerr nl))
+(define (xlink:api-error fmt . args)
+  (apply sxml:warn 'xlink:api-error fmt args))
 
 ; Id+XLink parser parameterized
 (define xlink:parser (ssax:multi-parser 'id 'xlink))
@@ -2096,7 +2095,7 @@
 (define (xlink:get-document-by-uri req-uri)
   (case (ar:resource-type req-uri)
     ((#f)  ; resource doesn't exist
-     (xlink:api-error "resource doesn't exist: " req-uri)
+     (xlink:api-error "resource doesn't exist: ~e" req-uri)
      #f)
     ((xml plain unknown)
      (let* ((port (open-input-resource req-uri))
@@ -2110,7 +2109,7 @@
 ;       (SHTML->SHTML+xlink
 ;        (xlink:set-uri req-uri doc))))    
     (else  ; unknown resource type
-     (xlink:api-error "resource type not supported: " req-uri)
+     (xlink:api-error "resource type not supported: ~e" req-uri)
      #f)))
 
 
@@ -2747,7 +2746,7 @@
 (define (sxml:document req-uri . namespace-prefix-assig)
   (case (ar:resource-type req-uri)
     ((#f)  ; resource doesn't exist
-     (xlink:api-error "resource doesn't exist: " req-uri)
+     (xlink:api-error "resource doesn't exist: ~e" req-uri)
      #f)
     ((xml plain unknown)
      (let* ((port (open-input-resource req-uri))
@@ -2766,7 +2765,7 @@
 ;       doc   ; DL: can also add URI: (xlink:set-uri req-uri doc)
 ;      ))
     (else  ; unknown resource type
-     (xlink:api-error "resource type not supported: " req-uri)
+     (xlink:api-error "resource type not supported: ~e" req-uri)
      #f)))
 
 
@@ -2894,8 +2893,8 @@
                      res
                      (begin
                        (xlink:api-error
-                        "XPointer fragment identifier doesn't "
-                        "select any nodeset: " (car xpointer-nset))
+                        "XPointer fragment identifier doesn't select any nodeset: ~e"
+                        (car xpointer-nset))
                        '())))))))))))
      arcs-to)))
 

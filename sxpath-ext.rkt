@@ -1,6 +1,7 @@
 #lang racket/base
 (require (only-in racket/port call-with-input-string)
          "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
          "sxml-tools.rkt")
 (provide (all-defined-out))
 
@@ -368,7 +369,7 @@
                  ((string-op elem (car nset)) #t)
                  (else (loop (cdr nset))))))
             (else  ; unknown datatype
-             (cerr "Unknown datatype: " elem nl)
+             (sxml:warn 'sxml:equality-cmp "unknown datatype: ~e" elem)
              #f))))))))
 
 (define sxml:equal? (sxml:equality-cmp eq? = string=?))

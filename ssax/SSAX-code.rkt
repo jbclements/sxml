@@ -1091,7 +1091,6 @@
     ((proper-attrs namespaces)
      (adjust-namespace-decl port merged-attrs namespaces))
     )
-   ;(cerr "proper attrs: " proper-attrs nl)
    ; build the return value
    (values
     (ssax:resolve-name port tag-head namespaces #t)
@@ -1359,7 +1358,7 @@
 ; 	  ((null? pi-handlers)
 ; 	   (if default `((else (,default port target seed)))
 ; 	       '((else
-; 		  (ssax:warn port "Skipping PI: " target nl)
+; 		  (ssax:warn port "Skipping PI: " target)
 ; 		  (ssax:skip-pi port)
 ; 		  seed))))
 ; 	  ((eq? '*DEFAULT* (caar pi-handlers))
@@ -1379,7 +1378,7 @@
 	   ((loop () #f accum port target seed) 	; no default
 	    (make-case 
 	      ((else
-		 (ssax:warn port "Skipping PI: " target nl)
+		 (ssax:warn port "Skipping PI: " target)
 		 (ssax:skip-pi port)
 		 seed)
 		. accum)

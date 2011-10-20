@@ -1,7 +1,8 @@
 #lang racket/base
-(require "myenv.ss")
-(require "access-remote.ss")
-(require "sxpathlib.ss")
+(require "errors-and-warnings.rkt"
+         "myenv.ss"
+         "access-remote.ss"
+         "sxpathlib.ss")
 (provide (all-defined-out))
 
 ;; Creation and manipulation of the ID-index
@@ -291,10 +292,11 @@
                       (id:ignore-until #\> port)
                       (loop id-attrs)))))
            (else   ; an error condition
-             (cerr "Error in markupdecl production: unexpected " beg nl)
+             (sxml:warn 'id:process-markupdecl
+                        "error in markupdecl production: unexpected ~a" beg)
              (id:ignore-until #\> port)
              id-attrs)))))
-                 
+
 
 ; This function processes a doctypedecl production ([75] in XML specification)
 ; [75]    ExternalID    ::=    'SYSTEM' S SystemLiteral 
@@ -369,8 +371,9 @@
           (let ((name (id:to-small (id:read-name port))))
             (cond((string=? name "doctype") 
                   (id:process-doctypedecl port))
-                 (else 
-                  (cerr "doctypedecl production expected" nl)
+                 (else
+                  (sxml:warn 'id:process-prolog
+                             "doctypedecl production expected")
                   '()))))
          (else   ; element begins, there was no doctypedecl
           '()))))

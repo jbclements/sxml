@@ -155,7 +155,9 @@
   (define-def user-agent req-parms  "Scheme-HTTP/1.0")
   (define-def http-req   req-parms  '())
   (define-def logger     req-parms
-    (lambda (port msg . other-msgs) (cerr msg other-msgs nl)))
+    (lambda (port msg . other-msgs)
+      ;; FIXME: avoid cerr
+      (cerr msg other-msgs nl)))
 
   (define CRLF (string (integer->char 13) (integer->char 10)))
 

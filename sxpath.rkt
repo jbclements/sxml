@@ -1,6 +1,7 @@
 #lang racket/base
 (require "sxml-tools.rkt"
          "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
          "sxpath-ext.rkt"
          "txpath.rkt")
 (provide (all-defined-out))
@@ -166,7 +167,7 @@
                     node))
                 filters))))))))
       (else
-       (cerr "Invalid path step: " (car path))
+       (sxml:warn 'sxpath "invalid path step: ~e" (car path))
        #f)))))
 
 

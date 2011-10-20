@@ -1,5 +1,6 @@
 #lang racket/base
 (require "myenv.ss"
+         "errors-and-warnings.rkt"
          "util.ss"
          "access-remote.ss"
          "sxpathlib.ss")
@@ -662,7 +663,7 @@
 ;  attr-name - a string denotating a name of an attribute (for a message)
 ;  position - position within a file
 ; Function always returns #t. 
-; Side effects: function "cerr"s a message if 'value' is not #f and not within
+; Side effects: emits warning if 'value' is not #f and not within
 ; 'valid-xlink-values'
 (define (xlink:check-helper value valid-xlink-values attr-name position)
   (cond
@@ -903,12 +904,12 @@
 ;  position - position within a file
 ;  text - a message to display
 (define (xlink:parser-error position . text)
-  (apply
-   cerr
-   (if
-    (string=? position "unknown")
-    (append (list nl "XLink error:" nl) text (list nl))
-    (append (list nl "XLink error in " position ":" nl) text (list nl)))))
+  (apply sxml:warn/concat
+         'XLink "error"
+         (if (equal? position "unknown")
+             ": "
+             (format " at ~a: " position))
+         text))
 
 ;------------------------------------------------
 ; Functions working on branches of an SXML tree

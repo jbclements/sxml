@@ -1,5 +1,6 @@
 #lang racket/base
 (require "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
          "xpath-context_xlink.rkt"
          "xpath-ast.rkt"
          "ddo-txpath.rkt")
@@ -20,9 +21,7 @@
 
 ; Displays an error to stderr and returns #f
 (define (sxml:modification-error . text)
-  (cerr "Modification error: ")
-  (apply cerr text)
-  (cerr nl)
+  (sxml:warn/concat 'sxml:modification-error text)
   #f)
 
 ;  Separates the list into two lists with respect to the predicate

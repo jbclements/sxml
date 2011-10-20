@@ -1,5 +1,6 @@
 #lang racket/base
 (require "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
          "xpath-parser.rkt")
 (provide (all-defined-out))
 
@@ -410,7 +411,7 @@
                     (cdr reducing-path)
                     (cons `(predicate ,pred-ast) filters)))))))))
           (else
-           (cerr "Invalid path step: " (car path))
+           (sxml:warn 'tsp:sxpath->ast "invalid path step: ~e" (car path))
            #f))))))
 
 

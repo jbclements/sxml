@@ -3,6 +3,7 @@
          (only-in racket/port call-with-input-string)
          srfi/13/string
          "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
          "sxpath-ext.rkt"
          "xpath-parser.rkt"
          "txpath.rkt"
@@ -965,7 +966,7 @@
                  ((string-op elem (car nset)) #t)
                  (else (loop (cdr nset))))))
             (else  ; unknown datatype
-             (cerr "Unknown datatype: " elem nl)
+             (sxml:warn 'lazy:equality-cmp "unknown datatype: ~e" elem)
              #f))))))))
 
 (define lazy:equal? (lazy:equality-cmp eq? = string=?))

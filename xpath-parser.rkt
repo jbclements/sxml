@@ -1,5 +1,6 @@
 #lang racket/base
-(require "ssax/ssax.rkt")
+(require "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt")
 (provide (all-defined-out))
 
 ;; XPath/XPointer grammar parser.
@@ -50,15 +51,13 @@
 ; Syntactic error (also called a parser error)
 
 (define (sxml:xpointer-parse-error . text)
-  (apply cerr
-         (append (list "XPath/XPointer parser error: ") text (list nl)))
+  (apply sxml:warn/concat 'XPath/XPointer "parser error: " text)
   #f)
 
 ; A warning message for grammar features which are not supported by this
 ; implementation
 (define (sxml:xpointer-parse-warning . text)
-  (apply cerr
-         (append (list "XPath/XPointer parser warning: ") text (list nl))))
+  (apply sxml:warn/concat 'XPath/XPointer "parser warning: " text))
 
 
 ;-------------------------------------------------
@@ -74,8 +73,7 @@
 
 ; Constructed specific parsers may wish to use this function
 (define (txp:signal-semantic-error . text)
-  (apply cerr
-         (append (list "XPath/XPointer semantic error: ") text (list nl)))
+  (sxml:warn/concat 'XPath/XPointer "semantic error: " text)
   'txp:semantic-error)
 
 

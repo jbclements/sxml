@@ -1,9 +1,10 @@
 #lang mzscheme
-(require "myenv.ss")
-(require "http.ss")
-(require "srfi-12.ss")
-(require "util.ss")
-(require (lib "string.ss" "srfi/13"))
+(require srfi/13/string
+         "errors-and-warnings.rkt"
+         "myenv.ss"
+         "http.ss"
+         "srfi-12.ss"
+         "util.ss")
 
 ;; Uniform access to local and remote resources
 ;; Resolution for relative URIs in accordance with RFC 2396
@@ -41,10 +42,13 @@
 ; An input port is returned if there were no errors. In case of an error,
 ; the function returns #f and displays an error message as a side effect.
 ; Doesn't raise any exceptions.
+;; ryanc: Why not?!
 (define (open-input-resource req-uri)
   (with-exception-handler
    (lambda (x)
-     (cerr nl req-uri ": " ((condition-property-accessor 'exn 'message) x) nl)
+     (sxml:warn 'open-input-resource
+                "~a: ~a"
+                req-uri ((condition-property-accessor 'exn 'message) x))
      #f)
    (lambda ()
      (cond
@@ -58,7 +62,9 @@
              ((and (>= resp-code 200) (< resp-code 400)) resp-port)
              (else
               (close-input-port resp-port)
-              (cerr nl req-uri ": resource not available: " resp-code nl)
+              (sxml:warn 'open-input-resource
+                         "~a: resource not available: ~a"
+                         req-uri resp-code)
               #f)))))
        (else  ; a local file     
         (open-input-file req-uri))))))
