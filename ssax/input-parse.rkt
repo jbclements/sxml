@@ -181,9 +181,16 @@
 ; is to allow most of the tokens to fit in.
 ; Using a static buffer _dramatically_ reduces the amount of produced garbage
 ; (e.g., during XML parsing).
+;; ryanc: Unfortunately, single static buffer not safe in Racket
+;; FIXME: tune size, see if thread-cell cache is worth it
 (define input-parse:init-buffer
-  (let ((buffer (make-string 512)))
-    (lambda () buffer)))
+  (let ([buffers (make-thread-cell #f)])
+    (lambda ()
+      (let ([buffer (thread-cell-ref buffers)])
+        (or buffer
+            (let ([buffer (make-string 512)])
+              (thread-cell-set! buffers buffer)
+              buffer))))))
 
 (define-opt (next-token prefix-skipped-chars break-chars
 			(optional (comment "") (port (current-input-port))) )
