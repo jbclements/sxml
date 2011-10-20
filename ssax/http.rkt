@@ -1,12 +1,17 @@
-#lang mzscheme
-
-(require (lib "defmacro.ss"))
-(require "common.ss")
+#lang racket/base
+(require racket/tcp)
 (require "myenv.ss")
 (require "mime.ss")
 (require "srfi-12.ss")
 (require "util.ss")
 (require (lib "string.ss" "srfi/13"))
+(provide http-transaction
+         #|
+         open-tcp-connection
+         flush-output-port
+         shutdown-sender
+         define-def
+         |#)
 
 ;************************************************************************
 ; 
@@ -100,7 +105,6 @@
 ; $Id: http.scm,v 2.0 2002/08/23 19:36:25 oleg Exp oleg $
 ;^^^^^^^^^^^^^^^^^^^^^
 
-;;(include "myenv.scm")
 	; The standard prelude and SRFI-12 are assumed
 	; See http://pobox.com/~oleg/ftp/Scheme/
 	; for myenv.scm and other input parsing functions used
@@ -116,54 +120,14 @@
 ;
 ; These functions are necessarily platform- and system-specific
 
-(cond-expand
- (gambit
-  ; For Gambit 4
-  (define (open-tcp-connection host port-number)
-    (assert (integer? port-number) (positive? port-number))
-    (let ((p (open-tcp-client
-              (list server-address: host
-                    port-number: port-number))))
-      (cons p p)))
-  (define flush-output-port force-output)
-  (define close-tcp-connection close-port)
+(define (open-tcp-connection host port-number)
+  (call-with-values
+      (lambda () (tcp-connect host port-number))
+    (lambda (input-port output-port)
+      (cons input-port output-port))))
+(define flush-output-port flush-output)
+(define shutdown-sender close-output-port)
 
-  ; DL: by analogue with Gambit 3
-  (define shutdown-sender force-output)
-
-; Previous version for Gambit 3
-;  ; The Gambit implementation relies on internal Gambit procedures,
-;  ; whose names start with ##
-;  ; Such identifiers cannot be _read_ on many other systems
-;  ; The following macro constructs Gambit-specific ids on the fly
-;  (define-macro (_gid id)
-;    (string->symbol (string-append "##" (symbol->string id))))
-;  (define (open-tcp-connection host port-number)
-;    (assert (integer? port-number) (positive? port-number))
-;    (let ((io-port ((_gid open-input-output-file)
-;		    (string-append "tcp://" host ":" 
-;				   (number->string port-number)))))
-;      (cons io-port io-port)))
-;  (define flush-output-port flush-output)
-;  (define shutdown-sender flush-output)
-  )
- (bigloo
-  (define (open-tcp-connection host port-number)
-    (let ((sock (make-client-socket host port-number)))
-      (cons (socket-input sock) (socket-output sock))))
-  ; flush-output-port is built-in
-  (define shutdown-sender close-output-port)
-  )
- ((or plt chicken)
-  (define (open-tcp-connection host port-number)
-    (call-with-values
-     (lambda () (tcp-connect host port-number))
-     (lambda (input-port output-port)
-       (cons input-port output-port))))
-  (define flush-output-port flush-output)
-  (define shutdown-sender close-output-port)
-  )
-)
 ;^^^^^^^
 
 
@@ -174,13 +138,11 @@
 ; the latter is #f.
 ; If the lookup fails, the defaultvalue is used.
 
-(define-macro (define-def ident assoc-list defaultvalue)
-  `(define ,ident 
-     (or
-      (cond
-       ((assq ',ident ,assoc-list) => cdr)
-       (else #f))
-      ,defaultvalue)))
+(define-syntax-rule (define-def ident assoc-list defaultvalue)
+  (define ident
+    (or (cond [(assq 'ident assoc-list) => cdr]
+              [else #f])
+        defaultvalue)))
 
 ; The body of the function. 
 ; The function is written as a collection of mutually-recursive
@@ -193,18 +155,20 @@
   (define-def user-agent req-parms  "Scheme-HTTP/1.0")
   (define-def http-req   req-parms  '())
   (define-def logger     req-parms
-    (lambda (port msg . other-msgs) (cerr msg other-msgs nl)))
+    (lambda (port msg . other-msgs)
+      ;; FIXME: avoid cerr
+      (cerr msg other-msgs nl)))
 
   (define CRLF (string (integer->char 13) (integer->char 10)))
 
   (define (die reason headers port)
-    (if port (close-output-port port))
+    (when port (close-output-port port))
     (abort (make-property-condition 'HTTP-TRANSACTION
 	      'REASON reason 'HEADERS headers)))
 
   ; re-throw the exception exc as a HTTP-TRANSACTION exception
   (define (die-again exc reason headers port)
-    (if port (close-output-port port))
+    (when port (close-output-port port))
     (abort (make-composite-condition
 	    (make-property-condition
 	     'HTTP-TRANSACTION 'REASON reason 'HEADERS headers)
@@ -224,8 +188,8 @@
 	   (dummy (logger #f "Connecting to " target-host-proper ":"
 			  target-port))
 	   ; prevent hacking
-	   (dummy (if (string-index target-host-proper #\|)
-		      (myenv:error "Bad target addr: " target-host-proper)))
+	   (dummy (when (string-index target-host-proper #\|)
+                    (myenv:error "Bad target addr: " target-host-proper)))
 	   (http-ports (open-tcp-connection target-host-proper target-port))
 	   (http-i-port (car http-ports))
 	   (http-o-port (cdr http-ports))
@@ -323,5 +287,3 @@
       (die 'UNSUPPORTED-SCHEMA '() #f)
       ))))
 )
-
-(provide (all-defined))

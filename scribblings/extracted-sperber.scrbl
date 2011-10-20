@@ -1,8 +1,9 @@
 #lang scribble/doc
+@(require scribble/manual
+          "util.rkt"
+          (for-label (this-package-in main)))
 
-@require[scribble/manual]
-
-@section{Automatically Extracted Comments}
+@title{Automatically Extracted Comments}
 
 The following "documentation" was generated automatically, using 
 a script that I believe is due to Mike Sperber. This documentation

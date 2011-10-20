@@ -1,13 +1,14 @@
-#lang mzscheme
-
-(require "myenv.ss")
-(require (lib "string.ss" "srfi/13"))
-(require "input-parse.ss")
-(require "parse-error.ss")
-(require "SSAX-code.ss")
-(require "ssax-prim.ss")
-(require "id.ss")
-(require "xlink-parser.ss")
+#lang racket/base
+(require "myenv.ss"
+         srfi/13/string
+         "parse-error.ss"
+         "SSAX-code.ss"
+         "ssax-prim.ss"
+         "id.ss"
+         "xlink-parser.ss")
+(provide parent:new-level-seed-handler
+         parent:construct-element
+         ssax:multi-parser)
 
 ;; SSAX multi parser
 ;; Provides ID-index creation, SXML parent pointers and XLink grammar parsing
@@ -51,29 +52,13 @@
 ;  parent:seed - contains a delayed pointer to element's parent
 ;  attrs - element's attributes
 ;  children - a list of child elements
-(cond-expand
- (plt  ; set-cdr removed from plt
-  (define (parent:construct-element parent:parent-seed parent:seed
-                                    attrs children)  
-    (let ((head ((car parent:seed))))
-      (append head
-              (list (cons '@ attrs))
-              children)))
-  )
- (else
-  (define (parent:construct-element parent:parent-seed parent:seed
-                                    attrs children)
-    ; car gets the only element of parent seed - a pointer to a parent
-    (let((parent-ptr (car parent:parent-seed))
-         (head ((car parent:seed))))
-      (set-cdr!
-       head
-       (cons* (cons '@ attrs)
-              `(@@ (*PARENT* ,parent-ptr))
-              children))
-      head))
-  ))
-   
+(define (parent:construct-element parent:parent-seed parent:seed
+                                  attrs children)  
+  (let ((head ((car parent:seed))))
+    (append head
+            (list (cons '@ attrs))
+            children)))
+
 ;=========================================================================
 ; A seed
 ;  seed = (list  original-seed  parent:seed  id:seed  xlink:seed)
@@ -95,8 +80,9 @@
 ; mul:seed-xlink get-xlink-seed
 ; Handler for attempts to access an absent seed.
 (define (bad-accessor type)
-  (lambda x
-  (cerr nl "MURDER!!!  -> " type nl x nl) (exit -1)))
+  (lambda args
+    (error 'ssax:multi-parser "bad accessor; called with ~a"
+           (string-join (map (lambda (x) (format "~e" x)) args) " "))))
 
 ; Seed constructor. #f seeds will be omitted.
 (define (make-seed . seeds)
@@ -107,7 +93,7 @@
        ((car s) (rpt (cdr s) 
 		     (cons (car s) rzt)))
        (else (rpt (cdr s) rzt)))))
-     
+
 ;=========================================================================
 ; This is a multi parser constructor function
 
@@ -168,8 +154,9 @@
                              (cons '@@ aux)
                              result))))
                  (else
-                  (cerr "ending-actions NIY: " with-parent? with-id? with-xlink? nl)
-                  (exit))))
+                  (error 'ssax:multi-parser
+                         "ending-actions NIY: ~a ~a ~a"
+                         with-parent? with-id? with-xlink?))))
               
               
               ;------------------------------------
@@ -226,8 +213,10 @@
                        (id:new-level-seed-handler (get-id-seed seed))
                        (xlink:new-level-seed-handler
                         port attributes namespaces (get-xlink-seed seed))))))
-                 (else (cerr "new-level NIY: " with-parent? with-id? with-xlink? nl)
-                       (exit))))
+                 (else
+                  (error 'ssax:multi-parser
+                         "new-level NIY: ~s ~s ~s"
+                         with-parent? with-id? with-xlink?))))
               
               
               ; A special handler function for a FINISH-ELEMENT
@@ -338,38 +327,40 @@
                                 (cons (cons '@ attrs) children)))))
                         (list ; make-seed
                          (cons element (get-sxml-seed parent-seed))
-(id:finish-element-handler
-                 elem-gi attributes (get-id-seed seed) element)
-                (xlink:finish-element-handler
-                 (get-xlink-seed parent-seed)
-                 (get-xlink-seed seed) element))))))   
-          ((and with-parent? with-id? with-xlink?)  ; parent, id, xlink
-           (lambda (elem-gi attributes namespaces parent-seed seed)
-             (let((children (reverse-collect-str-drop-ws (get-sxml-seed seed)))
-                  (attrs
-                   (attlist-fold
-                    (lambda (attr accum)
-                      (cons (list 
-                             (if (symbol? (car attr)) (car attr)
-                                 (RES-NAME->SXML (car attr)))
-                             (cdr attr)) accum))
-                    '() attributes)))
-               (let((element
-                     (parent:construct-element
-                      (get-pptr-seed parent-seed) (get-pptr-seed seed)
-                      attrs children)))
-               (list ; make-seed
-                (cons element (get-sxml-seed parent-seed))
-                ; pptr- seed from parent seed is not modified:
-                (get-pptr-seed parent-seed)
-                (id:finish-element-handler
-                 elem-gi attributes (get-id-seed seed) element)
-                (xlink:finish-element-handler
-                 (get-xlink-seed parent-seed)
-                 (get-xlink-seed seed) element))))))
-	   (else (cerr "finish-element: NIY" nl) (exit))))
-      
-       
+                         (id:finish-element-handler
+                          elem-gi attributes (get-id-seed seed) element)
+                         (xlink:finish-element-handler
+                          (get-xlink-seed parent-seed)
+                          (get-xlink-seed seed) element))))))   
+                 ((and with-parent? with-id? with-xlink?)  ; parent, id, xlink
+                  (lambda (elem-gi attributes namespaces parent-seed seed)
+                    (let((children (reverse-collect-str-drop-ws (get-sxml-seed seed)))
+                         (attrs
+                          (attlist-fold
+                           (lambda (attr accum)
+                             (cons (list 
+                                    (if (symbol? (car attr)) (car attr)
+                                        (RES-NAME->SXML (car attr)))
+                                    (cdr attr)) accum))
+                           '() attributes)))
+                      (let((element
+                               (parent:construct-element
+                                (get-pptr-seed parent-seed) (get-pptr-seed seed)
+                                attrs children)))
+                        (list ; make-seed
+                         (cons element (get-sxml-seed parent-seed))
+                                        ; pptr- seed from parent seed is not modified:
+                         (get-pptr-seed parent-seed)
+                         (id:finish-element-handler
+                          elem-gi attributes (get-id-seed seed) element)
+                         (xlink:finish-element-handler
+                          (get-xlink-seed parent-seed)
+                          (get-xlink-seed seed) element))))))
+                 (else
+                  (error 'ssax:multi-parser
+                         "finish-element: NIY"))))
+
+
        ; A special function
        ; Given 'namespaces', it becomes a handler for a DOCTYPE
        (doctype-handler
@@ -467,5 +458,3 @@
           port
           initial-seed))))))
 ))))
-
-(provide (all-defined))

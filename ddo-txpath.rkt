@@ -1,16 +1,12 @@
-#lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
-(require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
-(require "sxpath-ext.rkt")
-(require "xpath-parser.rkt")
-(require "txpath.rkt")
-(require "xpath-ast.rkt")
-(require "xpath-context_xlink.rkt")
-(require "ddo-axes.rkt")
-
-(require (only racket filter))
+#lang racket/base
+(require racket/promise
+         "ssax/ssax.rkt"
+         "sxpath-ext.rkt"
+         "txpath.rkt"
+         "xpath-ast.rkt"
+         "xpath-context_xlink.rkt"
+         "ddo-axes.rkt")
+(provide (all-defined-out))
 
 ;; XPath implementation with distinct document order support
 ;
@@ -233,8 +229,7 @@
     (let ((prim-res (expr-impl nodeset position+size var-binding)))
       (cond
         ((not (nodeset? prim-res))
-         (sxml:xpointer-runtime-error 
-          "expected - nodeset instead of " prim-res)
+         (sxml:xpath-error "filter" "nodeset" prim-res)
          '())
         (else
          (let iter-preds ((nset prim-res)
@@ -267,8 +262,7 @@
     (let ((prim-res (expr-impl nodeset position+size var-binding)))
       (cond
         ((not (nodeset? prim-res))
-         (sxml:xpointer-runtime-error 
-          "expected - nodeset instead of " prim-res)
+         (sxml:xpath-type-error "filter" "nodeset" prim-res)
          '())
         (else
          (let iter-preds ((nset prim-res)
@@ -296,8 +290,7 @@
       (if
        (not (nodeset? prim-res))
        (begin
-         (sxml:xpointer-runtime-error
-          "expected - nodeset instead of " prim-res)
+         (sxml:xpath-type-error "filter" "nodeset" prim-res)
          '())
        (special-pred-impl prim-res)))))
 
@@ -575,14 +568,13 @@
     (cond
       ((not (and (nodeset? nodeset)
                  (null? (cdr nodeset))))
-       (sxml:xpointer-runtime-error
-        "internal DDO SXPath error - "
-        "a predicate is supplied with a non-singleton nodeset: " pred-id)
+       (sxml:xpath-error
+        "internal DDO SXPath error; predicate given a non-singleton nodeset: ~e" pred-id)
        #f)
       ((or (null? var-binding)
            (not (eq? (caar var-binding) '*var-vector*)))
-       (sxml:xpointer-runtime-error
-        "internal DDO SXPath error - predicate value not found: " pred-id)
+       (sxml:xpath-error
+        "internal DDO SXPath error; predicate value not found: ~e " pred-id)
        #f)
       ; predicate value as expected
       ((assq (sxml:context->node (car nodeset))
@@ -591,8 +583,8 @@
        ; => cdr   ; DL: was
        )
       (else  ; predicate value for the given node not found
-       (sxml:xpointer-runtime-error
-        "internal DDO SXPath error - no predicate value for node: "
+       (sxml:xpath-error
+        "internal DDO SXPath error; no predicate '~a' for node: ~e"
         pred-id (sxml:context->node (car nodeset)))
        #f))))
 
@@ -611,14 +603,13 @@
     (cond
       ((not (and (nodeset? nodeset)
                  (null? (cdr nodeset))))
-       (sxml:xpointer-runtime-error
-        "internal DDO SXPath error - "
-        "a predicate is supplied with a non-singleton nodeset: " pred-id)
+       (sxml:xpath-error
+        "internal DDO SXPath error; predicate given a non-singleton nodeset: ~e" pred-id)
        #f)
       ((or (null? var-binding)
            (not (eq? (caar var-binding) '*var-vector*)))
-       (sxml:xpointer-runtime-error
-        "internal DDO SXPath error - predicate value not found: " pred-id)
+       (sxml:xpath-error
+        "internal DDO SXPath error; predicate value not found: ~e" pred-id)
        #f)
       ; predicate value as expected
       ((assq (sxml:context->node (car nodeset))
@@ -628,9 +619,9 @@
              (> (cdr position+size)  ; context size
                 (vector-length (cdr size-pair)))
              (begin
-               (sxml:xpointer-runtime-error
-                "internal DDO SXPath error - "
-                "vector member for context size not found: " pred-id)
+               (sxml:xpath-error
+                "internal DDO SXPath error; vector member for context size not found: ~e"
+                pred-id)
                #f)
              (let ((pos-vect (vector-ref (cdr size-pair)
                                          (- (cdr position+size) 1))))
@@ -638,16 +629,15 @@
                 (> (car position+size)  ; context position
                    (vector-length pos-vect))
                 (begin
-                  (sxml:xpointer-runtime-error
-                   "internal DDO SXPath error - "
-                   "vector member for context position not found: "
+                  (sxml:xpath-error
+                   "internal DDO SXPath error; vector member for context position not found: ~e"
                    pred-id)
                   #f)
                 (force (vector-ref pos-vect
                                    (- (car position+size) 1))))))))
       (else  ; predicate value for the given node not found
-       (sxml:xpointer-runtime-error
-        "internal DDO SXPath error - no predicate value for node: "
+       (sxml:xpath-error
+        "internal DDO SXPath error; no predicate '~s' for node: ~e"
         pred-id (sxml:context->node (car nodeset)))
        #f))))
 
@@ -660,9 +650,8 @@
      (or (null? var-binding)
          (not (eq? (caar var-binding) '*var-vector*)))
      (begin
-       (sxml:xpointer-runtime-error
-        "internal DDO SXPath error - "
-        "value for absolute location path not found: " pred-id)
+       (sxml:xpath-error
+        "internal DDO SXPath error; value for absolute location path not found: ~e" pred-id)
        '()  ; the value defaults to an empty nodeset
        )     
      (vector-ref (cdar var-binding) pred-id))))
@@ -822,8 +811,8 @@
                       ((assq (caar vars-alist) var-binding)
                        => cdr)
                       (else
-                       (sxml:xpointer-runtime-error "unbound variable - "
-                                                    (cdar vars-alist))
+                       (sxml:xpath-error "variable reference: unbound variable: ~e"
+                                         (cdar vars-alist))
                        '()))
                     lst)))))))
        (if
@@ -964,7 +953,7 @@
             )
        (cdadr tree))
       (else
-       (sxml:xpointer-runtime-error "unbound variable - " var-name)
+       (sxml:xpath-error "variable reference: unbound variable: ~e" var-name)
        '()  ; dummy value
        ))))
 
@@ -1831,8 +1820,7 @@
                  res
                  (cond
                    ((not (nodeset? nset))
-                    (sxml:xpointer-runtime-error
-                     "expected - nodeset instead of " nset)
+                    (sxml:xpath-type-error "union" "nodeset" nset)
                     '())
                    (else nset)))
                 (cdr fs))))))
@@ -1881,8 +1869,7 @@
                        (cond
                          ((nodeset? nset) nset)
                          (else
-                          (sxml:xpointer-runtime-error 
-                           "expected - nodeset instead of " nset)
+                          (sxml:xpath-type-error "path" "nodeset" nset)
                           '())))
                       (fs converters))
               (if (null? fs)
@@ -1984,7 +1971,7 @@
             ((assq name var-binding)
              => cdr)
             (else
-             (sxml:xpointer-runtime-error "unbound variable - " name)
+             (sxml:xpath-error "variable reference: unbound variable: ~e" name)
              '())))
         0
         #t  ; ATTENTION: in is not generally on the single-level
@@ -2219,5 +2206,3 @@
 (define ddo:txpath (ddo:api-helper txp:xpath->ast ddo:ast-location-path))
 (define ddo:xpath-expr (ddo:api-helper txp:expr->ast ddo:ast-expr))
 (define ddo:sxpath (ddo:api-helper txp:sxpath->ast ddo:ast-expr))
-
-(provide (all-defined))

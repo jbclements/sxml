@@ -1,11 +1,7 @@
-#lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
-(require "ssax/ssax.rkt")
-(require "sxml-tools.ss")
-(require "xpath-context_xlink.ss")
-
-(require (only racket filter))
+#lang racket/base
+(require "ssax/ssax.rkt"
+         "xpath-context_xlink.rkt")
+(provide (all-defined-out))
 
 ;; The implementation of SXPath axes with support for distinct document order
 ;
@@ -1546,22 +1542,21 @@
                (else
                 (values '() src vacant-num)))))))
       (lambda (node)   ; node or nodeset
-        (if
-         (nodeset? node)
-         (let iter ((src node)
-                    (pos-res '())
-                    (vacant-num 1))
-           (if
-            (null? src)
-            (filter  ; removing empty result nodesets
-             (lambda (x) (not (null? x)))
-             pos-res)
-            (call-with-values
-             (lambda () (process-single (car src) (cdr src) vacant-num))
-             (lambda (new-pos-res new-src new-vacant)
-               (iter new-src
-                     (append pos-res new-pos-res)
-                     new-vacant))))))))))
+        (when (nodeset? node)
+          (let iter ((src node)
+                     (pos-res '())
+                     (vacant-num 1))
+            (if
+             (null? src)
+             (filter  ; removing empty result nodesets
+              (lambda (x) (not (null? x)))
+              pos-res)
+             (call-with-values
+                 (lambda () (process-single (car src) (cdr src) vacant-num))
+               (lambda (new-pos-res new-src new-vacant)
+                 (iter new-src
+                       (append pos-res new-pos-res)
+                       new-vacant))))))))))
 
 ; Parent axis, for position-based filtering
 ; We won't reinvent the wheel here. We'll use ddo:parent and apply the fact
@@ -1711,8 +1706,7 @@
                (else
                 (values '() src vacant-num)))))))
       (lambda (node)   ; node or nodeset
-        (if
-         (nodeset? node)
+        (when (nodeset? node)
          (let iter ((src (reverse node))
                     (pos-res '())
                     (vacant-num -1))
@@ -2156,5 +2150,3 @@
                (filter  ; removing empty result nodesets
                 (lambda (x) (not (null? x)))
                 (process-single (car nset) (cdr nset) -1)))))))))
-
-(provide (all-defined))

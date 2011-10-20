@@ -1,9 +1,8 @@
-#lang mzscheme
-
-(require (lib "defmacro.ss"))
-(require "common.ss")
+#lang racket/base
+(require (for-syntax racket/base))
 (require "myenv.ss")
 (require "parse-error.ss")
+(provide (all-defined-out))
 
 ;****************************************************************************
 ;			Simple Parsing of input
@@ -37,14 +36,6 @@
 ;
 ; $Id: input-parse.scm,v 1.1.1.1 2001/07/11 19:33:43 oleg Exp $
 
-;(declare 			; Gambit-compiler optimization options
-; (block)
-; (standard-bindings)
-; (extended-bindings)		; Needed for #!optional arguments, DSSSL-style
-; (fixnum)			; optional, keyword and rest arguments
-;)
-;(include "myenv.scm") ; include target dependent stuff
-
 ;------------------------------------------------------------------------
 ;		     Preparation and tuning section
 
@@ -61,131 +52,15 @@
 ; last argument may have a form
 ;	(optional (binding init) ... )
 
-(cond-expand
- ((or bigloo gambit)
-
-    ; For Gambit and Bigloo, which support DSSSL extended lambdas,
-    ; define-opt like the one in the example above is re-written into
-    ; (define-opt (foo arg1 arg2 #!optional (arg3 init3) (arg4 init4)) body)
-  (define-macro (define-opt bindings body . body-rest)
-    (let* ((rev-bindings (reverse bindings))
-	   (opt-bindings
-	    (and (pair? rev-bindings) (pair? (car rev-bindings))
-		 (eq? 'optional (caar rev-bindings))
-		 (cdar rev-bindings))))
-      (if opt-bindings
-	`(define ,(append (reverse
-			   (cons (with-input-from-string "#!optional" read)
-				 (cdr rev-bindings)))
-			  opt-bindings)
-	   ,body ,@body-rest)
-	`(define ,bindings ,body ,@body-rest))))
-  )
- (plt  ; DL: borrowed from "define-opt.scm"
-
-  (define-syntax define-opt
-   (syntax-rules (optional)
-    ((define-opt (name . bindings) . bodies)
-      (define-opt "seek-optional" bindings () ((name . bindings) . bodies)))
-
-    ((define-opt "seek-optional" ((optional . _opt-bindings))
-       (reqd ...) ((name . _bindings) . _bodies))
-      (define (name reqd ... . _rest)
-	(letrec-syntax
-	  ((handle-opts
-	     (syntax-rules ()
-	       ((_ rest bodies (var init))
-		 (let ((var (if (null? rest) init
-			      (if (null? (cdr rest)) (car rest)
-				(myenv:error "extra rest" rest)))))
-		   . bodies))
-	       ((_ rest bodies var) (handle-opts rest bodies (var #f)))
-	       ((_ rest bodies (var init) . other-vars)
-		 (let ((var (if (null? rest) init (car rest)))
-		       (new-rest (if (null? rest) '() (cdr rest))))
-		   (handle-opts new-rest bodies . other-vars)))
-	       ((_ rest bodies var . other-vars)
-		 (handle-opts rest bodies (var #f) . other-vars))
-	       ((_ rest bodies)		; no optional args, unlikely
-		 (let ((_ (or (null? rest) (myenv:error "extra rest" rest))))
-		   . bodies)))))
-	  (handle-opts _rest _bodies . _opt-bindings))))
-
-    ((define-opt "seek-optional" (x . rest) (reqd ...) form)
-      (define-opt "seek-optional" rest (reqd ... x) form))
-
-    ((define-opt "seek-optional" not-a-pair reqd form)
-      (define . form))			; No optional found, regular define
-
-    ((define-opt name body)		; Just the definition for 'name',
-      (define name body))		; for compatibilibility with define
-  ))
- )
- (else
-
-    ; For Scheme systems without DSSSL extensions, we rewrite the definition
-    ; of foo of the example above into the following:
-    ;	(define (foo arg1 arg2 . rest)
-    ;      (let* ((arg3 (if (null? rest) init3 (car rest)))
-    ;	          (arg4 (if (or (null? rest) (null? (cdr rest))) init4
-    ;		            (cadr rest)))
-    ;        body))
-    ; We won't handle more than two optional arguments
-
-  (define-macro define-opt (lambda (bindings body . body-rest)
-    (let* ((rev-bindings (reverse bindings))
-	   (opt-bindings
-	    (and (pair? rev-bindings) (pair? (car rev-bindings))
-		 (eq? 'optional (caar rev-bindings))
-		 (cdar rev-bindings))))
-      (cond
-       ((not opt-bindings)		; No optional arguments
-	`(define ,bindings ,body ,@body-rest))
-       ((null? opt-bindings)
-	`(define ,bindings ,body ,@body-rest))
-       ((or (null? (cdr opt-bindings)) (null? (cddr opt-bindings)))
-	(let* ((rest (gensym))		; One or two optional args
-	       (first-opt (car opt-bindings))
-	       (second-opt (and (pair? (cdr opt-bindings))
-				(cadr opt-bindings))))
-	  `(define ,(let loop ((bindings bindings))
-		      (if (null? (cdr bindings)) rest
-			  (cons (car bindings) (loop (cdr bindings)))))
-	     (let* ((,(car first-opt) (if (null? ,rest)
-					  ,(cadr first-opt)
-					  (car ,rest)))
-		    ,@(if second-opt
-			  `((,(car second-opt) 
-			     (if (or (null? ,rest) (null? (cdr ,rest)))
-				 ,(cadr second-opt)
-				 (cadr ,rest))))
-			  '()))
-	       ,body ,@body-rest))))
-       (else
-	'(myenv:error "At most two options are supported"))))))
-  ))
-
-(cond-expand
- (gambit
-      ; The following macro makes a macro that turns (read-char port)
-      ; into (##read-char port). We can't enter such a macro-converter
-      ; directly as readers of SCM and Bigloo, for ones, don't like
-      ; identifiers with two leading # characters
-   (define-macro (gambitize clause)
-     `(define-macro ,clause
-	,(list 'quasiquote
-	    (cons
-	     (string->symbol (string-append "##"
-					    (symbol->string (car clause))))
-	     (map (lambda (id) (list 'unquote id)) (cdr clause))))))
-   (gambitize (read-char port))
-   (gambitize (peek-char port))
-   (gambitize (eof-object? port))
-   ;(gambitize (string-append a b))
-   )
- (else #t))
-
-
+(define-syntax (define-opt stx)
+  (syntax-case stx ()
+    [(_ (name req-param ... (optional (opt-param opt-default) ...)) . body)
+     #'(define (name req-param ... [opt-param opt-default] ...) . body)]
+    [(_ (name . formals) . body)
+     #'(define (name . formals) . body)]
+    [(_ name expr)
+     (identifier? #'name)
+     #'(define name expr)]))
 
 ;------------------------------------------------------------------------
 
@@ -237,16 +112,17 @@
    ((number? arg)		; skip 'arg' characters
       (do ((i arg (-- i)))
       	  ((<= i 0) #f)
-      	  (if (eof-object? (read-char port))
+      	  (when (eof-object? (read-char port))
       	    (parser-error port "Unexpected EOF while skipping "
-			 arg " characters"))))
+                          arg " characters"))))
    (else			; skip until break-chars (=arg)
      (let loop ((c (read-char port)))
        (cond
          ((memv c arg) c)
          ((eof-object? c)
-           (if (memv '*eof* arg) c
-             (parser-error port "Unexpected EOF while skipping until " arg)))
+           (if (memv '*eof* arg)
+               c
+               (parser-error port "Unexpected EOF while skipping until " arg)))
          (else (loop (read-char port))))))))
 
 
@@ -305,9 +181,16 @@
 ; is to allow most of the tokens to fit in.
 ; Using a static buffer _dramatically_ reduces the amount of produced garbage
 ; (e.g., during XML parsing).
+;; ryanc: Unfortunately, single static buffer not safe in Racket
+;; FIXME: tune size, see if thread-cell cache is worth it
 (define input-parse:init-buffer
-  (let ((buffer (make-string 512)))
-    (lambda () buffer)))
+  (let ([buffers (make-thread-cell #f)])
+    (lambda ()
+      (let ([buffer (thread-cell-ref buffers)])
+        (or buffer
+            (let ([buffer (make-string 512)])
+              (thread-cell-set! buffers buffer)
+              buffer))))))
 
 (define-opt (next-token prefix-skipped-chars break-chars
 			(optional (comment "") (port (current-input-port))) )
@@ -321,7 +204,7 @@
     	    (substring buffer 0 i)		; was EOF expected?
     	    (parser-error port "EOF while reading a token " comment)))
     	(else
-    	  (if (>= i curr-buf-len)	; make space for i-th char in buffer
+    	  (when (>= i curr-buf-len)	; make space for i-th char in buffer
     	    (begin			; -> grow the buffer by the quantum
     	      (set! buffer (string-append buffer (make-string quantum)))
     	      (set! quantum curr-buf-len)
@@ -330,45 +213,7 @@
     	  (read-char port)			; move to the next char
     	  (loop (++ i) (peek-char port))
     	  )))))
-    	
 
-; Another version of next-token, accumulating characters in a list rather
-; than in a string buffer. I heard that it tends to work faster.
-; In reality, it works just as fast as the string buffer version above,
-; but it allocates 50% more memory and thus has to run garbage collection
-; 50% as many times. See next-token-comp.scm
-(cond-expand
- (plt
-  #f  ; set-cdr removed from plt
-  )
- (else
-  
-(define-opt (next-token-list-based prefix-skipped-chars break-chars
-		  (optional (comment "") (port (current-input-port))) )
-  (let* ((first-char (skip-while prefix-skipped-chars port))
-         (accum-chars (cons first-char '())))
-    (cond 
-      ((eof-object? first-char)
-        (if (memq '*eof* break-chars) ""
-          (parser-error port "EOF while skipping before reading token "
-		       comment)))
-      ((memq first-char break-chars) "")
-      (else
-        (read-char port)		; consume the first-char
-        (let loop ((tail accum-chars) (c (peek-char port)))
-          (cond
-            ((memq c break-chars) (list->string accum-chars))
-            ((eof-object? c)
-              (if (memq '*eof* break-chars)
-                (list->string accum-chars)		; was EOF expected?
-                (parser-error port "EOF while reading a token " comment)))
-            (else
-              (read-char port)		; move to the next char
-              (set-cdr! tail (cons c '()))
-              (loop (cdr tail) (peek-char port))
-        )))))))
-
- ))
 
 ; -- procedure+: next-token-of INC-CHARSET [PORT]
 ;	Reads characters from the PORT that belong to the list of characters
@@ -414,7 +259,7 @@
       (cond
         ((incl-list/pred c) =>
           (lambda (c)
-            (if (>= i curr-buf-len)	; make space for i-th char in buffer
+            (when (>= i curr-buf-len)	; make space for i-th char in buffer
               (begin			; -> grow the buffer by the quantum
                 (set! buffer (string-append buffer (make-string quantum)))
                 (set! quantum curr-buf-len)
@@ -428,7 +273,7 @@
       (cond
         ((not (memq c incl-list/pred)) (substring buffer 0 i))
     	(else
-    	  (if (>= i curr-buf-len)	; make space for i-th char in buffer
+    	  (when (>= i curr-buf-len)	; make space for i-th char in buffer
     	    (begin			; -> grow the buffer by the quantum
     	      (set! buffer (string-append buffer (make-string quantum)))
     	      (set! quantum curr-buf-len)
@@ -437,53 +282,3 @@
     	  (read-char port)			; move to the next char
     	  (loop (++ i) (peek-char port))
     	  ))))))
-
-(cond-expand
- (plt
-  #t  ; DL: already available in PLT
- )
- (else
-
-; -- procedure+: read-line [PORT]
-;	Reads one line of text from the PORT, and returns it as a string.
-;	A line is a (possibly empty) sequence of characters terminated
-;	by CR, CRLF or LF (or even the end of file).
-;	The terminating character (or CRLF combination) is removed from
-;	the input stream. The terminating character(s) is not a part
-;	of the return string either.
-;	If EOF is encountered before any character is read, the return
-;	value is EOF.
-; 
-;	The optional argument PORT defaults to the current input port.
-
-(define-opt (read-line (optional (port (current-input-port))) )
-  (if (eof-object? (peek-char port)) (peek-char port)
-    (let* ((line
-             (next-token '() '(#\newline #\return *eof*)
-			 "reading a line" port))
-           (c (read-char port)))	; must be either \n or \r or EOF
-       (and (eq? c #\return) (eq? (peek-char port) #\newline)
-         (read-char port))			; skip \n that follows \r
-       line)))
-
-
-; -- procedure+: read-string N [PORT]
-;	Reads N characters from the PORT, and  returns them in a string.
-;	If EOF is encountered before N characters are read, a shorter string
-;	will be returned.
-;	If N is not positive, an empty string will be returned.
-;	The optional argument PORT defaults to the current input port.
-
-(define-opt (read-string n (optional (port (current-input-port))) )
-  (if (not (positive? n)) ""
-    (let ((buffer (make-string n)))
-      (let loop ((i 0) (c (read-char port)))
-        (if (eof-object? c) (substring buffer 0 i)
-          (let ((i1 (++ i)))
-            (string-set! buffer i c)
-            (if (= i1 n) buffer
-              (loop i1 (read-char port)))))))))
-
-))
-
-(provide (all-defined))

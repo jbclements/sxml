@@ -1,8 +1,11 @@
 #lang scribble/doc
+@(require scribble/manual
+          "util.rkt"
+          #|
+          (for-label (this-package-in main))
+          |#)
 
-@(require scribble/manual)
-
-@section{Raw Lists of Exported Identifiers}
+@title{Raw Lists of Exported Identifiers}
 
 These lists appear without documentation.  Searching this page is probably better
 than trawling through the source, and perhaps you'll consider extracting or 
@@ -10,9 +13,8 @@ contributing documentation for them.
 
 
 @(section "SSAX-code.rkt")
-  
-
-  @racketblock[(#%provide
+@racketblock[
+(#%provide
    attlist-fold
    attlist-null?
    attlist-remove-top
@@ -63,8 +65,10 @@ contributing documentation for them.
   
 @(section "common.rkt")
 @racketblock[(#%provide close-output-string and-let*)]
-  @(section "myenv.rkt")
-  @racketblock[(#%provide
+
+@(section "myenv.rkt")
+@racketblock[
+(#%provide
    cerr
    assert
    cond-expand
@@ -90,8 +94,10 @@ contributing documentation for them.
    let-values*
    ++
    --!)]
-  @(section "util.rkt")
-  @racketblock[(#%provide
+
+@(section "util.rkt")
+@racketblock[
+(#%provide
    any?
    make-char-quotator
    list-intersperse
@@ -100,10 +106,13 @@ contributing documentation for them.
    string-split
    substring?
    string->integer)]
-  @(section "parse-error.rkt")
-  @racketblock[(#%provide SSAX:warn parser-error ssax:warn)]
-  @(section "input-parse.rkt")
-  @racketblock[(#%provide
+
+@(section "parse-error.rkt")
+@racketblock[(#%provide SSAX:warn parser-error ssax:warn)]
+
+@(section "input-parse.rkt")
+@racketblock[
+(#%provide
    skip-until
    assert-curr-char
    input-parse:init-buffer
@@ -112,20 +121,26 @@ contributing documentation for them.
    skip-while
    define-opt
    peek-next-char)]
-  @(section "look-for-str.rkt")
-  @racketblock[(#%provide MISCIO:find-string-from-port? find-string-from-port?)]
-  @(section "char-encoding.rkt")
-  @racketblock[(#%provide
+
+@(section "look-for-str.rkt")
+@racketblock[(#%provide MISCIO:find-string-from-port? find-string-from-port?)]
+
+@(section "char-encoding.rkt")
+@racketblock[
+(#%provide
    char-newline
    char-return
    char-space
    ucscode->char
    ascii->char
    char-tab)]
-  @(section "SXML-tree-trans.rkt")
-  @racketblock[(#%provide SRV:send-reply replace-range foldts post-order pre-post-order)]
-  @(section "sxpathlib.rkt")
-  @racketblock[(#%provide
+
+@(section "SXML-tree-trans.rkt")
+@racketblock[(#%provide SRV:send-reply replace-range foldts post-order pre-post-order)]
+
+@(section "sxpathlib.rkt")
+@racketblock[
+(#%provide
    node-or
    node-equal?
    node-join
@@ -156,8 +171,10 @@ contributing documentation for them.
    map-union
    sxml:element?
    sxml:attr-list)]
-  @(section "srfi-12.rkt")
-  @racketblock[(#%provide
+
+@(section "srfi-12.rkt")
+@racketblock[
+(#%provide
    signal
    condition-property-accessor
    exc:signal
@@ -169,17 +186,22 @@ contributing documentation for them.
    abort
    condition-predicate
    with-exception-handler)]
-  @(section "mime.rkt")
-  @racketblock[(#%provide MIME:parse-content-type MIME:read-headers http-token-char?)]
-  @(section "http.rkt")
-  @racketblock[(#%provide
+
+@(section "mime.rkt")
+@racketblock[(#%provide MIME:parse-content-type MIME:read-headers http-token-char?)]
+
+@(section "http.rkt")
+@racketblock[
+(#%provide
    flush-output-port
    http-transaction
    open-tcp-connection
    shutdown-sender
    define-def)]
-  @(section "access-remote.rkt")
-  @racketblock[(#%provide
+
+@(section "access-remote.rkt")
+@racketblock[
+(#%provide
    ar:components->uri
    ar:file-extension
    ar:normalize-dir-lst
@@ -190,8 +212,10 @@ contributing documentation for them.
    ar:segments->path
    ar:uri->components
    resource-exists?)]
-  @(section "id.rkt")
-  @racketblock[(#%provide
+
+@(section "id.rkt")
+@racketblock[
+(#%provide
    id:read-document-declaration
    SXML->SXML+id
    id:AttType-ID?
@@ -219,8 +243,10 @@ contributing documentation for them.
    id:unite-id-attrs
    id:process-AttDef
    id:process-prolog)]
-  @(section "xlink-parser.rkt")
-  @racketblock[(#%provide
+
+@(section "xlink-parser.rkt")
+@racketblock[
+(#%provide
    xlink:add-default-arc
    xlink:append-branch
    xlink:check-type-show-actuate-constraints
@@ -292,10 +318,13 @@ contributing documentation for them.
    xlink:none-end
    xlink:none-start
    xlink:parser-error)]
-  @(section "ssax-prim.rkt")
-  @racketblock[(#%provide reverse-collect-str-drop-ws RES-NAME->SXML reverse-collect-str)]
-  @(section "multi-parser.rkt")
-  @racketblock[(#%provide
+
+@(section "ssax-prim.rkt")
+@racketblock[(#%provide reverse-collect-str-drop-ws RES-NAME->SXML reverse-collect-str)]
+
+@(section "multi-parser.rkt")
+@racketblock[
+(#%provide
    bad-accessor
    get-sxml-seed
    make-seed
@@ -304,8 +333,8 @@ contributing documentation for them.
    ssax:multi-parser)]
 
 @section{sxml-tools.rkt}
-
-    @racketblock['(#%provide
+@racketblock[
+(#%provide
      sxml:aux-as-list
      sxml:aux-list-node
      sxml:change-attrlist
@@ -364,10 +393,9 @@ contributing documentation for them.
      sxml:ns-uri->nodes
      sxml:squeeze)]
 
-    
-    @section{sxpath-ext.rkt}
-    
-    @racketblock['(#%provide
+@section{sxpath-ext.rkt}
+@racketblock[
+(#%provide
      sxml:merge-sort
      sxml:nested-loop-join
      sxml:not-equal?
@@ -395,11 +423,10 @@ contributing documentation for them.
      sxml:string->tree
      sxml:string-in-tree?
      sxml:string-value)]
-    
-    
-    @section{xpath-parser.rkt}
-    
-    @racketblock['(#%provide
+
+@section{xpath-parser.rkt}
+@racketblock[
+(#%provide
      sxml:parse-check-sequence
      sxml:assert-end-of-path
      sxml:parse-name
@@ -422,11 +449,10 @@ contributing documentation for them.
      txp:param-value
      txp:parameterize-parser
      txp:resolve-ns-prefix)]
-    
-    
-    @(section "txpath.rkt")
-    
-    @racketblock['(#%provide
+
+@(section "txpath.rkt")
+@racketblock[
+(#%provide
      sxml:xpointer+index
      sxml:classic-res
      sxml:core-boolean
@@ -471,15 +497,13 @@ contributing documentation for them.
      sxml:xpointer
      sxml:xpointer+root+vars
      sxml:xpointer-runtime-error)]
-    
-    
-    
-    @(section "sxpath.rkt")
-    @racketblock['(#%provide sxml:id-alist sxpath car-sxpath if-car-sxpath if-sxpath)]
-    
-    
-    @(section "xpath-ast.rkt")
-    @racketblock['(#%provide
+
+@(section "sxpath.rkt")
+@racketblock[(#%provide sxml:id-alist sxpath car-sxpath if-car-sxpath if-sxpath)]
+
+@(section "xpath-ast.rkt")
+@racketblock[
+(#%provide
      txp:ast-params
      txp:ast-api-helper
      txp:ast-operation-helper
@@ -493,10 +517,10 @@ contributing documentation for them.
      txp:sxpath->ast
      txp:xpath->ast
      txp:xpointer->ast)]
-    
-    
-    @(section "xpath-context_xlink.rkt")
-    @racketblock['(#%provide
+
+@(section "xpath-context_xlink.rkt")
+@racketblock[
+(#%provide
      draft:ast-function-call
      draft:ast-literal
      draft:ast-node-test
@@ -650,10 +674,10 @@ contributing documentation for them.
      xlink:unite-duplicate-keys-in-alist
      xlink:uris
      draft:ast-number)]
-    
-    
-    @(section "ddo-axes.rkt")
-    @racketblock['(#%provide
+
+@(section "ddo-axes.rkt")
+@racketblock[
+(#%provide
      ddo:following-single-level
      ddo:list-last
      ddo:namespace
@@ -690,8 +714,9 @@ contributing documentation for them.
      ddo:preceding-sibling-single-level
      ddo:preceding-sibling-single-level-pos)]
     
-    @(section "ddo-txpath.rkt")
-    @racketblock['(#%provide
+@(section "ddo-txpath.rkt")
+@racketblock[
+(#%provide
      ddo:ast-path-expr
      ddo:type-string
      ddo:ast-predicate
@@ -760,10 +785,10 @@ contributing documentation for them.
      ddo:var-binding->tree
      ddo:vector-copy-set
      ddo:xpath-expr)]
-    
-    
-    @(section "lazy-xpath.rkt")
-    @racketblock['(#%provide
+
+@(section "lazy-xpath.rkt")
+@racketblock[
+(#%provide
      lazy:ast-variable-reference
      lazy:result->list
      lazy:ast-absolute-location-path
@@ -857,18 +882,19 @@ contributing documentation for them.
      lazy:sxpath
      lazy:txpath
      lazy:xpath-expr)]
-    
-    @(section "lazy-ssax.rkt")
-    @racketblock['(#%provide
+
+@(section "lazy-ssax.rkt")
+@racketblock[
+(#%provide
      lazy:except-last
      lazy:force-descendants
      lazy:replace-common
      lazy:seed-common
      lazy:xml->sxml)]
-    
-    
-    @(section "modif.rkt")
-    @racketblock['(#%provide
+
+@(section "modif.rkt")
+@racketblock[
+(#%provide
      modif:delete
      modif:delete-undeep
      modif:insert-following
@@ -886,10 +912,10 @@ contributing documentation for them.
      sxml:tree-trans
      sxml:unite-annot-attributes-lists
      sxml:update-specifiers->lambdas)]
-    
-    
-    @(section "serializer.rkt")
-    @racketblock['(#%provide
+
+@(section "serializer.rkt")
+@racketblock[
+(#%provide
      srl:name->qname-components
      srl:display-fragments-2nesting
      srl:processing-instruction->str-lst
@@ -939,5 +965,3 @@ contributing documentation for them.
      srl:top->nested-str-lst
      srl:update-space-specifier
      srl:xml-char-escaped)]
-     
-

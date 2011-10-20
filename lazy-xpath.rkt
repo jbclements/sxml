@@ -1,15 +1,15 @@
-#lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
-(require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
-(require "sxpath-ext.rkt")
-(require "xpath-parser.rkt")
-(require "txpath.rkt")
-(require "xpath-ast.rkt")
-(require "xpath-context_xlink.rkt")
-
-(require (only racket filter call-with-input-string))
+#lang racket/base
+(require racket/promise
+         (only-in racket/port call-with-input-string)
+         srfi/13/string
+         "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
+         "sxpath-ext.rkt"
+         "xpath-parser.rkt"
+         "txpath.rkt"
+         "xpath-ast.rkt"
+         "xpath-context_xlink.rkt")
+(provide (all-defined-out))
 
 ;; This module implements lazy SXPath evaluation over lazy SXML documents
 ;
@@ -43,46 +43,10 @@
 ;=========================================================================
 ; Misc helpers for working with a lazy nodeset
 
-; Escaping the ## for some Scheme implementations
-(cond-expand
- (gambit
-  ; The following macro constructs Gambit-specific ids on the fly
-  ; Borrowed from "http.scm"
-  (define-macro (_gid id)
-    (string->symbol (string-append "##" (symbol->string id))))
-  )
- (chicken
-  ; The following macro encapsulates the function ##sys#structure?
-  ; Thanks to Thomas Chust and Felix Winkelmann for the explanation of
-  ; qualified symbols in Chicken
-  (define-macro (chk:sys-structure?)
-    (string->symbol
-     (string-append (string (integer->char 3)) "sys" "structure?")))
-  )
- (else
-  #t))
-
 ; Predicate for detecting a promise
 ; There is no such a predicate in R5RS, so different Scheme implementations
 ; use different names for this functionality
-(define lazy:promise?
-  (cond-expand
-   (plt promise?)
-   (bigloo
-    procedure?   ; ATTENTION: returns #t in more general situations
-    )
-   (chicken
-    ; Thanks to Zbigniew Szadkowski <zbigniewsz@gmail.com>
-    ; for the insight of this function
-    (lambda (p) ((chk:sys-structure?) p 'promise))
-    )
-   (gambit
-    (_gid promise?)
-    )
-   (else
-    (lambda (obj) #f)   ; ATTENTION: just makes the approach applicable for
-                        ; conventional SXML documents
-   )))
+(define lazy:promise? promise?)
 
 ;-------------------------------------------------
 ; Lazy analogues for common list operations
@@ -154,8 +118,7 @@
 
 ; Like conventional cdr
 (define (lazy:cdr nodeset)
-  (if
-   (lazy:promise? (car nodeset))
+  (when (lazy:promise? (car nodeset))
    (let ((nset-car (force (car nodeset))))
      (lazy:cdr
       ((if (nodeset? nset-car) append cons)
@@ -1003,7 +966,7 @@
                  ((string-op elem (car nset)) #t)
                  (else (loop (cdr nset))))))
             (else  ; unknown datatype
-             (cerr "Unknown datatype: " elem nl)
+             (sxml:warn 'lazy:equality-cmp "unknown datatype: ~e" elem)
              #f))))))))
 
 (define lazy:equal? (lazy:equality-cmp eq? = string=?))
@@ -1090,8 +1053,7 @@
       (cond
         ((nodeset? res) (lazy:length res))
         (else
-         (sxml:xpointer-runtime-error
-          "count() function - an argument is not a nodeset")
+         (sxml:xpath-type-error "count()" "nodeset" res)
          0)))))
 
 ; id(object)
@@ -1136,8 +1098,7 @@
             (cond
               ((null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")              
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (lazy:car obj))) "")  ; no name
               (else
@@ -1174,8 +1135,7 @@
             (cond
               ((lazy:null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (lazy:car obj))) "")  ; no name
               (else
@@ -1204,8 +1164,7 @@
             (cond
               ((lazy:null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (lazy:car obj))) "")  ; no name
               (else
@@ -1481,8 +1440,7 @@
                     (lazy:string-value (sxml:context->node node))))
                  (lazy:result->list res))))
         (else
-         (sxml:xpointer-runtime-error
-          "SUM function - an argument is not a nodeset")
+         (sxml:xpath-type-error "sum()" "nodeset" res)
          0)))))
 
 ; floor(number)
@@ -2072,8 +2030,7 @@
                  (let ((nset ((car fs) nodeset position+size var-binding)))
                    (cond
                      ((not (nodeset? nset))
-                      (sxml:xpointer-runtime-error 
-                       "expected - nodeset instead of " nset)
+                      (sxml:xpath-type-error "union" "nodeset" nset)
                       '())
                    (else nset)))
                  res)))
@@ -2115,8 +2072,7 @@
                        (cond
                          ((nodeset? nset) nset)
                          (else
-                          (sxml:xpointer-runtime-error 
-                           "expected - nodeset instead of " nset)
+                          (sxml:xpath-type-error "path" "nodeset" nset)
                           '())))
                       (fs converters))
               (if (null? fs)
@@ -2152,8 +2108,7 @@
                                  (nodeset? prim-res)
                                  prim-res
                                  (begin 
-                                   (sxml:xpointer-runtime-error 
-                                    "expected - nodeset instead of " prim-res)
+                                   (sxml:xpath-type-error "filter" "nodeset" prim-res)
                                    '())))
                                (preds pred-impl-lst))
                 (if
@@ -2175,7 +2130,7 @@
          ((assoc name var-binding)
           => cdr)
          (else
-          (sxml:xpointer-runtime-error "unbound variable - " name)
+          (sxml:xpath-error "variable reference: unbound variable: ~e" name)
           '())))
      0  ; num-ancestors
      #f  ; requires-last?
@@ -2322,5 +2277,3 @@
 
 ; Support for native sxpath syntax
 (define lazy:sxpath (lazy:api-helper txp:sxpath->ast lazy:ast-expr))
-
-(provide (all-defined))

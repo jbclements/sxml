@@ -1,12 +1,7 @@
-#lang racket
-
-; Module header is generated automatically
-(require (lib "defmacro.ss"))
-(require (lib "string.ss" "srfi/13"))
-  
+#lang racket/base
 (require "ssax/ssax.rkt")
+(provide (all-defined-out))
 
-;
 ; This software is in Public Domain.
 ; IT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 ;
@@ -32,15 +27,11 @@
       (if (pred (car l))
 	(cons (proc (car l)) (rpt (cdr l)))
 	(rpt (cdr l))))))
-      
+
 ; Applies pred to every member of lst and yields #t if all the results
 ; are #t
-(define (check-list pred lst) 
-  (cond
-    ((null? lst) #t)
-    ((pred (car lst))
-     (check-list pred (cdr lst)))
-    (else #f)))
+(define (check-list pred lst)
+  (andmap pred lst))
 
 ; Returns attr-list node for a given obj 
 ;   or #f if it is absent
@@ -84,20 +75,12 @@
 
 ; optimized (string-rindex name #\:)
 ; returns position of a separator between namespace-id and LocalName
-(define-macro (sxml:find-name-separator len)
-  `(let rpt ((pos (-- ,len))) 
-     (cond
-       ((negative? pos) #f) 	
-       ((char=? #\: (string-ref name pos)) pos)
-       (else (rpt (-- pos))))))
-  
-
-; sxml error message
-(define (sxml:error . messages)
-  (cerr nl "SXML ERROR: ")
-  (apply cerr messages)
-  (cerr nl)
-  (exit -1))
+(define-syntax-rule (sxml:find-name-separator name len)
+  (let rpt ((pos (-- len))) 
+    (cond
+     ((negative? pos) #f) 	
+     ((char=? #\: (string-ref name pos)) pos)
+     (else (rpt (-- pos))))))
 
 ;==============================================================================
 ; Predicates
@@ -108,7 +91,7 @@
 ; It is a SXML counterpart of XML empty-element.
 (define (sxml:empty-element? obj)
   (not 
-    ((select-first-kid 
+   ((select-first-kid 
      (lambda(x)
        (or ((ntype-names?? '(*PI* *COMMENT* *ENTITY*)) x)
            ((ntype?? '*) x)
@@ -132,16 +115,14 @@
 ; Returns #t if the given <obj> is normalized SXML element.
 ;  The element itself and all its nested elements have to be normalised.
 (define (sxml:normalized? obj)
-    (and
-      (sxml:shallow-normalized? obj)
-    (check-list
-      (lambda(x)
-	(if
-	   (sxml:element? x)
-	   (sxml:normalized? x)
-	   #t))
-       (sxml:content obj))
-    ))
+  (and (sxml:shallow-normalized? obj)
+       (check-list
+        (lambda(x)
+          (if
+           (sxml:element? x)
+           (sxml:normalized? x)
+           #t))
+        (sxml:content obj))))
 
 ; Returns #t if the given <obj> is shallow-minimized SXML element.
 ; The element itself has to be minimised but its nested elements are not tested.
@@ -199,7 +180,7 @@
   (let* ((name (symbol->string (car obj)))
 	 (len (string-length name)))
     (cond
-      ((sxml:find-name-separator len)
+      ((sxml:find-name-separator name len)
        => (lambda (pos) 
 	    (substring name (+ pos 1) len)))
       (else name))))
@@ -208,7 +189,7 @@
 (define (sxml:name->ns-id sxml-name)
   (let* ((name (symbol->string sxml-name)))
     (cond
-      ((sxml:find-name-separator (string-length name))
+      ((sxml:find-name-separator name (string-length name))
        => (lambda (pos) 
 	    (substring name  0 pos)))
       (else #f))))
@@ -440,23 +421,7 @@
 ; 2. pure functions without side-effects which return modified elements.
 ;   An example: 
 ;      sxml:change-content
- 
-; Change the content of given SXML element to <new-content>
-; If <new-content> is an empty list then the <obj> is transformed 
-; The resulting SXML element is normalized
-; Former name sxml:content!
-(cond-expand
- (plt
-  (void)  ; set-cdr removed from plt
-  )
- (else
-  (define (sxml:change-content! obj new-content)
-    (set-cdr! obj 
-              `(
-                ,@(sxml:attr-as-list obj)
-                ,@(sxml:aux-as-list obj)
-                ,@new-content)))
-  ))
+
   
 ; Change the content of given SXML element to <new-content>
 ; If <new-content> is an empty list then the <obj> is transformed 
@@ -481,38 +446,7 @@
      ,@(sxml:aux-as-list obj)
      ,@(sxml:content obj)))
 
-; The resulting SXML element is normalized, if <new-attrlist> is empty,
-; the cadr of <obj> is (@)
-; Former name sxml:attrlist!
-(cond-expand
- (plt
-  (void)  ; set-cdr removed from plt
-  )
- (else
-  (define (sxml:change-attrlist! obj new-attrlist)
-    (set-cdr! obj 
-              `(
-                ,@(cond 
-                    (new-attrlist
-                     `((@ ,@new-attrlist)))
-                    ((sxml:aux-list-node obj)
-                     '((@)))
-                    (else `()))
-                ,@(sxml:aux-as-list obj)
-                ,@(sxml:content obj))))
-  ))
-      
-; Change a name of SXML element destructively
-; Former name was 'sxml:name!'
-(cond-expand
- (plt
-  (void)  ; set-car removed from plt
-  )
- (else
-  (define (sxml:change-name! obj new-name)
-    (set-car! obj new-name))
-  ))
-  
+
 ; Returns SXML element with its name changed 
 (define (sxml:change-name obj new-name)
   (cons new-name (cdr obj)))
@@ -529,28 +463,6 @@
 	(@ ,@(cons attr attr-list))
 	,@(sxml:aux-as-list obj)
 	,@(sxml:content obj)))))
-
-; Add an attribute <attr> for an element <obj>
-; Returns #f if the attribute with given name already exists. 
-; The resulting SXML node is normalized.
-; Linear update counterpart to sxml:add-attr
-(cond-expand
- (plt
-  (void)  ; set-cdr removed from plt
-  )
- (else
-  (define (sxml:add-attr! obj attr)
-    (let ((attr-list (sxml:attr-list obj)))
-      (if (assq (car attr) attr-list) 
-          #f
-          (begin
-            (set-cdr! obj 
-                      `(
-                        (@ ,@(cons attr attr-list))
-                        ,@(sxml:aux-as-list obj)
-                        ,@(sxml:content obj)))
-            obj))))
-  ))
 
 
 ; Returns SXML element <obj> with changed value of attribute <attr> or #f
@@ -575,24 +487,6 @@
 		 ,@(sxml:content obj)
 		 )))
 	(else #f)))))
-    
-; Change value of the attribute for element <obj> 
-; <attr> is (<attr-name> <attr-value>)
-; Returns #f if where is no such attribute
-(cond-expand
- (plt
-  (void)  ; set-cdr removed from plt
-  )
- (else
-  (define (sxml:change-attr! obj attr)
-    (let ((x (sxml:attr-list obj)))
-      (if (null? x)
-          #f
-          (cond 
-            ((assv (car attr) x) => (lambda (y)
-                                      (set-cdr! y (cdr attr)) obj))
-            (else #f)))))
-  ))
 
 ; Set attribute <attr> of element <obj> 
 ; If there is no such attribute the new one is added
@@ -619,25 +513,6 @@
 	   ,@(sxml:content obj))))
     ))
 
-; Set attribute <attr> of element <obj> 
-; If there is no such attribute the new one is added
-(cond-expand
- (plt
-  (void)  ; set-cdr removed from plt
-  )
- (else
-  (define (sxml:set-attr! obj attr)
-    (let ((attr-list (sxml:attr-list obj)))
-      (cond 
-        ((assv (car attr) attr-list) 
-         => (lambda (x) (set-cdr! x (cdr attr))))
-        (else (set-cdr! obj
-                        `((@ ,@(cons attr attr-list)) 
-                          ,@(sxml:aux-as-list obj)
-                          ,@(sxml:content obj))))
-        )))
-  ))
-
 ; Returns SXML element <obj> with an auxiliary node <aux-node> added 
 (define (sxml:add-aux obj aux-node)
       `(,(sxml:name obj)
@@ -645,58 +520,7 @@
 	(@@ ,@(cons aux-node (sxml:aux-list obj)))
 	,@(sxml:content obj)))
 
-; Add an auxiliary node <aux-node> for an element <obj>
-(cond-expand
- (plt
-  (void)  ; set-cdr removed from plt
-  )
- (else
-  (define (sxml:add-aux! obj aux-node)
-    (set-cdr! obj 
-              `(
-                (@ ,@(sxml:attr-list obj))
-                (@@ ,@(cons aux-node (sxml:aux-list obj)))
-                ,@(sxml:content obj)))
-    obj)
-  ))
 
-; Eliminates empty lists of attributes and aux-lists for given SXML element 
-; <obj> and its descendants ("minimize" it)
-; Returns: minimized and normalized SXML element
-(cond-expand
- (plt
-  (void)  ; set-cdr removed from plt
-  )
- (else
-  (define (sxml:squeeze! obj)
-    (set-cdr! obj 
-              `(,@(cond 
-                    ((sxml:attr-list-node obj)
-                     => (lambda (atl) 
-                          (if (and (null? (cdr atl)) 
-                                   (null? (sxml:aux-list obj)))
-                              '()
-                              (list atl))))	
-                    (else '()))
-                ,@(cond ((sxml:aux-list-node obj)
-                         => (lambda (axl) 
-                              (if (null? (cdr axl))
-                                  '()
-                                  (list axl))))
-                        (else '()))
-                ,@(map
-                   (lambda(x)
-                     (cond 
-                       (((ntype?? '*) x)
-                        (sxml:squeeze! x)
-                        x)
-                       (else x)))
-                   (sxml:content obj))
-                ))
-    )
-  ))
-
-	     
 ; Eliminates empty lists of attributes and aux-lists for given SXML element 
 ; <obj> and its descendants ("minimize" it)
 ; Returns: minimized and normalized SXML element
@@ -743,6 +567,7 @@
 	     (sxml:clean x))
 	    (else x)))
        (sxml:content obj))))
+
 ;==============================================================================
 ; SXPath-related 
 
@@ -788,43 +613,7 @@
     ((and (pair? obj)
           (eq? (car obj) '*TOP* ))
      '())           
-     (else (sxml:error nl "PARENT pointer is absent in: " obj nl)
-	   ))))
-
-(cond-expand
- (plt
-  (void)  ; set-cdr removed from plt
-  )
- (else
-  (define (sxml:add-parents obj . top-ptr)
-    (let rpt 
-      ((elt obj)
-       (p '*TOP*)
-       (at-aux (if (eq? (sxml:name obj) '*TOP*)
-                   (list (cons '@@ (sxml:aux-list-u obj)))
-                   (list
-                    (cons '@ (sxml:attr-list obj))
-                    (cons '@@ (cons `(*PARENT* ,(lambda() (car top-ptr))) 
-                                    (sxml:aux-list obj))))))
-       ) ; *TOP* is a parent for top-level element
-      (let* ((h (list (sxml:name elt)))
-             (b  (append 
-                  at-aux
-                  (map
-                   (lambda(x)
-                     (cond 
-                       (((ntype?? '*) x)
-                        (rpt x h
-                             (list
-                              (cons '@ (sxml:attr-list x))
-                              (cons '@@ (cons `(*PARENT* ,(lambda() h)) 
-                                              (sxml:aux-list x))))
-                             ))
-                       (else x)))
-                   (sxml:content elt)))))
-        (set-cdr! h b)
-        h)))
-  ))
+     (else (error 'sxml:node-parent "PARENT pointer is absent in: ~e" obj)))))
 
 ; Lookup an element using its ID 
 (define (sxml:lookup id index)
@@ -868,7 +657,7 @@
 	   ,@(if (null? content) '("/>")
 	       `(">" ,@(sxml:sxml->xml content) "</" ,nm ">")))))
     ((string? tree) (sxml:string->xml tree)) ; *text*
-    (else (sxml:error "sxml->html - unexpected type of node: " tree))))
+    (else (error 'sxml:sxml->xml "unexpected type of node: ~e" tree))))
 
 
 ;------------------------------------------------------------------------------
@@ -916,7 +705,4 @@
 	       (if (sxml:non-terminated-html-tag? name) '(">") '("/>"))
 	       `(">" ,@(sxml:sxml->html content) "</" ,nm ">")))))
     ((string? tree) (sxml:string->html tree)) ; *text*
-    (else (sxml:error "sxml->html - unexpected type of node: " tree))))
-
-
-(provide (all-defined-out))
+    (else (error 'sxml:sxml->html "unexpected type of node: ~e" tree))))

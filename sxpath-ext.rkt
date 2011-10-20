@@ -1,10 +1,9 @@
-#lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
-(require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
-
-(require (only racket/port call-with-input-string))
+#lang racket/base
+(require (only-in racket/port call-with-input-string)
+         "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
+         "sxml-tools.rkt")
+(provide (all-defined-out))
 
 ;; W3C compliant extensions to SXPathlib
 ; $Id: sxpath-ext.scm,v 1.911 2002/12/06 22:10:53 kl Exp kl $:
@@ -370,7 +369,7 @@
                  ((string-op elem (car nset)) #t)
                  (else (loop (cdr nset))))))
             (else  ; unknown datatype
-             (cerr "Unknown datatype: " elem nl)
+             (sxml:warn 'sxml:equality-cmp "unknown datatype: ~e" elem)
              #f))))))))
 
 (define sxml:equal? (sxml:equality-cmp eq? = string=?))
@@ -623,5 +622,3 @@
 			 (cdr seqs))))
 		((eq? (car seq) node) ((sxml:filter test-pred?) (cdr seq)))
 		(else (rpt (cdr seq)))))))))))
-
-(provide (all-defined))
