@@ -82,14 +82,6 @@
      ((char=? #\: (string-ref name pos)) pos)
      (else (rpt (-- pos))))))
 
-
-; sxml error message
-(define (sxml:error . messages)
-  (cerr nl "SXML ERROR: ")
-  (apply cerr messages)
-  (cerr nl)
-  (exit -1))
-
 ;==============================================================================
 ; Predicates
 
@@ -621,8 +613,7 @@
     ((and (pair? obj)
           (eq? (car obj) '*TOP* ))
      '())           
-     (else (sxml:error nl "PARENT pointer is absent in: " obj nl)
-	   ))))
+     (else (error 'sxml:node-parent "PARENT pointer is absent in: ~e" obj)))))
 
 ; Lookup an element using its ID 
 (define (sxml:lookup id index)
@@ -666,7 +657,7 @@
 	   ,@(if (null? content) '("/>")
 	       `(">" ,@(sxml:sxml->xml content) "</" ,nm ">")))))
     ((string? tree) (sxml:string->xml tree)) ; *text*
-    (else (sxml:error "sxml->html - unexpected type of node: " tree))))
+    (else (error 'sxml:sxml->xml "unexpected type of node: ~e" tree))))
 
 
 ;------------------------------------------------------------------------------
@@ -714,4 +705,4 @@
 	       (if (sxml:non-terminated-html-tag? name) '(">") '("/>"))
 	       `(">" ,@(sxml:sxml->html content) "</" ,nm ">")))))
     ((string? tree) (sxml:string->html tree)) ; *text*
-    (else (sxml:error "sxml->html - unexpected type of node: " tree))))
+    (else (error 'sxml:sxml->html "unexpected type of node: ~e" tree))))
