@@ -1052,8 +1052,7 @@
       (cond
         ((nodeset? res) (lazy:length res))
         (else
-         (sxml:xpointer-runtime-error
-          "count() function - an argument is not a nodeset")
+         (sxml:xpath-type-error "count()" "nodeset" res)
          0)))))
 
 ; id(object)
@@ -1098,8 +1097,7 @@
             (cond
               ((null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")              
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (lazy:car obj))) "")  ; no name
               (else
@@ -1136,8 +1134,7 @@
             (cond
               ((lazy:null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (lazy:car obj))) "")  ; no name
               (else
@@ -1166,8 +1163,7 @@
             (cond
               ((lazy:null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (lazy:car obj))) "")  ; no name
               (else
@@ -1443,8 +1439,7 @@
                     (lazy:string-value (sxml:context->node node))))
                  (lazy:result->list res))))
         (else
-         (sxml:xpointer-runtime-error
-          "SUM function - an argument is not a nodeset")
+         (sxml:xpath-type-error "sum()" "nodeset" res)
          0)))))
 
 ; floor(number)
@@ -2034,8 +2029,7 @@
                  (let ((nset ((car fs) nodeset position+size var-binding)))
                    (cond
                      ((not (nodeset? nset))
-                      (sxml:xpointer-runtime-error 
-                       "expected - nodeset instead of " nset)
+                      (sxml:xpath-type-error "union" "nodeset" nset)
                       '())
                    (else nset)))
                  res)))
@@ -2077,8 +2071,7 @@
                        (cond
                          ((nodeset? nset) nset)
                          (else
-                          (sxml:xpointer-runtime-error 
-                           "expected - nodeset instead of " nset)
+                          (sxml:xpath-type-error "path" "nodeset" nset)
                           '())))
                       (fs converters))
               (if (null? fs)
@@ -2114,8 +2107,7 @@
                                  (nodeset? prim-res)
                                  prim-res
                                  (begin 
-                                   (sxml:xpointer-runtime-error 
-                                    "expected - nodeset instead of " prim-res)
+                                   (sxml:xpath-type-error "filter" "nodeset" prim-res)
                                    '())))
                                (preds pred-impl-lst))
                 (if
@@ -2137,7 +2129,7 @@
          ((assoc name var-binding)
           => cdr)
          (else
-          (sxml:xpointer-runtime-error "unbound variable - " name)
+          (sxml:xpath-error "variable reference: unbound variable: ~e" name)
           '())))
      0  ; num-ancestors
      #f  ; requires-last?
