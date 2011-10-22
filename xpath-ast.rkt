@@ -1,9 +1,8 @@
-#lang mzscheme
-
-(require "ssax/ssax.rkt")
-(require "xpath-parser.rkt")
-
-(require (only racket filter))
+#lang racket/base
+(require "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
+         "xpath-parser.rkt")
+(provide (all-defined-out))
 
 ;; XPath/XPointer -> Abstract Syntax Tree parser
 ;
@@ -412,7 +411,7 @@
                     (cdr reducing-path)
                     (cons `(predicate ,pred-ast) filters)))))))))
           (else
-           (cerr "Invalid path step: " (car path))
+           (sxml:warn 'tsp:sxpath->ast "invalid path step: ~e" (car path))
            #f))))))
 
 
@@ -467,5 +466,3 @@
          ,@(map
             (lambda (pred-expr) `(predicate ,pred-expr))
             pred-expr-list)))
-
-(provide (all-defined))

@@ -1,14 +1,13 @@
-#lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
-(require "sxml-tools.rkt")
-(require "sxpath-ext.rkt")
-(require "xpath-parser.rkt")
-(require "txpath.rkt")
-(require "xpath-ast.rkt")
-(require "ssax/ssax.rkt")
-
-(require (only racket filter))
+#lang racket/base
+(require srfi/13/string
+         "sxml-tools.rkt"
+         "sxpath-ext.rkt"
+         "xpath-parser.rkt"
+         "txpath.rkt"
+         "xpath-ast.rkt"
+         "ssax/errors-and-warnings.rkt"
+         "ssax/ssax.rkt")
+(provide (all-defined-out))
 
 ;; Context-based XPath implementation
 ;
@@ -630,8 +629,7 @@
       (cond
         ((nodeset? res) (length res))
         (else
-         (sxml:xpointer-runtime-error
-          "count() function - an argument is not a nodeset")
+         (sxml:xpath-type-error "count()" "nodeset" res)
          0)))))
 
 ; id(object)
@@ -674,8 +672,7 @@
             (cond
               ((null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")              
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (car obj))) "")  ; no name
               (else
@@ -712,8 +709,7 @@
             (cond
               ((null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (car obj))) "")  ; no name
               (else
@@ -742,8 +738,7 @@
             (cond
               ((null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (car obj))) "")  ; no name
               (else
@@ -1022,8 +1017,7 @@
                     (sxml:string-value (sxml:context->node node))))
                  res)))
         (else
-         (sxml:xpointer-runtime-error
-          "SUM function - an argument is not a nodeset")
+         (sxml:xpath-type-error "sum()" "nodeset" res)
          0)))))
 
 ; floor(number)
@@ -1601,8 +1595,7 @@
                res
                (cond
                  ((not (nodeset? nset))
-                  (sxml:xpointer-runtime-error 
-                   "expected - nodeset instead of " nset)
+                  (sxml:xpath-type-error "union" "nodeset" nset)
                   '())
                  (else nset)))
               (cdr fs))))))
@@ -1623,8 +1616,7 @@
                        (cond
                          ((nodeset? nset) nset)
                          (else
-                          (sxml:xpointer-runtime-error 
-                           "expected - nodeset instead of " nset)
+                          (sxml:xpath-type-error "path" "nodeset" nset)
                           '())))
                       (fs converters))
               (if (null? fs)
@@ -1656,8 +1648,7 @@
               (let loop ((nset (cond
                                  ((nodeset? prim-res) prim-res)
                                  (else 
-                                  (sxml:xpointer-runtime-error 
-                                   "expected - nodeset instead of " prim-res)
+                                  (sxml:xpath-type-error "filter" "nodeset" prim-res)
                                   '())))
                          (preds pred-impl-lst))
                 (if
@@ -1676,7 +1667,7 @@
          ((assoc name var-binding)
           => cdr)
          (else
-          (sxml:xpointer-runtime-error "unbound variable - " name)
+          (sxml:xpath-error "variable-reference: unbound variable: ~e" name)
           '())))
      0)))
 
@@ -2087,10 +2078,8 @@
 ; Get the document by its URI
 
 ; Handler for error messages
-(define (xlink:api-error . text)
-  (cerr "XLink API error: ")
-  (apply cerr text)
-  (cerr nl))
+(define (xlink:api-error fmt . args)
+  (apply sxml:warn 'xlink:api-error fmt args))
 
 ; Id+XLink parser parameterized
 (define xlink:parser (ssax:multi-parser 'id 'xlink))
@@ -2106,7 +2095,7 @@
 (define (xlink:get-document-by-uri req-uri)
   (case (ar:resource-type req-uri)
     ((#f)  ; resource doesn't exist
-     (xlink:api-error "resource doesn't exist: " req-uri)
+     (xlink:api-error "resource doesn't exist: ~e" req-uri)
      #f)
     ((xml plain unknown)
      (let* ((port (open-input-resource req-uri))
@@ -2120,7 +2109,7 @@
 ;       (SHTML->SHTML+xlink
 ;        (xlink:set-uri req-uri doc))))    
     (else  ; unknown resource type
-     (xlink:api-error "resource type not supported: " req-uri)
+     (xlink:api-error "resource type not supported: ~e" req-uri)
      #f)))
 
 
@@ -2757,7 +2746,7 @@
 (define (sxml:document req-uri . namespace-prefix-assig)
   (case (ar:resource-type req-uri)
     ((#f)  ; resource doesn't exist
-     (xlink:api-error "resource doesn't exist: " req-uri)
+     (xlink:api-error "resource doesn't exist: ~e" req-uri)
      #f)
     ((xml plain unknown)
      (let* ((port (open-input-resource req-uri))
@@ -2776,7 +2765,7 @@
 ;       doc   ; DL: can also add URI: (xlink:set-uri req-uri doc)
 ;      ))
     (else  ; unknown resource type
-     (xlink:api-error "resource type not supported: " req-uri)
+     (xlink:api-error "resource type not supported: ~e" req-uri)
      #f)))
 
 
@@ -2904,8 +2893,8 @@
                      res
                      (begin
                        (xlink:api-error
-                        "XPointer fragment identifier doesn't "
-                        "select any nodeset: " (car xpointer-nset))
+                        "XPointer fragment identifier doesn't select any nodeset: ~e"
+                        (car xpointer-nset))
                        '())))))))))))
      arcs-to)))
 
@@ -2973,5 +2962,3 @@
                 (draft:reach-root (as-nodeset node)))
         (xlink:docs-variable var-binding)
         num-anc)))))
-
-(provide (all-defined))

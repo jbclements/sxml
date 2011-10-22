@@ -1,10 +1,9 @@
-#lang mzscheme
-
-(require (rename (lib "pretty.ss") pp pretty-print))
-(require "common.ss")
-(require "myenv.ss")
-(require (lib "string.ss" "srfi/13"))
-(require "util.ss")
+#lang racket/base
+(require (only-in racket/pretty [pretty-write pp])
+         "myenv.ss"
+         srfi/13/string
+         "util.ss")
+(provide (all-defined-out))
 
 ;;			XML processing in Scheme
 ;		     SXPath -- SXML Query Language
@@ -531,6 +530,3 @@
 (define sxml:child-nodes (sxml:child sxml:node?))
 
 (define sxml:child-elements (select-kids sxml:element?))
-
-
-(provide (all-defined))

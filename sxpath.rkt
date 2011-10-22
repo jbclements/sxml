@@ -1,11 +1,10 @@
-#lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
-(require "sxml-tools.rkt")
-(require "ssax/ssax.rkt")
-(require "sxpath-ext.rkt")
-(require "txpath.rkt")
-(require "xpath-parser.rkt")
+#lang racket/base
+(require "sxml-tools.rkt"
+         "ssax/ssax.rkt"
+         "ssax/errors-and-warnings.rkt"
+         "sxpath-ext.rkt"
+         "txpath.rkt")
+(provide (all-defined-out))
 
 ;; $Id: sxpath.scm,v 1.5 2005/09/07 09:27:34 lizorkin Exp $
 ;; Highghest level SXPath 
@@ -168,7 +167,7 @@
                     node))
                 filters))))))))
       (else
-       (cerr "Invalid path step: " (car path))
+       (sxml:warn 'sxpath "invalid path step: ~e" (car path))
        #f)))))
 
 
@@ -220,6 +219,3 @@
 				(cddr lpr)))) node))   
 	  ))
       lpaths)))
-
-
-(provide (all-defined))

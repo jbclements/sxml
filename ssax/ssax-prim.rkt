@@ -1,6 +1,8 @@
-#lang mzscheme
-
+#lang racket/base
 (require "SSAX-code.ss")
+(provide RES-NAME->SXML
+         reverse-collect-str
+         reverse-collect-str-drop-ws)
 
 ;=========================================================================
 ; This is a multi parser constructor function
@@ -66,6 +68,3 @@
                  (if all-whitespace? result
                      (cons (apply string-append strs) result)))
                 '() #t)))))))
-
-
-(provide (all-defined))

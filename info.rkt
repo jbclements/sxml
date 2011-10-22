@@ -12,4 +12,4 @@
 (define release-notes (list "doc updates, changed error behavior"))
 (define version "201103230729")
 
-(define scribblings '(("scribblings/sxml.scrbl")))
+(define scribblings '(("scribblings/sxml.scrbl" (multi-page))))

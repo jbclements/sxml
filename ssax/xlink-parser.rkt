@@ -1,13 +1,10 @@
-#lang mzscheme
-
-(require "common.ss")
-(require "myenv.ss")
-(require "util.ss")
-(require (lib "string.ss" "srfi/13"))
-(require "access-remote.ss")
-(require "sxpathlib.ss")
-
-(require (only scheme filter))
+#lang racket/base
+(require "myenv.ss"
+         "errors-and-warnings.rkt"
+         "util.ss"
+         "access-remote.ss"
+         "sxpathlib.ss")
+(provide (all-defined-out))
 
 ;; Parser for XML documents that contain XLink elements
 ;
@@ -666,7 +663,7 @@
 ;  attr-name - a string denotating a name of an attribute (for a message)
 ;  position - position within a file
 ; Function always returns #t. 
-; Side effects: function "cerr"s a message if 'value' is not #f and not within
+; Side effects: emits warning if 'value' is not #f and not within
 ; 'valid-xlink-values'
 (define (xlink:check-helper value valid-xlink-values attr-name position)
   (cond
@@ -901,33 +898,18 @@
 ; Returns posiotion of a port
 ; NOTE: Specific for different Scheme implementations
 (define (xlink:get-port-position port)
-  (cond-expand         
-   (bigloo
-    (string-append "position " (number->string (input-port-position port))))
-   (chicken
-    (string-append
-     "line " (number->string (receive (row col) (port-position port) row))))
-   (gambit
-    ; DL: was
-    ;(string-append "line " (number->string (port-input-line-count port)))
-    (string-append "position "
-                   (number->string (input-port-byte-position port))))
-   (guile
-    (string-append "line " (number->string (port-line port))))
-   (plt
-    (string-append "position " (number->string (file-position port))))
-   (else "unknown")))
+  (string-append "position " (number->string (file-position port))))
 
 ; This function displays an error message. #t is returned
 ;  position - position within a file
 ;  text - a message to display
 (define (xlink:parser-error position . text)
-  (apply
-   cerr
-   (if
-    (string=? position "unknown")
-    (append (list nl "XLink error:" nl) text (list nl))
-    (append (list nl "XLink error in " position ":" nl) text (list nl)))))
+  (apply sxml:warn/concat
+         'XLink "error"
+         (if (equal? position "unknown")
+             ": "
+             (format " at ~a: " position))
+         text))
 
 ;------------------------------------------------
 ; Functions working on branches of an SXML tree
@@ -1280,5 +1262,3 @@
        (if uri  ; URI for the document supplied
            (xlink:set-uri-for-sxlink-arcs uri sxlink-arcs)
            sxlink-arcs)))))
-
-(provide (all-defined))

@@ -1,10 +1,10 @@
-#lang mzscheme
-
-(require (lib "string.ss" "srfi/13"))
-(require "ssax/ssax.rkt")
-(require "sxml-tools.rkt")
-(require "sxpath-ext.rkt")
-(require "xpath-parser.rkt")
+#lang racket/base
+(require srfi/13/string
+          "ssax/ssax.rkt"
+          "sxml-tools.rkt"
+          "sxpath-ext.rkt"
+          "xpath-parser.rkt")
+(provide (all-defined-out))
 
 ;; Classic TXPath implementation based on sxpathlib, sxpath-ext and txp-parser
 ;
@@ -54,15 +54,16 @@
 ;==========================================================================
 ; Auxilliary
 
-; Runtime errors handler (unbound variable, bad argument, etc).
-; It may be re-defined (say, like a warning) without 'exit',  and evaluation will 
-; be continued.
+; Runtime error functions (unbound variable, bad argument, etc).
+; They may be re-defined (say, like a warning) so that evaluation will be continued.
 ; In this case, a default value (usually empty nodeset or 0) is returned by 
 ; a sub-expression which caused an XPath/XPointer runtime error.
-(define (sxml:xpointer-runtime-error . text)
-  (apply cerr (append (list "XPath/XPointer runtime error: ") text (list nl)))
-  (exit -1))
 
+(define (sxml:xpath-error fmt . args)
+  (apply error 'xpath/xpointer fmt args))
+
+(define (sxml:xpath-type-error who type arg)
+  (sxml:xpath-error "~a: expected ~a, got ~e" who type arg))
 
 ;--------------------------------------------------------------------------
 ; Helper functions
@@ -135,8 +136,7 @@
       (cond
         ((nodeset? res) (length res))
         (else
-         (sxml:xpointer-runtime-error
-          "count() function - an argument is not a nodeset")
+         (sxml:xpath-type-error "count()" "nodeset" res)
          0)))))
 
 ; id(object)
@@ -171,8 +171,7 @@
             (cond
               ((null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")              
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (car obj))) "")  ; no name
               (else
@@ -205,8 +204,7 @@
             (cond
               ((null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (car obj))) "")  ; no name
               (else
@@ -232,8 +230,7 @@
             (cond
               ((null? obj) "")  ; an empty nodeset
               ((not (nodeset? obj))
-               (sxml:xpointer-runtime-error
-                "NAME function - an argument is not a nodeset")
+               (sxml:xpath-type-error "name()" "nodeset" obj)
                "")
               ((not (pair? (car obj))) "")  ; no name
               (else
@@ -506,8 +503,7 @@
                    (sxml:number (sxml:string-value node)))
                  res)))
         (else
-         (sxml:xpointer-runtime-error
-          "SUM function - an argument is not a nodeset")
+         (sxml:xpath-type-error "sum()" "nodeset" res)
          0)))))
 
 ; floor(number)
@@ -698,7 +694,7 @@
               ((assoc name var-binding)
                => cdr)
               (else
-               (sxml:xpointer-runtime-error "unbound variable - " name)
+               (sxml:xpath-error "variable reference: unbound variable: ~s" name)
                '()))))))
     
     ; Function call implementation
@@ -773,8 +769,7 @@
              (cond
                ((nodeset? nodeset) nodeset)
                (else 
-                (sxml:xpointer-runtime-error 
-                 "expected - nodeset instead of " nodeset)
+                (sxml:xpath-type-error "filter" "nodeset" nodeset)
                 '()))
              root-node var-binding)))))
     
@@ -789,8 +784,7 @@
                      (cond
                        ((nodeset? nset) nset)
                        (else 
-                        (sxml:xpointer-runtime-error 
-                         "expected - nodeset instead of " nset)
+                        (sxml:xpath-type-error "/" "nodeset" nset)
                         '()))))
                 (relative-lpath-res nset root-node context var-binding))))))
       (double-slash
@@ -802,8 +796,7 @@
                      (cond
                        ((nodeset? nset) nset)
                        (else 
-                        (sxml:xpointer-runtime-error 
-                         "expected - nodeset instead of " nset)
+                        (sxml:xpath-type-error "//" "nodeset" nset)
                         '()))))
                 (let ((nset ((sxml:descendant-or-self sxml:node?) nset)))
                   (relative-lpath-res
@@ -824,8 +817,7 @@
                  res
                  (cond
                    ((not (nodeset? nset))
-                    (sxml:xpointer-runtime-error 
-                     "expected - nodeset instead of " nset)
+                    (sxml:xpath-type-error "union" "nodeset" nset)
                     '())
                    (else nset)))
                 (cdr fs))))))))
@@ -1110,5 +1102,3 @@
   (sxml:api-index-helper (cadr (assq 'xpath sxml:classic-res))))
 (define sxml:xpointer+index
   (sxml:api-index-helper (cadr (assq 'xpointer sxml:classic-res))))
-
-(provide (all-defined))
