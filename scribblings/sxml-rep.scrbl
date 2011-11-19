@@ -305,9 +305,9 @@ XPath axes.
 @defproc[((sxml:ancestor-or-self [pred @#,tech{sxml-converter-as-predicate}])
           [root sxml:node?])
          @#,tech{sxml-converter}]
-@defproc[(sxml:descendent [pred @#,tech{sxml-converter-as-predicate}])
+@defproc[(sxml:descendant [pred @#,tech{sxml-converter-as-predicate}])
          @#,tech{sxml-converter}]
-@defproc[(sxml:descendent-or-self [pred @#,tech{sxml-converter-as-predicate}])
+@defproc[(sxml:descendant-or-self [pred @#,tech{sxml-converter-as-predicate}])
          @#,tech{sxml-converter}]
 @defproc[((sxml:following [pred @#,tech{sxml-converter-as-predicate}])
           [root sxml:node?])
@@ -402,3 +402,117 @@ sxml:name ;; what is domain???
 (sxml:text '(p (em "red") " fish; " (em "blue") " fish"))
 ]
 }
+
+@defproc[(sxml:attr [elem sxml:element?]
+                    [attr-name symbol?])
+         (or/c string? #f)]{
+
+  Gets the value of the @racket[attr-name] attribute of @racket[elem].
+}
+
+@;{
+sxml:content-raw
+sxml:attr-list-u
+sxml:aux-list
+sxml:aux-list-u
+sxml:aux-node
+sxml:aux-nodes
+sxml:attr-from-list
+sxml:num-attr
+sxml:attr-u
+sxml:ns-list
+sxml:ns-id->nodes
+sxml:ns-id->uri
+sxml:ns-uri->nodes
+sxml:ns-id
+sxml:ns-uri
+sxml:ns-prefix
+}
+
+@defproc[(sxml:change-content [elem sxml:element?]
+                              [new-content (listof _child)])
+         sxml:element?]{
+
+  Replaces the content of @racket[elem] with @racket[new-content],
+  preserving its attributes and auxiliary information.
+}
+
+@defproc[(sxml:change-attrlist [elem sxml:element?]
+                               [new-attrlist (listof _attribute)])
+         sxml:element?]{
+
+  Replaces the attributes of @racket[elem] with @racket[new-attrlist],
+  preserving its contents and auxiliary information.
+}
+
+@defproc[(sxml:change-name [elem sxml:element?]
+                           [tag symbol?])
+         sxml:element?]{
+
+  Changes the tag name of @racket[elem], preserving its attributes,
+  auxiliary information, and contents.
+}
+
+@defproc[(sxml:set-attr [elem sxml:element?]
+                        [attr (list/c symbol? any/c)])
+         sxml:element?]{
+
+  Returns an element like @racket[elem] but with the attribute
+  @racket[attr], which replaces any existing attribute with
+  @racket[attr]'s key.
+}
+
+@defproc[(sxml:add-attr [elem sxml:element?]
+                        [attr (list/c symbol? any/c)])
+         (or/c sxml:element? #f)]{
+
+  Like @racket[sxml:set-attr], but returns @racket[#f] if
+  @racket[elem] already contains an attribute with @racket[attr]'s
+  key.
+}
+
+@defproc[(sxml:change-attr [elem sxml:element?]
+                           [attr (list/c symbol? any/c)])
+         (or/c sxml:element? #f)]{
+
+  Like @racket[sxml:set-attr], but returns @racket[#f] unless
+  @racket[elem] already contains an attribute with @racket[attr]'s
+  key.
+}
+
+@defproc[(sxml:squeeze [elem sxml:element?])
+         sxml:element?]{
+
+  Eliminates empty attribute lists and auxiliary lists.
+}
+
+@defproc[(sxml:clean [elem sxml:element?])
+         sxml:element?]{
+
+  Eliminates empty attribute lists and removes all auxilary lists.
+}
+
+@;{
+sxml:add-aux
+}
+
+@;{ -- }
+
+@defproc[(select-first-kid [pred @#,tech{sxml-converter-as-predicate}])
+         (-> (or/c nodeset? sxml:node?) (or/c sxml:node? #f))]{
+
+  Like @racket[select-kids] but returns only the first one, or
+  @racket[#f] if none.
+}
+
+@;{
+sxml:node-parent
+sxml:lookup
+sxml:attr->xml
+sxml:string->xml
+sxml:sxml->xml
+sxml:attr->html
+sxml:string->html
+sxml:sxml->html
+}
+
