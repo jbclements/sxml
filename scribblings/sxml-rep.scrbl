@@ -84,41 +84,16 @@ about documents and namespaces.
 
 @section{SXML Functions}
 
-@;{ ============================================================ }
-@;{ -- From ssax/sxpathlib -- }
-
-A @deftech{sxml-converter} is a function
-@racketblock[(-> (or/c sxml:node? (listof sxml:node?))
-                 (listof sxml:node?))]
-that is, it takes nodes or nodesets to nodesets. A
-@deftech{sxml-converter-as-predicate} is an @tech{sxml-converter} used
-as a predicate; a return value of @racket['()] indicates false.
-
-@defproc[(nodeset? [v any/c]) boolean?]{
-  Returns @racket[#t] if @racket[v] is a list of nodes (that is, a
-  list that does not start with a symbol).
-
-@examples[#:eval the-eval
-(nodeset? '(p "blah"))
-(nodeset? '((p "blah") (br) "more"))
-]
-}
-
-@defproc[(as-nodeset [v any/c])
-         nodeset?]{
-
-  If @racket[v] is not a nodeset, returns @racket[(list v)], otherwise
-  returns @racket[v].
-
-@examples[#:eval the-eval
-(as-nodeset '(p "blah"))
-(as-nodeset '((p "blah") (br) "more"))
-]
-}
-
 @defproc[(sxml:element? [v any/c]) boolean?]{
-  Returns @racket[#t] if @racket[v] (shallowly) fits the grammar for
-  @racket[_element], @racket[#f] otherwise.
+
+  Returns @racket[#t] if @racket[v] is a list starting with a symbol
+  that is not a special symbol, @racket[#f] otherwise.
+
+@examples[#:eval the-eval
+(sxml:element? '(p "blah"))
+(sxml:element? '(*COMMENT* "ignore me"))
+(sxml:element? '(|@| (href "link.html")))
+]
 }
 
 @defproc[(ntype-names?? [tags (listof symbol?)])
@@ -176,81 +151,13 @@ as a predicate; a return value of @racket['()] indicates false.
 ]
 }
 
-@;{
-sxml:complement
-}
-
-@defproc[(node-eq? [v any/c])
-         (-> any/c boolean?)]{
-  Curried @racket[eq?].
-}
-@defproc[(node-equal? [v any/c])
-         (-> any/c boolean?)]{
-  Curried @racket[equal?].
-}
-
-@defproc[(node-pos [n (or/c exact-positive-integer? exact-negative-integer?)])
-         @#,tech{sxml-converter}]{
-
-  Returns a converter that selects the @racket[n]th element (counting
-  from 1, not 0) of a nodelist and returns it as a singleton nodelist. If
-  @racket[n] is negative, it selects from the right: @racket[-1]
-  selects the last node, and so forth.
-
-@examples[#:eval the-eval
-((node-pos 2) '((a) (b) (c) (d) (e)))
-((node-pos -1) '((a) (b) (c)))
-]
-}
-
-@;{
-sxml:filter
-take-until
-take-after
-map-union
-node-reverse
-node-trace
-}
-
-@defproc[(select-kids [pred @#,tech{sxml-converter-as-predicate}])
-         @#,tech{sxml-converter}]{
-
-  Returns a converter that selects an (ordered) subset of the children
-  of the given node (or the children of the members of the given
-  nodelist) satisfying @racket[pred].
-
-@examples[#:eval the-eval
-((select-kids (ntype?? 'p)) '(p "blah"))
-((select-kids (ntype?? '*text*)) '(p "blah"))
-((select-kids (ntype?? 'p)) (list '(p "blah") '(br) '(p "blahblah")))
-]
-}
-
-@defproc[(node-self [pred @#,tech{sxml-converter-as-predicate}])
-         @#,tech{sxml-converter}]{
-
-  Returns a function that when applied to @racket[_node], returns
-  @racket[(list node)] if @racket[(pred node)] is neither @racket[#f]
-  nor @racket['()], otherwise returns @racket['()].
-
-@examples[#:eval the-eval
-((node-self (ntype?? 'p)) '(p "blah"))
-((node-self (ntype?? 'p)) '(br))
-]
-}
-
-@defproc[(node-join [selector @#,tech{sxml-converter}])
-         @#,tech{sxml-converter}]
-@defproc[(node-reduce [converter @#,tech{sxml-converter}])
-         @#,tech{sxml-converter}]
-@defproc[(node-or [converter @#,tech{sxml-converter}])
-         @#,tech{sxml-converter}]
-@defproc[(node-closure [converter @#,tech{sxml-converter}])
-         @#,tech{sxml-converter}]
-
 @defproc[(sxml:node? [v any/c]) boolean?]{
 
-  Returns @racket[#t] for anything except an attribute list.
+  Returns @racket[#t] for anything except an attribute list (that is,
+  a list whose first element is @racket['|@|]).
+
+  Note that the set of values accepted by @racket[sxml:node?] is
+  different from the non-terminal @racket[_node].
 
 @examples[#:eval the-eval
 (sxml:node? '(a (|@| (href "link.html")) "blah"))
@@ -258,8 +165,8 @@ node-trace
 ]
 }
 
-@defproc[(sxml:attr-list [node sxml:node?])
-         (listof @racket[_attribute])]{
+@defproc[(sxml:attr-list [node _node])
+         (listof _attribute)]{
 
   If @racket[node] is an @racket[_element], returns its list of
   attributes (or @racket['()]) if it has no attributes; for all other
@@ -272,65 +179,11 @@ node-trace
 ]
 }
 
-@deftogether[[
-@defproc[(sxml:attribute [pred @#,tech{sxml-converter-as-predicate}])
-         @#,tech{sxml-converter}]
-@defproc[(sxml:child [pred @#,tech{sxml-converter-as-predicate}])
-         @#,tech{sxml-converter}]
-@defthing[sxml:child-nodes @#,tech{sxml-converter}]
-@defthing[sxml:child-elements @#,tech{sxml-converter}]
-]]{
-
-XPath axes.
-}
-
-@deftogether[[
-@defproc[((sxml:parent [pred @#,tech{sxml-converter-as-predicate}])
-          [root sxml:node?])
-         @#,tech{sxml-converter}]
-@defproc[(node-parent [root sxml:node?])
-         @#,tech{sxml-converter}]
-]]{
-
-XPath axes.
-}
-
-@;{ ============================================================ }
-@;{ -- From sxpath-ext.rkt -- }
-
-@deftogether[[
-@defproc[((sxml:ancestor [pred @#,tech{sxml-converter-as-predicate}])
-          [root sxml:node?])
-         @#,tech{sxml-converter}]
-@defproc[((sxml:ancestor-or-self [pred @#,tech{sxml-converter-as-predicate}])
-          [root sxml:node?])
-         @#,tech{sxml-converter}]
-@defproc[(sxml:descendant [pred @#,tech{sxml-converter-as-predicate}])
-         @#,tech{sxml-converter}]
-@defproc[(sxml:descendant-or-self [pred @#,tech{sxml-converter-as-predicate}])
-         @#,tech{sxml-converter}]
-@defproc[((sxml:following [pred @#,tech{sxml-converter-as-predicate}])
-          [root sxml:node?])
-         @#,tech{sxml-converter}]
-@defproc[((sxml:following-sibling [pred @#,tech{sxml-converter-as-predicate}])
-          [root sxml:node?])
-         @#,tech{sxml-converter}]
-@defproc[((sxml:preceding [pred @#,tech{sxml-converter-as-predicate}])
-          [root sxml:node?])
-         @#,tech{sxml-converter}]
-@defproc[((sxml:preceding-sibling [pred @#,tech{sxml-converter-as-predicate}])
-          [root sxml:node?])
-         @#,tech{sxml-converter}]
-]]{
-
-XPath axes.
-}
-
 @;{ ============================================================ }
 @;{ -- From sxml-tools.rkt -- }
 
 @defproc[(sxml:attr-list-node [elem sxml:element?])
-         (or/c #f (cons '|@| (listof @racket[_attribute])))]{
+         (or/c #f (cons/c '|@| (listof @#,racket[_attribute])))]{
 
   Returns an element's attribute list node, or @racket[#f] it is has
   none. Compare @racket[sxml:attr-list].
@@ -386,13 +239,13 @@ sxml:name ;; what is domain???
   Returns the namespace part of a qualified name.
 }
 
-@defproc[(sxml:content [node-or-nodeset (or/c sxml:node? nodeset?)])
-         (listof sxml:node?)]{
+@defproc[(sxml:content [node-or-nodeset (or/c _node nodeset?)])
+         (listof _node)]{
   Returns the contents (elements and text nodes) of an element or
   nodeset.
 }
 
-@defproc[(sxml:text [node-or-nodeset (or/c sxml:node? nodeset?)])
+@defproc[(sxml:text [node-or-nodeset (or/c _node nodeset?)])
          string?]{
 
   Returns a string consisting of all of the character data immediately
@@ -497,13 +350,6 @@ sxml:add-aux
 }
 
 @;{ -- }
-
-@defproc[(select-first-kid [pred @#,tech{sxml-converter-as-predicate}])
-         (-> (or/c nodeset? sxml:node?) (or/c sxml:node? #f))]{
-
-  Like @racket[select-kids] but returns only the first one, or
-  @racket[#f] if none.
-}
 
 @;{
 sxml:node-parent
