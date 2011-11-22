@@ -1,7 +1,6 @@
 #lang racket/base
-(require (for-syntax racket/base))
-(require "myenv.ss")
-(require "parse-error.ss")
+(require "myenv.ss"
+         "parse-error.ss")
 (provide (all-defined-out))
 
 ;****************************************************************************

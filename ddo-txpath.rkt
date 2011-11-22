@@ -1,6 +1,7 @@
 #lang racket/base
 (require racket/promise
-         "ssax/ssax.rkt"
+         "ssax/sxpathlib.rkt"
+         "ssax/common.rkt"
          "sxpath-ext.rkt"
          "txpath.rkt"
          "xpath-ast.rkt"

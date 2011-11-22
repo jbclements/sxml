@@ -1,7 +1,6 @@
 #lang racket/base
-(require racket/contract
+(require racket/contract/base
          syntax/readerr
-         "myenv.ss"
          "errors-and-warnings.rkt")
 (provide/contract
  [parser-error

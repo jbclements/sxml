@@ -1,5 +1,5 @@
 #lang racket/base
-(require "ssax/ssax.rkt"
+(require "ssax/common.rkt"
          "ssax/errors-and-warnings.rkt"
          "xpath-parser.rkt")
 (provide (all-defined-out))

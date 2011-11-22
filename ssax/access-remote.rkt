@@ -1,7 +1,6 @@
 #lang mzscheme
 (require srfi/13/string
          "errors-and-warnings.rkt"
-         "myenv.ss"
          "http.ss"
          "srfi-12.ss"
          "util.ss")

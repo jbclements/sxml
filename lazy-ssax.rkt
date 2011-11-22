@@ -1,7 +1,8 @@
 #lang racket/base
 (require racket/promise
          srfi/13/string
-         "ssax/ssax.rkt"
+         "ssax/parse-error.rkt"
+         "ssax/SSAX-code.rkt"
          "lazy-xpath.rkt")
 (provide (all-defined-out))
 
@@ -55,7 +56,7 @@
 (define (lazy:xml->sxml port namespace-prefix-assig)
   (let ((namespaces
          (map (lambda (el)
-                (cons* #f (car el) (ssax:uri-string->symbol (cdr el))))
+                (list* #f (car el) (ssax:uri-string->symbol (cdr el))))
               namespace-prefix-assig))
         (RES-NAME->SXML
          (lambda (res-name)
@@ -173,7 +174,7 @@
                 seed
                 (if (string-null? string2)
                     (cons string1 (lazy:seed-common seed))
-                    (cons* string2 string1 (lazy:seed-common seed)))))
+                    (list* string2 string1 (lazy:seed-common seed)))))
 
 	     DOCTYPE
 	     (lambda (port docname systemid internal-subset? seed)

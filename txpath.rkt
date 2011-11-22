@@ -1,9 +1,10 @@
 #lang racket/base
 (require srfi/13/string
-          "ssax/ssax.rkt"
-          "sxml-tools.rkt"
-          "sxpath-ext.rkt"
-          "xpath-parser.rkt")
+         "ssax/sxpathlib.rkt"
+         "ssax/util.rkt"
+         "sxml-tools.rkt"
+         "sxpath-ext.rkt"
+         "xpath-parser.rkt")
 (provide (all-defined-out))
 
 ;; Classic TXPath implementation based on sxpathlib, sxpath-ext and txp-parser

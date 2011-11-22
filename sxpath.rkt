@@ -1,6 +1,7 @@
 #lang racket/base
 (require "sxml-tools.rkt"
-         "ssax/ssax.rkt"
+         "ssax/sxpathlib.rkt"
+         "ssax/common.rkt"
          "ssax/errors-and-warnings.rkt"
          "sxpath-ext.rkt"
          "txpath.rkt")

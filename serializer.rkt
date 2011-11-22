@@ -1,6 +1,5 @@
 #lang racket/base
-(require racket/list
-         "ssax/ssax.rkt")
+(require racket/list)
 (provide (all-defined-out))
 
 ;; SXML serializer into XML and HTML
