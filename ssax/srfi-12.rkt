@@ -2,6 +2,7 @@
 (provide (all-defined-out))
 
 ;; oog, change to use racket exceptions.... -- JBC, 2011-02-15
+;; ryanc: used only in http.rkt & access-remote.rkt
 
 ;************************************************************************
 ; srfi-12.scm
@@ -50,22 +51,6 @@
 (define (abort obj)
   (raise (list obj)))
 
-; Procedure: exc:signal OBJ
-; Raises a continuable exception represented by OBJ.
-; In SRFI-12, this procedure is named 'signal'. However, this name
-; clashes with the name of an internal Bigloo procedure. In a compiled
-; code, this clash leads to a Bus error.
-
-(define (exc:signal obj)
-  (raise (list obj)))
-
-(define (signal obj)
-  (raise (list obj)))
-
-; Procedure: current-exception-handler
-; Returns the current exception handler.
-;; ryanc: unused
-
 ; A helper function which converts an exception (PLT internal exception
 ; or SRFI-12 exception) into CONDITION
 (define (exn:exception->condition obj)
@@ -79,18 +64,6 @@
     (car obj))
    (else  ; some more conditions should be added, I guess
     obj)))
-
-; Evaluates the body expressions expr1, expr2, ... in sequence with an
-; exception handler constructed from var and handle-expr. Assuming no
-; exception is raised, the result(s) of the last body expression is(are)
-; the result(s) of the HANDLE-EXCEPTIONS expression.
-; The exception handler created by HANDLE-EXCEPTIONS restores the dynamic
-; context (continuation, exception handler, etc.) of the HANDLE-EXCEPTIONS
-; expression, and then evaluates handle-expr with var bound to the value
-; provided to the handler.
-(define-syntax-rule (handle-exceptions var handle-expr . body)
-  (with-exception-handler (lambda (var) handle-expr) (lambda () . body)))
-
 
 ;------------------------------------------------------------------------
 ; Exception conditions

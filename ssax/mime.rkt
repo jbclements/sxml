@@ -70,7 +70,7 @@
 	    attrs				; return the attributes
 	    (let ((attr-name
 		   (string->symbol (next-token '(#\space #\tab) '(#\=)
-					 "reading attr-name" port))))
+                                               "reading attr-name" port))))
 	      (read-char port)		; skip the #\= separator
 	      ; loading attr-value, which is (section 2.2 of HTTP1.1):
 	      ;   attr-value = token | quoted-string
@@ -103,7 +103,7 @@
 		 (cons
 		  (cons attr-name
 			(next-token '() '(#\space #\; *eof* #\tab) 
-					  "reading token" port))
+                                    "reading token" port))
 		  attrs))))
 	      ))))))
 
@@ -114,50 +114,50 @@
 ; Later on, make a separate procedure: read-a-header
 
 (define MIME:read-headers
-    (let ()
-      (define (read-new-header http-port resp-headers)
-	(let ((c (peek-char http-port)))
-	  (cond
-	   ((eqv? c #\return)		; An empty line, the end of headers
-	    (when (eqv? #\newline (peek-next-char http-port))
-              (read-char http-port))	; skip the following \n if any
-	    resp-headers)
-	   ((eqv? c #\newline)	  ; #\return should have been appeared before
-	    (read-char http-port) ; but not all servers are compliant
-	    resp-headers)
-	   ((char-alphabetic? c)  ; beginning of the new header
-	    (let* ((header-name
-		    (string->symbol
-		     (string-upcase
-		      (next-token '() '(#\: #\space #\tab *eof*) ""
-				  http-port))))
-		   (delim (skip-while '(#\space #\tab) http-port))
-		   (header-value
-		    (if (eqv? delim #\:)
-			(begin (read-char http-port)
-			       (skip-while '(#\space #\tab) http-port)
-			       (read-line http-port))
-			#f)))
-	      (if (string? header-value)
-		  (check-cont http-port resp-headers
-			      header-name header-value)
-		  (myenv:error "BAD-HEADER: " resp-headers))))
-	   (else
-	    (myenv:error "BAD-HEADER: " resp-headers)))))
+  (let ()
+    (define (read-new-header http-port resp-headers)
+      (let ((c (peek-char http-port)))
+        (cond
+         ((eqv? c #\return)		; An empty line, the end of headers
+          (when (eqv? #\newline (peek-next-char http-port))
+            (read-char http-port))	; skip the following \n if any
+          resp-headers)
+         ((eqv? c #\newline)	  ; #\return should have been appeared before
+          (read-char http-port) ; but not all servers are compliant
+          resp-headers)
+         ((char-alphabetic? c)  ; beginning of the new header
+          (let* ((header-name
+                  (string->symbol
+                   (string-upcase
+                    (next-token '() '(#\: #\space #\tab *eof*) ""
+                                http-port))))
+                 (delim (skip-while '(#\space #\tab) http-port))
+                 (header-value
+                  (if (eqv? delim #\:)
+                      (begin (read-char http-port)
+                             (skip-while '(#\space #\tab) http-port)
+                             (read-line http-port))
+                      #f)))
+            (if (string? header-value)
+                (check-cont http-port resp-headers
+                            header-name header-value)
+                (error 'MIME:read-headers "bad header: ~e" resp-headers))))
+         (else
+          (error 'MIME:read-headers "bad header: ~e" resp-headers)))))
 
-      ; check to see if the value of the header continues on the next line
-      (define (check-cont http-port resp-headers
-			  header-name header-value)
-	(let ((c (peek-char http-port)))
-	  (cond
-	   ((or (eqv? c #\space) (eqv? c #\tab))	; it continues
-	    (let ((cont-value (read-line http-port)))
-	      (check-cont http-port resp-headers
-		    header-name (string-append header-value cont-value))))
-	   (else
-	    (read-new-header http-port
-			     (cons (cons header-name header-value)
-				   resp-headers))))))
-      (lambda (http-port)
-	(read-new-header http-port '()))
-      ))
+    ;; check to see if the value of the header continues on the next line
+    (define (check-cont http-port resp-headers
+                        header-name header-value)
+      (let ((c (peek-char http-port)))
+        (cond
+         ((or (eqv? c #\space) (eqv? c #\tab))	; it continues
+          (let ((cont-value (read-line http-port)))
+            (check-cont http-port resp-headers
+                        header-name (string-append header-value cont-value))))
+         (else
+          (read-new-header http-port
+                           (cons (cons header-name header-value)
+                                 resp-headers))))))
+    (lambda (http-port)
+      (read-new-header http-port '()))
+    ))
