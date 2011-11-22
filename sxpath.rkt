@@ -47,9 +47,8 @@
              (path (if (string? path) (list path) path)))
     (cond
       ((null? path)  ; parsing is finished
-       (lambda (node . var-binding)
-         (let ((var-binding
-                (if (null? var-binding) var-binding (car var-binding))))
+       (lambda (node [var-binding null])
+         (let ()
            (let rpt ((nodeset (as-nodeset node))
                      (conv (reverse converters))
                      (r-v (reverse root-vars)))
@@ -123,7 +122,7 @@
         ((select
           (if
            (symbol? (caar path))
-           (lambda (node . var-binding)
+           (lambda (node [var-binding null]) ;; ryanc: unused!!
              ((select-kids (ntype?? (caar path))) node))
            (sxpath (caar path) ns-binding))))
         (let reducer ((reducing-path (cdar path))
