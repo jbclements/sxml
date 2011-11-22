@@ -39,8 +39,7 @@
 ;		(node-reduce (sxpath path) (sxpathr reducer) ...)
 ; (sxpathr number)      -> (node-pos number)
 ; (sxpathr path-filter) -> (filter (sxpath path-filter))
-(define (sxpath path . ns-binding)
-  (let ((ns-binding (if (null? ns-binding) ns-binding (car ns-binding))))
+(define (sxpath path [ns-binding null])
   (let loop ((converters '())
              (root-vars '())  ; a list of booleans, one per location step:
 	                      ;  #t - location step function is binary
@@ -168,7 +167,7 @@
                 filters))))))))
       (else
        (sxml:warn 'sxpath "invalid path step: ~e" (car path))
-       #f)))))
+       #f))))
 
 
 ;==============================================================================
