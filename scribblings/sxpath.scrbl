@@ -10,7 +10,7 @@
 
 @defproc[(sxpath [path any/c]
                  [ns-binding ns-binding? '()])
-         (-> sxml? (listof sxml?))]{
+         (-> (or/c _node nodeset?) nodeset?)]{
 
   Given a representation of a @racket[path], produces a procedure that
   accepts an SXML document and returns a list of matches. Path
@@ -24,7 +24,6 @@
   }
 
 @(let (;; shadow the names so we don't get annoying undefined tag warnings
-       [sxml:complement #f]
        [txpath #f])
   (define-syntax-rule (rewrite-table line ...)
     (tabular #:style (let ([cs (style #f (list 'top))])
@@ -207,8 +206,7 @@ shortcut is actually the namespace. Thus:
 Ah well.
 }
 
-
-@section{SXML Search Functions}
+@;{ ============================================================ }
 
 A @deftech{sxml-converter} is a function
 @racketblock[(-> (or/c _node nodeset?) 
