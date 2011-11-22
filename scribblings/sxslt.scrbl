@@ -3,7 +3,98 @@
           "util.rkt"
           (for-label (this-package-in main)))
 
-@title[#:tag "sxslt"]{Transformation (SXSLT)}
+@title[#:tag "sxslt"]{SXML Transformation}
+
+@defproc[(sxml:modify [updater _update-spec] ...)
+         (-> _node _node)]{
+
+Returns a procedure that applies the given @racket[updater]s to an
+SXML document. Each @racket[updater] has the following form:
+
+@specsubform/subs[
+#:literals (list quote)
+(list xpath-location-path action action-param ...)
+([action 'delete
+         'delete-undeep
+         'insert-into
+         'insert-following
+         'insert-preceding
+         'replace
+         'move-into
+         'move-following
+         'move-preceding
+         handler-proc])]{
+
+The @racket[xpath-location-path] describes the nodes to be transformed
+(see also @racket[sxpath]). The @racket[xpath-location-path] is
+interpreted with respect to some base node. If the location path is
+absolute, the base node is the root of the document being
+transformed. If the location path is relative, the base node is the
+node selected by the previous @racket[updater].
+
+The following combinations of @racket[action]s and
+@racket[action-param]s are supported:
+                       
+@specsubform[#:literals (quote) 'delete]{
+  Deletes the node.
+}
+@specsubform[#:literals (quote) 'delete-undeep]{
+  Deletes the node, but keeps all its content, which thus moves one
+  level upwards in the document tree.
+}
+@specsubform[#:literals (quote) (code:line 'insert-into new-node ...)]{
+  Inserts the @racket[new-node]s as the last children of the selected
+  nodes.
+}
+@specsubform[#:literals (quote) (code:line 'insert-following new-node ...)]{
+  Inserts the @racket[new-node]s after the selected node.
+}
+@specsubform[#:literals (quote) (code:line 'insert-preceding new-node ...)]{
+  Inserts the @racket[new-node]s before the selected node.
+}
+@specsubform[#:literals (quote) (code:line 'replace new-node ...)]{
+  Replaces the selected node with the @racket[new-node]s.
+}
+@specsubform[#:literals (quote) (code:line 'rename new-tag)]{
+  Renames the selected node, replacing its element tag with
+  @racket[new-tag].
+}
+@specsubform[#:literals (quote) (code:line 'move-into new-location-path)]{
+  Moves the selected node to a new location. The selected node becomes
+  the last child of the node selected by @racket[new-location-path].
+}
+@specsubform[#:literals (quote) (code:line 'move-following new-location-path)]{
+  Moves the selected node to a new location. The selected node is
+  placed immediately after the node selected by
+  @racket[new-location-path].
+}
+@specsubform[#:literals (quote) (code:line 'move-preceding new-location-path)]{
+  Moves the selected node to a new location. The selected node is
+  placed immediately before the node selected by
+  @racket[new-location-path].
+}
+@specsubform[handler-proc]{
+  Applies @racket[handler-proc] to three arguments: the selected node,
+  a context (?), and the base node. The procedure must return a node
+  or nodeset, which replaces the selected node.
+}
+}
+
+@examples[#:eval the-eval
+(define sample-doc
+  `(*TOP*
+    (html (title "the title")
+          (body (p "paragraph 1")
+                (p "paragraph 2")))))
+((sxml:modify (list "//title" 'delete)) sample-doc)
+((sxml:modify (list "//body" 'delete-undeep)) sample-doc)
+((sxml:modify (list "//body" 'rename 'table)
+              (list "p" (lambda (node ctx root)
+                          `(tr (td ,node)))))
+ sample-doc)
+]
+}
+
 
 @defproc[(pre-post-order [tree sxml?]
                          [bindings (listof _binding)])
