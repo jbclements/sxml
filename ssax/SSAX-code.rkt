@@ -1135,7 +1135,7 @@
             (read-char port)	; reading the closing delim
             ))
          ((eq? discriminator (string->symbol "PUBLIC"))
-           (skip-until (list delimiter) port)
+           (skip-until-char delimiter port)
            (assert-curr-char ssax:S-chars "space after PubidLiteral" port)
            (ssax:skip-S port)
            (let* ((delimiter 

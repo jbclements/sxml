@@ -44,20 +44,20 @@
 
 ;------------------------------------------------------------------------
 
-; -- procedure+: peek-next-char [PORT]
+; -- procedure+: peek-next-char PORT
 ; 	advances to the next character in the PORT and peeks at it.
 ; 	This function is useful when parsing LR(1)-type languages
 ; 	(one-char-read-ahead).
 ;	The optional argument PORT defaults to the current input port.
 
-(define (peek-next-char [port (current-input-port)])
+(define (peek-next-char port)
   (read-char port) 
   (peek-char port)) 
 
 
 ;------------------------------------------------------------------------
 
-; -- procedure+: assert-curr-char CHAR-LIST STRING [PORT]
+; -- procedure+: assert-curr-char CHAR-LIST STRING PORT
 ;	Reads a character from the PORT and looks it up
 ;	in the CHAR-LIST of expected characters
 ;	If the read character was found among expected, it is returned
@@ -65,7 +65,7 @@
 ;	as a comment, and quits.
 ;	The optional argument PORT defaults to the current input port.
 ;
-(define (assert-curr-char expected-chars comment [port (current-input-port)])
+(define (assert-curr-char expected-chars comment port)
   (let ((c (read-char port)))
     (if (memq c expected-chars) c
     (parser-error port "Wrong character " c
@@ -74,38 +74,19 @@
     	   comment ". " expected-chars " expected"))))
     	   
 
-; -- procedure+: skip-until CHAR-LIST [PORT]
-;	Reads and skips characters from the PORT until one of the break
-;	characters is encountered. This break character is returned.
-;	The break characters are specified as the CHAR-LIST. This list
-;	may include EOF, which is to be coded as a symbol *eof*
-;
-; -- procedure+: skip-until NUMBER [PORT]
-;	Skips the specified NUMBER of characters from the PORT and returns #f
-;
-;	The optional argument PORT defaults to the current input port.
+; -- procedure+: skip-until CHAR PORT
+;	Reads and skips characters from the PORT until the break
+;	character is encountered. This break character is returned.
 
+(define (skip-until-char stop-char port)
+  (let loop ((c (read-char port)))
+    (cond
+     ((eqv? c stop-char) c)
+     ((eof-object? c)
+      (parser-error port "Unexpected EOF while skipping until " stop-char))
+     (else (loop (read-char port))))))
 
-(define (skip-until arg [port (current-input-port)])
-  (cond
-   ((number? arg)		; skip 'arg' characters
-      (do ((i arg (-- i)))
-      	  ((<= i 0) #f)
-      	  (when (eof-object? (read-char port))
-      	    (parser-error port "Unexpected EOF while skipping "
-                          arg " characters"))))
-   (else			; skip until break-chars (=arg)
-     (let loop ((c (read-char port)))
-       (cond
-         ((memv c arg) c)
-         ((eof-object? c)
-           (if (memv '*eof* arg)
-               c
-               (parser-error port "Unexpected EOF while skipping until " arg)))
-         (else (loop (read-char port))))))))
-
-
-; -- procedure+: skip-while CHAR-LIST [PORT]
+; -- procedure+: skip-while CHAR-LIST PORT
 ;	Reads characters from the PORT and disregards them,
 ;	as long as they are mentioned in the CHAR-LIST.
 ;	The first character (which may be EOF) peeked from the stream
@@ -113,7 +94,7 @@
 ;	is left on the stream.
 ;	The optional argument PORT defaults to the current input port.
 
-(define (skip-while skip-chars [port (current-input-port)])
+(define (skip-while skip-chars port)
   (do ((c (peek-char port) (peek-char port)))
       ((not (memv c skip-chars)) c)
     (read-char port)))
@@ -171,8 +152,7 @@
               (thread-cell-set! buffers buffer)
               buffer))))))
 
-(define (next-token prefix-skipped-chars break-chars
-                    [comment ""] [port (current-input-port)])
+(define (next-token prefix-skipped-chars break-chars comment port)
   (let* ((buffer (input-parse:init-buffer))
 	 (curr-buf-len (string-length buffer)) (quantum 16))
     (let loop ((i 0) (c (skip-while prefix-skipped-chars port)))
@@ -229,9 +209,10 @@
 ; This procedure is similar to next-token but only it implements
 ; an inclusion rather than delimiting semantics.
 
-(define (next-token-of incl-list/pred [port (current-input-port)])
+(define (next-token-of incl-list/pred port)
   (let* ((buffer (input-parse:init-buffer))
-	 (curr-buf-len (string-length buffer)) (quantum 16))
+	 (curr-buf-len (string-length buffer))
+         (quantum 16))
   (if (procedure? incl-list/pred)
     (let loop ((i 0) (c (peek-char port)))
       (cond
