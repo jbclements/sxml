@@ -42,26 +42,6 @@
 ; This package is heavily used. Therefore, we take time to tune it in,
 ; in particular for Gambit.
 
-
-; Concise and efficient definition of a function that takes one or two
-; optional arguments, e.g.,
-;
-; (define-opt (foo arg1 arg2 (optional (arg3 init3) (arg4 init4))) body)
-;
-; define-opt is identical to a regular define, with one exception: the
-; last argument may have a form
-;	(optional (binding init) ... )
-
-(define-syntax (define-opt stx)
-  (syntax-case stx ()
-    [(_ (name req-param ... (optional (opt-param opt-default) ...)) . body)
-     #'(define (name req-param ... [opt-param opt-default] ...) . body)]
-    [(_ (name . formals) . body)
-     #'(define (name . formals) . body)]
-    [(_ name expr)
-     (identifier? #'name)
-     #'(define name expr)]))
-
 ;------------------------------------------------------------------------
 
 ; -- procedure+: peek-next-char [PORT]
@@ -70,7 +50,7 @@
 ; 	(one-char-read-ahead).
 ;	The optional argument PORT defaults to the current input port.
 
-(define-opt (peek-next-char (optional (port (current-input-port))))
+(define (peek-next-char [port (current-input-port)])
   (read-char port) 
   (peek-char port)) 
 
@@ -85,8 +65,7 @@
 ;	as a comment, and quits.
 ;	The optional argument PORT defaults to the current input port.
 ;
-(define-opt (assert-curr-char expected-chars comment
-			      (optional (port (current-input-port))))
+(define (assert-curr-char expected-chars comment [port (current-input-port)])
   (let ((c (read-char port)))
     (if (memq c expected-chars) c
     (parser-error port "Wrong character " c
@@ -107,7 +86,7 @@
 ;	The optional argument PORT defaults to the current input port.
 
 
-(define-opt (skip-until arg (optional (port (current-input-port))) )
+(define (skip-until arg [port (current-input-port)])
   (cond
    ((number? arg)		; skip 'arg' characters
       (do ((i arg (-- i)))
@@ -134,11 +113,11 @@
 ;	is left on the stream.
 ;	The optional argument PORT defaults to the current input port.
 
-(define-opt (skip-while skip-chars (optional (port (current-input-port))) )
+(define (skip-while skip-chars [port (current-input-port)])
   (do ((c (peek-char port) (peek-char port)))
       ((not (memv c skip-chars)) c)
-      (read-char port)))
- 
+    (read-char port)))
+
 ; whitespace const
 
 ;------------------------------------------------------------------------
@@ -192,8 +171,8 @@
               (thread-cell-set! buffers buffer)
               buffer))))))
 
-(define-opt (next-token prefix-skipped-chars break-chars
-			(optional (comment "") (port (current-input-port))) )
+(define (next-token prefix-skipped-chars break-chars
+                    [comment ""] [port (current-input-port)])
   (let* ((buffer (input-parse:init-buffer))
 	 (curr-buf-len (string-length buffer)) (quantum 16))
     (let loop ((i 0) (c (skip-while prefix-skipped-chars port)))
@@ -250,8 +229,7 @@
 ; This procedure is similar to next-token but only it implements
 ; an inclusion rather than delimiting semantics.
 
-(define-opt (next-token-of incl-list/pred
-			   (optional (port (current-input-port))) )
+(define (next-token-of incl-list/pred [port (current-input-port)])
   (let* ((buffer (input-parse:init-buffer))
 	 (curr-buf-len (string-length buffer)) (quantum 16))
   (if (procedure? incl-list/pred)

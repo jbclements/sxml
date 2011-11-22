@@ -5,6 +5,7 @@
          "http.ss"
          "srfi-12.ss"
          "util.ss")
+(provide (all-defined))
 
 ;; Uniform access to local and remote resources
 ;; Resolution for relative URIs in accordance with RFC 2396
@@ -314,5 +315,3 @@
                         (string-index req-path #\\)))
                   req-query
                   req-fragment)))))))))))))
-
-(provide (all-defined))

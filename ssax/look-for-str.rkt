@@ -40,8 +40,7 @@
 ;
 ; This code is in the public domain.
 
-(define (MISCIO:find-string-from-port? str <input-port> . max-no-char)
-  (set! max-no-char (if (null? max-no-char) #f (car max-no-char)))
+(define (MISCIO:find-string-from-port? str <input-port> [max-no-char #f])
   (letrec
       ((no-chars-read 0)
        (my-peek-char			; Return a peeked char or #f
