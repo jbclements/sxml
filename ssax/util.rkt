@@ -200,16 +200,15 @@
 			; if omitted, maxsplit defaults to
 			; (inc (string-length str))
   (if (string-null? str) '()
-    (if (null? rest) 
-      (split-by-whitespace str (inc (string-length str)))
-      (let ((charset (car rest))
-          (maxsplit
-            (if (pair? (cdr rest)) (cadr rest) (inc (string-length str)))))
-        (cond 
-          ((not (positive? maxsplit)) '())
-          ((null? charset) (split-by-whitespace str maxsplit))
-          (else (split-by-charset str charset maxsplit))))))
-)
+      (if (null? rest) 
+          (split-by-whitespace str (inc (string-length str)))
+          (let ((charset (car rest))
+                (maxsplit
+                 (if (pair? (cdr rest)) (cadr rest) (inc (string-length str)))))
+            (cond 
+             ((not (positive? maxsplit)) '())
+             ((null? charset) (split-by-whitespace str maxsplit))
+             (else (split-by-charset str charset maxsplit)))))))
 
 
 ; make-char-quotator QUOT-RULES
@@ -259,5 +258,4 @@
 		      (cons
 		       (substring str from to)
 		       (cons quoted-char (loop (inc to) new-to)))
-		      (cons quoted-char (loop (inc to) new-to))))))))))
-))
+		      (cons quoted-char (loop (inc to) new-to))))))))))))

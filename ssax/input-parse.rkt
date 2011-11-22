@@ -47,7 +47,6 @@
 ; 	advances to the next character in the PORT and peeks at it.
 ; 	This function is useful when parsing LR(1)-type languages
 ; 	(one-char-read-ahead).
-;	The optional argument PORT defaults to the current input port.
 
 (define (peek-next-char port)
   (read-char port) 
@@ -62,8 +61,7 @@
 ;	If the read character was found among expected, it is returned
 ;	Otherwise, the procedure writes a nasty message using STRING
 ;	as a comment, and quits.
-;	The optional argument PORT defaults to the current input port.
-;
+
 (define (assert-curr-char expected-chars comment port)
   (let ((c (read-char port)))
     (if (memq c expected-chars) c
@@ -91,7 +89,6 @@
 ;	The first character (which may be EOF) peeked from the stream
 ;	that is NOT a member of the CHAR-LIST is returned. This character
 ;	is left on the stream.
-;	The optional argument PORT defaults to the current input port.
 
 (define (skip-while skip-chars port)
   (do ((c (peek-char port) (peek-char port)))
@@ -115,8 +112,6 @@
 ;	The list of break characters may include EOF, which is to be coded as
 ;	a symbol *eof*. Otherwise, EOF is fatal, generating an error message
 ;	including a specified COMMENT-STRING (if any)
-;
-;	The optional argument PORT defaults to the current input port.
 ;
 ; Note: since we can't tell offhand how large the token being read is
 ; going to be, we make a guess, pre-allocate a string, and grow it by
@@ -173,13 +168,13 @@
     	  )))))
 
 
-; -- procedure+: next-token-of INC-CHARSET [PORT]
+; -- procedure+: next-token-of INC-CHARSET PORT
 ;	Reads characters from the PORT that belong to the list of characters
 ;	INC-CHARSET. The reading stops at the first character which is not
 ;	a member of the set. This character is left on the stream.
 ;	All the read characters are returned in a string.
 ;
-; -- procedure+: next-token-of PRED [PORT]
+; -- procedure+: next-token-of PRED PORT
 ;	Reads characters from the PORT for which PRED (a procedure of one
 ;	argument) returns non-#f. The reading stops at the first character
 ;	for which PRED returns #f. That character is left on the stream.
@@ -197,8 +192,6 @@
 ;	will try to read an alphabetic token from the current
 ;	input port, and return it in lower case.
 ; 
-;	The optional argument PORT defaults to the current input port.
-;
 ; Note: since we can't tell offhand how large the token being read is
 ; going to be, we make a guess, pre-allocate a string, and grow it by
 ; quanta if necessary. The quantum is always the length of the string

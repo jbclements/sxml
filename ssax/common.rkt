@@ -1,8 +1,5 @@
 #lang racket/base
-(provide close-output-string
-         and-let*)
-
-(define close-output-string get-output-string)
+(provide and-let*)
 
 (define-syntax and-let*                                                            
   (syntax-rules ()                   

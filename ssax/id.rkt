@@ -3,7 +3,11 @@
          "myenv.ss"
          "access-remote.ss"
          "sxpathlib.ss")
-(provide (all-defined-out))
+(provide id:doctype-handler
+         id:ending-action
+         id:finish-element-handler
+         id:make-seed
+         id:new-level-seed-handler)
 
 ;; Creation and manipulation of the ID-index
 ;; Provides the DTD parser for extracting ID attribute declarations
