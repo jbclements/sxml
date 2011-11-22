@@ -8,8 +8,8 @@
 
 @title[#:tag "sxpath"]{Search (SXPath)}
 
-@defproc[(sxpath [path any/c]
-                 [ns-binding ns-binding? '()])
+@defproc[(sxpath [path (or/c list? string?)]
+                 [ns-bindings (listof (cons/c symbol? string?)) '()])
          (-> (or/c _node nodeset?) nodeset?)]{
 
   Given a representation of a @racket[path], produces a procedure that
@@ -23,8 +23,7 @@
   But it isn't!
   }
 
-@(let (;; shadow the names so we don't get annoying undefined tag warnings
-       [txpath #f])
+@(let ()
   (define-syntax-rule (rewrite-table line ...)
     (tabular #:style (let ([cs (style #f (list 'top))])
                        (style #f (list (table-columns (list cs cs cs)))))
@@ -82,7 +81,7 @@
 (line (sxpathr _path)
       (sxml:filter (sxpath _path)))))
 
-To extract all cells from an html table:
+To extract all cells from an HTML table:
 
 @interaction[#:eval the-eval
 (define table
@@ -204,6 +203,16 @@ shortcut is actually the namespace. Thus:
 ]
 
 Ah well.
+}
+
+@defproc[(txpath [xpath-location-path string?]
+                 [ns-bindings (listof (cons/c symbol? string?)) '()])
+         (-> (or/c _node nodeset?) nodeset?)]{
+
+  Like @racket[sxpath], but only accepts an XPath query in string
+  form, using the standard XPath syntax.
+
+  Deprecated; use @racket[sxpath] instead.
 }
 
 @;{ ============================================================ }
