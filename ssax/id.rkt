@@ -95,86 +95,75 @@
 ; These functions perform reading from a file
 
 ; Read N symbols from a port
+;; If fewer than N are available before EOF, return eof
 (define (id:read-n num port)
   (id:process-s port)
-  (let loop ((num num) (res '()))
-    (if(= num 0) 
-       (list->string (reverse res))
-       (let((symb (peek-char port)))
-         (cond((eof-object? symb) symb)
-              (else (read-char port)
-                    (loop (- num 1) (cons symb res))))))))
-
+  (let ([result (read-string num port)])
+    (cond [(string? result)
+           (if (< (string-length result) num) eof result)]
+          [else eof])))
 
 ; This function reads a name - a sequence of characters ending with
 ; a whitespace or '<'. '>', '(', ')', '[', ']', '|'
+;; ryanc: FIXME: use buffer from other file? (next-token??)
 (define (id:read-name port)
   (id:process-s port)
-  (let loop ((res ""))
-    (let ((symb (peek-char port)))
-      (cond((eof-object? symb) res)
-           ((member symb '(#\space #\tab #\return #\newline
-                           #\< #\> #\( #\) #\[ #\] #\|)) 
-                    res)
-           (else (loop (string-append res (string (read-char port)))))))))
-
+  (let ([out (open-output-string)])
+    (let loop ()
+      (let ([symb (peek-char port)])
+        (cond [(or (eof-object? symb)
+                   (member symb '(#\space #\tab #\return #\newline
+                                  #\< #\> #\( #\) #\[ #\] #\|)))
+               (get-output-string out)]
+              [else
+               (write-char (read-char port) out)
+               (loop)])))))
 
 ; This function reads a literal
 ;  literal   ::=    ('"' [^"]* '"') | ("'" [^']* "'")  
 ; A string is returned 
 (define (id:process-literal port)
   (id:process-s port)
-  (let((quot (peek-char port)))
-    (if(eof-object? quot)  ; an incorrect situaltion
-       ""
-       (let((quot (if (char=? (read-char port) #\") #\" #\')))
-         (let loop ((res '()))
-           (let((symb (peek-char port)))
-             (cond
-               ((eof-object? symb) (list->string (reverse res)))
-               ((char=? symb quot)  ; end of the string
-                (read-char port)
-                (list->string (reverse res)))
-               (else
-                (read-char port)
-                (loop (cons symb res))))))))))
-         
+  (let ([quot (read-char port)]
+        [out (open-output-string)])
+    ;; ryanc: FIXME, check is either ' or "
+    (let loop ()
+      (let ([next (read-char port)])
+        (cond [(or (eof-object? next)
+                   (eqv? next quot))
+               (get-output-string out)]
+              [else
+               (write-char next out)
+               (loop)])))))
 
 ;------------------------------------------------
 ; Miscellaneous
 
 ; Converts a string into small letters
-(define (id:to-small str)
-  (let loop ((arg (string->list str)) (res '()))
-    (cond((null? arg) (list->string (reverse res)))
-         ((char-upper-case? (car arg))
-           (loop (cdr arg) (cons (char-downcase (car arg)) res)))
-         (else (loop (cdr arg) (cons (car arg) res))))))
-
+(define (id:to-small str) (string-downcase str))
 
 ; Takes an 'id-attrs' which can contain equal element names
 ; Returns a new 'id-attrs' where all element names are unique
 (define (id:unite-id-attrs id-attrs)
   (let loop ((id-attrs id-attrs)
              (new '()))
-    (if
-     (null? id-attrs)
-     new
-     (let rpt ((elem-name (caar id-attrs))
-               (atts (cdar id-attrs))
-               (rest (cdr id-attrs))
-               (id-attrs '()))
-       (cond
-         ((null? rest) 
-          (loop id-attrs (cons (cons elem-name atts) new)))
-         ((equal? (caar rest) elem-name)
-          (rpt elem-name 
-               (append atts (cdar rest))
-               (cdr rest)
-               id-attrs))
-         (else
-          (rpt elem-name atts (cdr rest) (cons (car rest) id-attrs))))))))
-    
+    (if (null? id-attrs)
+        new
+        (let rpt ((elem-name (caar id-attrs))
+                  (atts (cdar id-attrs))
+                  (rest (cdr id-attrs))
+                  (id-attrs '()))
+          (cond
+           ((null? rest) 
+            (loop id-attrs (cons (cons elem-name atts) new)))
+           ((equal? (caar rest) elem-name)
+            (rpt elem-name 
+                 (append atts (cdar rest))
+                 (cdr rest)
+                 id-attrs))
+           (else
+            (rpt elem-name atts (cdr rest) (cons (car rest) id-attrs))))))))
+
   
 ;------------------------------------------------
 ; Parsing XML productions concerning document declaration

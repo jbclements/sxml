@@ -3,9 +3,7 @@
          (only-in racket/port call-with-input-string)
          "myenv.ss"
          "parse-error.ss"
-         "input-parse.ss"
-         "look-for-str.ss"
-         "char-encoding.ss")
+         "input-parse.ss")
 (provide (all-defined-out))
 
 ;	Functional XML parsing framework: SAX/DOM and SXML parsers

@@ -1,5 +1,6 @@
 #lang racket/base
-(require "myenv.ss"
+(require racket/port
+         "myenv.ss"
          "parse-error.ss")
 (provide (all-defined-out))
 
@@ -233,3 +234,79 @@
     	  (read-char port)			; move to the next char
     	  (loop (++ i) (peek-char port))
     	  ))))))
+
+;; ============================================================
+
+; -- Function: find-string-from-port? STR IN-PORT
+;    Looks for a string STR within the input port IN-PORT
+;    When the STR is found, the function returns the number of
+;    characters it has read from the port, and the port is set
+;    to read the first char after that (that is, after the STR)
+;    The function returns #f when the string wasn't found
+; Note the function reads the port *STRICTLY* sequentially, and does not
+; perform any buffering. So the function can be used even if the port is open
+; on a pipe or other communication channel.
+
+(define (find-string-from-port? str input-port)
+  (let ([output-counting-port (open-output-nowhere)])
+    ;; Could just use file-position, but that returns byte count, not char count
+    ;; Could use output string port, but don't need contents (memory use)
+    (port-count-lines-enabled output-counting-port)
+    (let ([result
+           (regexp-match? (regexp-quote str)
+                          input-port
+                          0 #f
+                          output-counting-port)])
+      (and result
+           (let-values ([(_line _col pos) (port-next-location output-counting-port)])
+             (sub1 pos))))))
+
+;; ============================================================
+
+;		Character-encoding
+;
+; This module deals with particular character-encoding issues such as
+; conversions between characters and their ASCII or UCS2 codes, Scheme
+; representations of "Carriage Return" (CR), "tabulation" (TAB) and
+; other control characters.
+;
+; This module by necessity is platform-specific as character encoding
+; issues are hardly addressed in R5RS. For example, the result of
+; char->integer is generally not an ASCII code of an integer (although
+; it is, on many Scheme systems, with the important exception of
+; Scheme48 and SCSH). The level of support for character sets other
+; than ASCII varies widely among Scheme systems.
+;
+; This file collects various character-encoding functions that are
+; necessary for the SSAX XML parser. The functions are of general use
+; and scope.
+;
+; $Id: char-encoding.scm,v 1.1 2003/04/09 20:34:28 oleg Exp $
+
+
+;	ascii->char INT -> CHAR
+; return a character whose ASCII code is INT
+; Note, because ascii->char is injective (there are more characters than
+; ASCII characters), the inverse transformation is not defined.
+(define ascii->char integer->char)
+
+
+;	ucscode->char INT -> CHAR
+; Return a character whose UCS (ISO/IEC 10646) code is INT
+; Note
+; This function is required for processing of XML character entities:
+; According to Section "4.1 Character and Entity References"
+; of the XML Recommendation:
+;  "[Definition: A character reference refers to a specific character
+;   in the ISO/IEC 10646 character set, for example one not directly
+;   accessible from available input devices.]"
+
+(define (ucscode->char code)
+  (integer->char code))
+
+; Commonly used control characters
+
+(define char-return (ascii->char 13))
+(define char-tab    (ascii->char 9))
+(define char-newline (ascii->char 10)) ; a.k.a. #\newline, per R5RS
+(define char-space (ascii->char 32))
