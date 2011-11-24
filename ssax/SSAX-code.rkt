@@ -359,17 +359,8 @@
 ; Test if a string is made of only whitespace
 ; An empty string is considered made of whitespace as well
 (define (string-whitespace? str)
-  (let ((len (string-length str)))
-    (cond
-     ((zero? len) #t)
-     ((= 1 len) (char-whitespace? (string-ref str 0)))
-     ((= 2 len) (and (char-whitespace? (string-ref str 0))
-		     (char-whitespace? (string-ref str 1))))
-     (else
-      (let loop ((i 0))
-	(or (>= i len)
-	    (and (char-whitespace? (string-ref str i))
-		 (loop (inc i)))))))))
+  (for/and ([c (in-string str)])
+    (char-whitespace? c)))
 
 ; Find val in alist
 ; Return (values found-el remaining-alist) or
@@ -385,19 +376,10 @@
       (loop (cdr alist) (cons (car alist) scanned))))))
 
 ; From SRFI-1
-(define (fold-right kons knil lis1)
-    (let recur ((lis lis1))
-       (if (null? lis) knil
-	    (let ((head (car lis)))
-	      (kons head (recur (cdr lis)))))))
+(define fold-right foldr)
 
 ; Left fold combinator for a single list
-(define (fold kons knil lis1)
-  (let lp ((lis lis1) (ans knil))
-    (if (null? lis) ans
-      (lp (cdr lis) (kons (car lis) ans)))))
-
-
+(define fold foldl)
 
 ;========================================================================
 ;		Lower-level parsers and scanners
