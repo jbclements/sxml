@@ -1,8 +1,6 @@
 #lang scheme
-
 (require "../main.rkt"
          rackunit)
-
 
 ;; this set of tests is wildly inadequate.
 
@@ -62,18 +60,10 @@ t
 </a>")
              `(*TOP* (a "\nt\n")))
 
-
-
-
-
 #;(check-exn (lambda (exn) #t)
            (lambda () (ssax:xml->sxml (open-input-string "") `())))
-
-
 
 (check-equal? (srl:sxml->xml `(*TOP* (p))) "<p />")
 
 ;; this error message should be better...
-(check-exn? (lambda (x) #t) (lambda () (srl:sxml->xml '(foo (@ (bar (13)))))))
-
-
+(check-exn (lambda (x) #t) (lambda () (srl:sxml->xml '(foo (@ (bar (13)))))))

@@ -7,8 +7,6 @@
          (except-in "../ssax/myenv.ss" assert)
          "../ssax/parse-error.rkt"
          "../ssax/input-parse.rkt"
-         "../ssax/look-for-str.rkt"
-         "../ssax/char-encoding.rkt"
          "../ssax/SSAX-code.rkt")
 (provide (all-defined-out))
 
