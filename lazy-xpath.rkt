@@ -4,7 +4,7 @@
          srfi/13/string
          "ssax/sxpathlib.rkt"
          "ssax/util.rkt"
-         "ssax/common.rkt"
+         srfi/2
          "ssax/errors-and-warnings.rkt"
          "sxpath-ext.rkt"
          "xpath-parser.rkt"

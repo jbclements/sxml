@@ -9,7 +9,7 @@
          "ssax/multi-parser.rkt"
          "ssax/access-remote.rkt"
          "ssax/SSAX-code.rkt"
-         "ssax/common.rkt"
+         srfi/2
          "ssax/sxpathlib.rkt"
          "ssax/util.rkt"
          "ssax/xlink-parser.rkt")

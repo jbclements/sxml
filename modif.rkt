@@ -1,7 +1,7 @@
 #lang racket/base
 (require racket/list
+         srfi/2
          "ssax/sxpathlib.rkt"
-         "ssax/common.rkt"
          "ssax/errors-and-warnings.rkt"
          "xpath-context_xlink.rkt"
          "xpath-ast.rkt"

@@ -1,6 +1,5 @@
 #lang racket/base
 
-(require "common.rkt")
 (require "myenv.rkt")
 (require "util.rkt")
 (require "parse-error.rkt")
@@ -13,7 +12,6 @@
 (require "xlink-parser.rkt")
 (require "ssax-prim.rkt")
 (require "multi-parser.rkt")
-(provide (all-from-out "common.rkt"))
 (provide (all-from-out "myenv.rkt"))
 (provide (all-from-out "util.rkt"))
 (provide (all-from-out "parse-error.rkt"))
