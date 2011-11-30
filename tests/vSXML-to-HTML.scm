@@ -42,17 +42,14 @@
     (test-case "test 2"
       (letrec ((gen (lambda (exp)
                       (sxml->html exp))))
-        (equal-strs?! '(#\newline "<p>&amp;</p>") (gen '(p "&")))
-        (equal-strs?! '(#\newline
-                        "<p align=\"center\">bad chars:&lt;&gt;&amp;&quot;</p>")
+        (equal-strs?! '("<p>&amp;</p>") (gen '(p "&")))
+        (equal-strs?! '("<p align=\"center\">bad chars:&lt;&gt;&amp;&quot;</p>")
                       (gen '(p (@ (align "center")) "bad chars:" "<>&\"")))
-        (equal-strs?! '(#\newline
-                        "<p align=\"center\" atr=\"&lt;value&gt;\">bad chars:"
+        (equal-strs?! '("<p align=\"center\" atr=\"&lt;value&gt;\">bad chars:"
                         #\newline "<em>&lt;&gt;&amp;&quot;</em></p>")
                       (gen '(p (@ (align "center") (atr "<value>"))
                                "bad chars:" (em "<>&\""))))
-        (equal-strs?! '(#\newline
-                        "<p align=\"center\" atr=\"&quot;text&quot;\">"
+        (equal-strs?! '("<p align=\"center\" atr=\"&quot;text&quot;\">"
                         #\newline "<br>"
                         #\newline "<ul compact>"
                         #\newline "<li>item 1</li></ul></p>")

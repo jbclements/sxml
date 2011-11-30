@@ -2,7 +2,8 @@
 (require "myenv.ss")
 (provide post-order
          pre-post-order
-         SRV:send-reply)
+         SRV:send-reply
+         replace-range)
 
 
 ;		XML/HTML processing in Scheme
