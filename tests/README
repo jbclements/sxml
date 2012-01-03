@@ -1,2 +1,6 @@
-This directory will contain tests.  Right now, there's a bunch of goo pasted from the main trunk, and a short file (tests.rkt)
-containing working tests. Test coverage is somewhere between wretched and inadequate.
+This directory is for tests.  
+
+tests.rkt -- a few tests, all pass.
+ssax-test.rkt -- a very noisy test suite. All pass.
+
+other files -- random test-related stuff pulled in from the main tree. 

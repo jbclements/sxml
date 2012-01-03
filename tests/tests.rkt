@@ -74,6 +74,6 @@ t
 (check-equal? (srl:sxml->xml `(*TOP* (p))) "<p />")
 
 ;; this error message should be better...
-(check-exn? (lambda (x) #t) (lambda () (srl:sxml->xml '(foo (@ (bar (13)))))))
+(check-exn (lambda (x) #t) (lambda () (srl:sxml->xml '(foo (@ (bar (13)))))))
 
 
