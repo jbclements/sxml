@@ -12,7 +12,12 @@
 
 #|
 Current status: all tests pass; some print warnings.
+
+... adding cheesy mutation-based system to provide a final 
+report.
 |#
+
+(define test-failed? #f)
 
 ;; ryanc: use syntax-case; easier
 (define-syntax (run-test stx)
@@ -47,11 +52,13 @@ Current status: all tests pass; some print warnings.
     [(assert (equal? expected actual))
      (let ([e expected] [a actual])
        (unless (equal? e a)
+         (set! test-failed? #t)
          (eprintf "ASSERTION FAILURE: ~.s\n  wanted: ~e\n  got:    ~e\n"
                   '(assert (equal? expected actual))
                   e a)))]
     [(assert e ...)
      (unless (and e ...)
+       (set! test-failed? #t)
        (eprintf "ASSERTION FAILURE: ~.s\n" '(assert e ...)))]))
 
 ; The following is a function that is often used in validation tests,
@@ -1081,3 +1088,6 @@ Current status: all tests pass; some print warnings.
                               (TRange "958114800, 958118400"))
                            "VRB05KT"))))))
 ))
+
+(cond [test-failed? (printf "SOME TESTS FAILED.\n")]
+      [else (printf "ALL TESTS PASSED.\n")])

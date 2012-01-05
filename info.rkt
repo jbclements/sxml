@@ -9,7 +9,7 @@
 (define categories '(xml))
 (define compile-omit-paths '("tests/" "ssax/tests/"))
 (define repositories '("4.x"))
-(define release-notes (list "doc updates, changed error behavior"))
-(define version "201103230729")
+(define release-notes (list "releasing changes from Ryan Culpepper"))
+(define version "2012-01-03 20:25")
 
 (define scribblings '(("scribblings/sxml.scrbl" (multi-page))))
