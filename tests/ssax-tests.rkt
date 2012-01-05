@@ -38,7 +38,8 @@ Current status: all tests pass; some print warnings.
   (syntax-rules ()
     ((failed? . stmts)
      (with-handlers ([exn? (lambda (e) #t)])
-       (let () . stmts)))))
+       (let () . stmts)
+       #f))))
 
 ;; ryanc: specialize assert for better error messages
 (define-syntax assert
