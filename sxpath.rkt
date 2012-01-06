@@ -1,6 +1,7 @@
 #lang racket/base
 (require "sxml-tools.rkt"
-         "ssax/ssax.rkt"
+         "ssax/sxpathlib.rkt"
+         srfi/2
          "ssax/errors-and-warnings.rkt"
          "sxpath-ext.rkt"
          "txpath.rkt")
@@ -39,8 +40,7 @@
 ;		(node-reduce (sxpath path) (sxpathr reducer) ...)
 ; (sxpathr number)      -> (node-pos number)
 ; (sxpathr path-filter) -> (filter (sxpath path-filter))
-(define (sxpath path . ns-binding)
-  (let ((ns-binding (if (null? ns-binding) ns-binding (car ns-binding))))
+(define (sxpath path [ns-binding null])
   (let loop ((converters '())
              (root-vars '())  ; a list of booleans, one per location step:
 	                      ;  #t - location step function is binary
@@ -48,9 +48,8 @@
              (path (if (string? path) (list path) path)))
     (cond
       ((null? path)  ; parsing is finished
-       (lambda (node . var-binding)
-         (let ((var-binding
-                (if (null? var-binding) var-binding (car var-binding))))
+       (lambda (node [var-binding null])
+         (let ()
            (let rpt ((nodeset (as-nodeset node))
                      (conv (reverse converters))
                      (r-v (reverse root-vars)))
@@ -124,7 +123,7 @@
         ((select
           (if
            (symbol? (caar path))
-           (lambda (node . var-binding)
+           (lambda (node [var-binding null]) ;; ryanc: unused!!
              ((select-kids (ntype?? (caar path))) node))
            (sxpath (caar path) ns-binding))))
         (let reducer ((reducing-path (cdar path))
@@ -168,7 +167,7 @@
                 filters))))))))
       (else
        (sxml:warn 'sxpath "invalid path step: ~e" (car path))
-       #f)))))
+       #f))))
 
 
 ;==============================================================================

@@ -1,7 +1,7 @@
 #lang racket/base
-(require (for-syntax racket/base))
-(require "myenv.ss")
-(require "parse-error.ss")
+(require racket/port
+         "myenv.ss"
+         "parse-error.ss")
 (provide (all-defined-out))
 
 ;****************************************************************************
@@ -42,51 +42,28 @@
 ; This package is heavily used. Therefore, we take time to tune it in,
 ; in particular for Gambit.
 
-
-; Concise and efficient definition of a function that takes one or two
-; optional arguments, e.g.,
-;
-; (define-opt (foo arg1 arg2 (optional (arg3 init3) (arg4 init4))) body)
-;
-; define-opt is identical to a regular define, with one exception: the
-; last argument may have a form
-;	(optional (binding init) ... )
-
-(define-syntax (define-opt stx)
-  (syntax-case stx ()
-    [(_ (name req-param ... (optional (opt-param opt-default) ...)) . body)
-     #'(define (name req-param ... [opt-param opt-default] ...) . body)]
-    [(_ (name . formals) . body)
-     #'(define (name . formals) . body)]
-    [(_ name expr)
-     (identifier? #'name)
-     #'(define name expr)]))
-
 ;------------------------------------------------------------------------
 
-; -- procedure+: peek-next-char [PORT]
+; -- procedure+: peek-next-char PORT
 ; 	advances to the next character in the PORT and peeks at it.
 ; 	This function is useful when parsing LR(1)-type languages
 ; 	(one-char-read-ahead).
-;	The optional argument PORT defaults to the current input port.
 
-(define-opt (peek-next-char (optional (port (current-input-port))))
+(define (peek-next-char port)
   (read-char port) 
   (peek-char port)) 
 
 
 ;------------------------------------------------------------------------
 
-; -- procedure+: assert-curr-char CHAR-LIST STRING [PORT]
+; -- procedure+: assert-curr-char CHAR-LIST STRING PORT
 ;	Reads a character from the PORT and looks it up
 ;	in the CHAR-LIST of expected characters
 ;	If the read character was found among expected, it is returned
 ;	Otherwise, the procedure writes a nasty message using STRING
 ;	as a comment, and quits.
-;	The optional argument PORT defaults to the current input port.
-;
-(define-opt (assert-curr-char expected-chars comment
-			      (optional (port (current-input-port))))
+
+(define (assert-curr-char expected-chars comment port)
   (let ((c (read-char port)))
     (if (memq c expected-chars) c
     (parser-error port "Wrong character " c
@@ -95,50 +72,30 @@
     	   comment ". " expected-chars " expected"))))
     	   
 
-; -- procedure+: skip-until CHAR-LIST [PORT]
-;	Reads and skips characters from the PORT until one of the break
-;	characters is encountered. This break character is returned.
-;	The break characters are specified as the CHAR-LIST. This list
-;	may include EOF, which is to be coded as a symbol *eof*
-;
-; -- procedure+: skip-until NUMBER [PORT]
-;	Skips the specified NUMBER of characters from the PORT and returns #f
-;
-;	The optional argument PORT defaults to the current input port.
+; -- procedure+: skip-until CHAR PORT
+;	Reads and skips characters from the PORT until the break
+;	character is encountered. This break character is returned.
 
+(define (skip-until-char stop-char port)
+  (let loop ((c (read-char port)))
+    (cond
+     ((eqv? c stop-char) c)
+     ((eof-object? c)
+      (parser-error port "Unexpected EOF while skipping until " stop-char))
+     (else (loop (read-char port))))))
 
-(define-opt (skip-until arg (optional (port (current-input-port))) )
-  (cond
-   ((number? arg)		; skip 'arg' characters
-      (do ((i arg (-- i)))
-      	  ((<= i 0) #f)
-      	  (when (eof-object? (read-char port))
-      	    (parser-error port "Unexpected EOF while skipping "
-                          arg " characters"))))
-   (else			; skip until break-chars (=arg)
-     (let loop ((c (read-char port)))
-       (cond
-         ((memv c arg) c)
-         ((eof-object? c)
-           (if (memv '*eof* arg)
-               c
-               (parser-error port "Unexpected EOF while skipping until " arg)))
-         (else (loop (read-char port))))))))
-
-
-; -- procedure+: skip-while CHAR-LIST [PORT]
+; -- procedure+: skip-while CHAR-LIST PORT
 ;	Reads characters from the PORT and disregards them,
 ;	as long as they are mentioned in the CHAR-LIST.
 ;	The first character (which may be EOF) peeked from the stream
 ;	that is NOT a member of the CHAR-LIST is returned. This character
 ;	is left on the stream.
-;	The optional argument PORT defaults to the current input port.
 
-(define-opt (skip-while skip-chars (optional (port (current-input-port))) )
+(define (skip-while skip-chars port)
   (do ((c (peek-char port) (peek-char port)))
       ((not (memv c skip-chars)) c)
-      (read-char port)))
- 
+    (read-char port)))
+
 ; whitespace const
 
 ;------------------------------------------------------------------------
@@ -156,8 +113,6 @@
 ;	The list of break characters may include EOF, which is to be coded as
 ;	a symbol *eof*. Otherwise, EOF is fatal, generating an error message
 ;	including a specified COMMENT-STRING (if any)
-;
-;	The optional argument PORT defaults to the current input port.
 ;
 ; Note: since we can't tell offhand how large the token being read is
 ; going to be, we make a guess, pre-allocate a string, and grow it by
@@ -192,8 +147,7 @@
               (thread-cell-set! buffers buffer)
               buffer))))))
 
-(define-opt (next-token prefix-skipped-chars break-chars
-			(optional (comment "") (port (current-input-port))) )
+(define (next-token prefix-skipped-chars break-chars comment port)
   (let* ((buffer (input-parse:init-buffer))
 	 (curr-buf-len (string-length buffer)) (quantum 16))
     (let loop ((i 0) (c (skip-while prefix-skipped-chars port)))
@@ -215,13 +169,13 @@
     	  )))))
 
 
-; -- procedure+: next-token-of INC-CHARSET [PORT]
+; -- procedure+: next-token-of INC-CHARSET PORT
 ;	Reads characters from the PORT that belong to the list of characters
 ;	INC-CHARSET. The reading stops at the first character which is not
 ;	a member of the set. This character is left on the stream.
 ;	All the read characters are returned in a string.
 ;
-; -- procedure+: next-token-of PRED [PORT]
+; -- procedure+: next-token-of PRED PORT
 ;	Reads characters from the PORT for which PRED (a procedure of one
 ;	argument) returns non-#f. The reading stops at the first character
 ;	for which PRED returns #f. That character is left on the stream.
@@ -239,8 +193,6 @@
 ;	will try to read an alphabetic token from the current
 ;	input port, and return it in lower case.
 ; 
-;	The optional argument PORT defaults to the current input port.
-;
 ; Note: since we can't tell offhand how large the token being read is
 ; going to be, we make a guess, pre-allocate a string, and grow it by
 ; quanta if necessary. The quantum is always the length of the string
@@ -250,10 +202,10 @@
 ; This procedure is similar to next-token but only it implements
 ; an inclusion rather than delimiting semantics.
 
-(define-opt (next-token-of incl-list/pred
-			   (optional (port (current-input-port))) )
+(define (next-token-of incl-list/pred port)
   (let* ((buffer (input-parse:init-buffer))
-	 (curr-buf-len (string-length buffer)) (quantum 16))
+	 (curr-buf-len (string-length buffer))
+         (quantum 16))
   (if (procedure? incl-list/pred)
     (let loop ((i 0) (c (peek-char port)))
       (cond
@@ -282,3 +234,79 @@
     	  (read-char port)			; move to the next char
     	  (loop (++ i) (peek-char port))
     	  ))))))
+
+;; ============================================================
+
+; -- Function: find-string-from-port? STR IN-PORT
+;    Looks for a string STR within the input port IN-PORT
+;    When the STR is found, the function returns the number of
+;    characters it has read from the port, and the port is set
+;    to read the first char after that (that is, after the STR)
+;    The function returns #f when the string wasn't found
+; Note the function reads the port *STRICTLY* sequentially, and does not
+; perform any buffering. So the function can be used even if the port is open
+; on a pipe or other communication channel.
+
+(define (find-string-from-port? str input-port)
+  (let ([output-counting-port (open-output-nowhere)])
+    ;; Could just use file-position, but that returns byte count, not char count
+    ;; Could use output string port, but don't need contents (memory use)
+    (port-count-lines-enabled output-counting-port)
+    (let ([result
+           (regexp-match? (regexp-quote str)
+                          input-port
+                          0 #f
+                          output-counting-port)])
+      (and result
+           (let-values ([(_line _col pos) (port-next-location output-counting-port)])
+             (sub1 pos))))))
+
+;; ============================================================
+
+;		Character-encoding
+;
+; This module deals with particular character-encoding issues such as
+; conversions between characters and their ASCII or UCS2 codes, Scheme
+; representations of "Carriage Return" (CR), "tabulation" (TAB) and
+; other control characters.
+;
+; This module by necessity is platform-specific as character encoding
+; issues are hardly addressed in R5RS. For example, the result of
+; char->integer is generally not an ASCII code of an integer (although
+; it is, on many Scheme systems, with the important exception of
+; Scheme48 and SCSH). The level of support for character sets other
+; than ASCII varies widely among Scheme systems.
+;
+; This file collects various character-encoding functions that are
+; necessary for the SSAX XML parser. The functions are of general use
+; and scope.
+;
+; $Id: char-encoding.scm,v 1.1 2003/04/09 20:34:28 oleg Exp $
+
+
+;	ascii->char INT -> CHAR
+; return a character whose ASCII code is INT
+; Note, because ascii->char is injective (there are more characters than
+; ASCII characters), the inverse transformation is not defined.
+(define ascii->char integer->char)
+
+
+;	ucscode->char INT -> CHAR
+; Return a character whose UCS (ISO/IEC 10646) code is INT
+; Note
+; This function is required for processing of XML character entities:
+; According to Section "4.1 Character and Entity References"
+; of the XML Recommendation:
+;  "[Definition: A character reference refers to a specific character
+;   in the ISO/IEC 10646 character set, for example one not directly
+;   accessible from available input devices.]"
+
+(define (ucscode->char code)
+  (integer->char code))
+
+; Commonly used control characters
+
+(define char-return (ascii->char 13))
+(define char-tab    (ascii->char 9))
+(define char-newline (ascii->char 10)) ; a.k.a. #\newline, per R5RS
+(define char-space (ascii->char 32))

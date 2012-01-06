@@ -1,9 +1,10 @@
 #lang racket/base
 (require srfi/13/string
-          "ssax/ssax.rkt"
-          "sxml-tools.rkt"
-          "sxpath-ext.rkt"
-          "xpath-parser.rkt")
+         "ssax/sxpathlib.rkt"
+         "ssax/util.rkt"
+         "sxml-tools.rkt"
+         "sxpath-ext.rkt"
+         "xpath-parser.rkt")
 (provide (all-defined-out))
 
 ;; Classic TXPath implementation based on sxpathlib, sxpath-ext and txp-parser
@@ -1000,10 +1001,10 @@
 ; specifies the root of the SXML document
 
 (define (sxml:api-helper0 parse-proc)
-  (lambda (xpath-string . ns-binding)
+  (lambda (xpath-string [ns-binding null])
     (let ((res (parse-proc
                 xpath-string
-                (if (null? ns-binding) ns-binding (car ns-binding))
+                ns-binding
                 '())))
       (if (txp:error? res)  ; error detected
           #f
@@ -1024,10 +1025,10 @@
 (define sxml:classic-res (txp:parameterize-parser sxml:classic-params))
 
 (define (sxml:api-helper parse-proc)
-  (lambda (xpath-string . ns-binding)
+  (lambda (xpath-string [ns-binding null])
     (let ((res (parse-proc
                 xpath-string
-                (if (null? ns-binding) ns-binding (car ns-binding))
+                ns-binding
                 '())))
       (if (txp:error? res)  ; error detected
           #f
@@ -1085,10 +1086,10 @@
 ;  index-required - a boolean value: whether an id-index is required
 
 (define (sxml:api-index-helper parse-proc)
-  (lambda (xpath-string . ns-binding)
+  (lambda (xpath-string [ns-binding null])
     (let ((res (parse-proc
                 xpath-string
-                (if (null? ns-binding) ns-binding (car ns-binding))
+                ns-binding
                 '())))
       (if (txp:error? res)  ; error detected
           #f

@@ -1,5 +1,5 @@
 #lang racket/base
-(require "ssax/ssax.rkt"
+(require srfi/2
          "ssax/errors-and-warnings.rkt")
 (provide (all-defined-out))
 

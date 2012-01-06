@@ -1,5 +1,5 @@
 #lang racket/base
-(require "ssax/ssax.rkt")
+(require racket/list)
 (provide (all-defined-out))
 
 ;; SXML serializer into XML and HTML
@@ -29,11 +29,7 @@
 ; `map' and `append' in a single pass:
 ; (srl:map-append func lst) = (apply append (map func lst))
 ; A simplified analogue of `map-union' from "sxpathlib.scm"
-(define (srl:map-append func lst)
-  (if (null? lst)
-      lst
-      (append (func (car lst))
-              (srl:map-append func (cdr lst)))))
+(define (srl:map-append func lst) (append-map func lst))
 
 ; procedure srl:apply-string-append :: STR-LST -> STRING
 ; str-lst ::= (listof string)
@@ -98,18 +94,7 @@
 ; res-lst1 - contains all members from the input lst that satisfy the pred?
 ; res-lst2 - contains the remaining members of the input lst
 (define (srl:separate-list pred? lst)
-  (let loop ((lst lst)
-             (satisfy '())
-             (rest '()))
-    (cond
-      ((null? lst)
-       (values (reverse satisfy) (reverse rest)))
-      ((pred? (car lst))   ; the first member satisfies the predicate
-       (loop (cdr lst)
-             (cons (car lst) satisfy) rest))
-      (else
-       (loop (cdr lst)
-             satisfy (cons (car lst) rest))))))
+  (partition pred? lst))
 
 ;-------------------------------------------------
 ; Borrowed from "fragments.scm"
@@ -1313,15 +1298,7 @@
 ;   '(omit-xml-declaration . #f)  ; add XML declaration
 ;   '(standalone . yes)  ; denote a standalone XML document
 ;   '(version . "1.0"))  ; XML version
-(define (srl:parameterizable sxml-obj . port-or-filename+params)
-  (call-with-values
-   (lambda ()
-     (if (and (not (null? port-or-filename+params))
-              (or (output-port? (car port-or-filename+params))
-                  (string? (car port-or-filename+params))))
-         (values (car port-or-filename+params) (cdr port-or-filename+params))
-         (values #f port-or-filename+params)))
-   (lambda (port-or-filename params)
+(define (srl:parameterizable sxml-obj [port-or-filename #f] . params)
      (let loop ((params params)
                 (cdata-section-elements '())
                 (indent "  ")
@@ -1416,7 +1393,7 @@
                (loop (cdr params)
                      cdata-section-elements indent
                      method ns-prefix-assig
-                     omit-xml-declaration? standalone version))))))))))
+                     omit-xml-declaration? standalone version))))))))
 
 ;-------------------------------------------------
 ; High-level functions for popular serialization use-cases
@@ -1440,22 +1417,22 @@
 ; an output filename, the serialized representation of `sxml-obj' is written to
 ; that filename and an unspecified result is returned. If a file with the given
 ; name already exists, the effect is unspecified.
-(define (srl:sxml->xml sxml-obj . port-or-filename)
-  (if (null? port-or-filename)
+(define (srl:sxml->xml sxml-obj [port-or-filename #f])
+  (if (not port-or-filename)
       (srl:sxml->string sxml-obj '() #t 'xml
                         srl:conventional-ns-prefixes #t 'omit "1.0")
-      (srl:display-sxml sxml-obj (car port-or-filename) '() #t 'xml
+      (srl:display-sxml sxml-obj port-or-filename '() #t 'xml
                         srl:conventional-ns-prefixes #t 'omit "1.0")))
 
 ; procedure srl:sxml->xml-noindent :: SXML-OBJ [PORT-OR-FILENAME] ->
 ;                                      -> STRING|unspecified
 ;
 ; Serializes the `sxml-obj' into XML, without indentation.
-(define (srl:sxml->xml-noindent sxml-obj . port-or-filename)
-  (if (null? port-or-filename)
+(define (srl:sxml->xml-noindent sxml-obj [port-or-filename #f])
+  (if (not port-or-filename)
       (srl:sxml->string sxml-obj '() #f 'xml
                         srl:conventional-ns-prefixes #t 'omit "1.0")
-      (srl:display-sxml sxml-obj (car port-or-filename) '() #f 'xml
+      (srl:display-sxml sxml-obj port-or-filename '() #f 'xml
                         srl:conventional-ns-prefixes #t 'omit "1.0")))
 
 ; procedure srl:sxml->html :: SXML-OBJ [PORT-OR-FILENAME] -> STRING|unspecified
@@ -1475,18 +1452,18 @@
 ; an output filename, the serialized representation of `sxml-obj' is written to
 ; that filename and an unspecified result is returned. If a file with the given
 ; name already exists, the effect is unspecified.
-(define (srl:sxml->html sxml-obj . port-or-filename)
-  (if (null? port-or-filename)
+(define (srl:sxml->html sxml-obj [port-or-filename #f])
+  (if (not port-or-filename)
       (srl:sxml->string sxml-obj '() #t 'html '() #t 'omit "4.0")
-      (srl:display-sxml sxml-obj (car port-or-filename)
+      (srl:display-sxml sxml-obj port-or-filename
                         '() #t 'html '() #t 'omit "4.0")))
 
 ; procedure srl:sxml->html-noindent :: SXML-OBJ [PORT-OR-FILENAME] ->
 ;                                       -> STRING|unspecified
 ;
 ; Serializes the `sxml-obj' into HTML, without indentation.
-(define (srl:sxml->html-noindent sxml-obj . port-or-filename)
-  (if (null? port-or-filename)
+(define (srl:sxml->html-noindent sxml-obj [port-or-filename #f])
+  (if (not port-or-filename)
       (srl:sxml->string sxml-obj '() #f 'html '() #t 'omit "4.0")
-      (srl:display-sxml sxml-obj (car port-or-filename)
+      (srl:display-sxml sxml-obj port-or-filename
                         '() #f 'html '() #t 'omit "4.0")))
