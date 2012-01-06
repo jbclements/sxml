@@ -16,7 +16,7 @@
 ;; STATUS: all tests pass
 
 (define sxml-tree-trans-tests
-  (test-suite "Testing SXML-tree-trans, replace-range"
+  (test-suite "SXML-tree-trans"
     (let* ((tree
             '(root (n1 (n11) "s12" (n13))
                "s2"
