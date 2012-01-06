@@ -1,11 +1,9 @@
 #lang racket/base
 (require "myenv.ss")
-(provide pre-post-order
-         #|
-         post-order
-         foldts
-         replace-range
-         |#)
+(provide post-order
+         pre-post-order
+         SRV:send-reply
+         replace-range)
 
 
 ;		XML/HTML processing in Scheme

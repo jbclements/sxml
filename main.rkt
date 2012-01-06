@@ -27,5 +27,11 @@
 (provide (all-from-out "modif.rkt"))
 (provide (all-from-out "serializer.rkt"))
 
-(require "ssax/ssax.rkt")
-(provide (all-from-out "ssax/ssax.rkt"))
+(require "ssax/multi-parser.rkt"
+         "ssax/sxpathlib.rkt"
+         "ssax/SXML-tree-trans.rkt"
+         "ssax/SSAX-code.rkt")
+(provide ssax:multi-parser
+         (all-from-out "ssax/sxpathlib.rkt")
+         pre-post-order
+         ssax:xml->sxml)

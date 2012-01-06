@@ -9,3 +9,4 @@
 
 - (ryanc) add (or find?) sxml-top?, sxml-element?, etc predicates
 - (ryanc) parameters and/or kw args for continuable errors / warnings
+- (ryanc) parameters for defaults, eg namespace-abbreviations

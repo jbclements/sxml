@@ -6,7 +6,13 @@
          "txpath.rkt"
          "xpath-ast.rkt"
          "ssax/errors-and-warnings.rkt"
-         "ssax/ssax.rkt")
+         "ssax/multi-parser.rkt"
+         "ssax/access-remote.rkt"
+         "ssax/SSAX-code.rkt"
+         srfi/2
+         "ssax/sxpathlib.rkt"
+         "ssax/util.rkt"
+         "ssax/xlink-parser.rkt")
 (provide (all-defined-out))
 
 ;; Context-based XPath implementation

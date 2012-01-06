@@ -2,7 +2,9 @@
 (require racket/promise
          (only-in racket/port call-with-input-string)
          srfi/13/string
-         "ssax/ssax.rkt"
+         "ssax/sxpathlib.rkt"
+         "ssax/util.rkt"
+         srfi/2
          "ssax/errors-and-warnings.rkt"
          "sxpath-ext.rkt"
          "xpath-parser.rkt"

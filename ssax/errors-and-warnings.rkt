@@ -1,5 +1,5 @@
 #lang racket/base
-(require racket/contract)
+(require racket/contract/base)
 (provide/contract
  [current-sxml-warning-handler
   (parameter/c
