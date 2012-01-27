@@ -1234,7 +1234,7 @@
                           method ns-prefix-assig
                           omit-xml-declaration? standalone version)
   (if
-   (string? port-or-filename)  ; a filename?
+   (path-string? port-or-filename)  ; a filename?
    (let ((out (open-output-file port-or-filename)))
      (begin
        (srl:display-top-out (srl:normalize-sequence sxml-obj) out

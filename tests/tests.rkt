@@ -54,4 +54,10 @@
                  "<p />")
     (test-exn "serialization bad"
               (lambda (e) #t)
-              (lambda () (srl:sxml->xml '(foo (@ (bar (13)))))))))
+              (lambda () (srl:sxml->xml '(foo (@ (bar (13)))))))
+    (let ([temp (make-temporary-file)])
+    (test-not-exn "serialization accepts paths"
+                  (lambda () (and (path? temp)
+                                  (not (string? temp))
+                                  (delete-file temp)
+                                  (srl:sxml->xml `(*TOP* (p)) temp)))))))
