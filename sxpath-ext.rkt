@@ -1,6 +1,6 @@
 #lang racket/base
 (require (only-in racket/port call-with-input-string)
-         "ssax/ssax.rkt"
+         "ssax/sxpathlib.rkt"
          "ssax/errors-and-warnings.rkt"
          "sxml-tools.rkt")
 (provide (all-defined-out))

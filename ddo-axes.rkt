@@ -1,5 +1,5 @@
 #lang racket/base
-(require "ssax/ssax.rkt"
+(require "ssax/sxpathlib.rkt"
          "xpath-context_xlink.rkt")
 (provide (all-defined-out))
 

@@ -1,5 +1,7 @@
 #lang racket/base
-(require "ssax/ssax.rkt"
+(require racket/list
+         srfi/2
+         "ssax/sxpathlib.rkt"
          "ssax/errors-and-warnings.rkt"
          "xpath-context_xlink.rkt"
          "xpath-ast.rkt"
@@ -21,7 +23,7 @@
 
 ; Displays an error to stderr and returns #f
 (define (sxml:modification-error . text)
-  (sxml:warn/concat 'sxml:modification-error text)
+  (sxml:warn/concat 'sxml:modify text)
   #f)
 
 ;  Separates the list into two lists with respect to the predicate
@@ -29,18 +31,7 @@
 ; res-lst1 - contains all members from the input lst that satisfy the pred?
 ; res-lst2 - contains the remaining members of the input lst
 (define (sxml:separate-list pred? lst)
-  (let loop ((lst lst)
-             (satisfy '())
-             (rest '()))
-    (cond
-      ((null? lst)
-       (values (reverse satisfy) (reverse rest)))
-      ((pred? (car lst))   ; the first member satisfies the predicate
-       (loop (cdr lst)
-             (cons (car lst) satisfy) rest))
-      (else
-       (loop (cdr lst)
-             satisfy (cons (car lst) rest))))))
+  (partition pred? lst))
 
 ;-------------------------------------------------
 ; Miscellaneous helpers
@@ -615,52 +606,3 @@
      (sxml:transform-document
       doc
       (sxml:lambdas-upd-specifiers->targets doc lambdas-upd-specifiers)))))
-
-
-;==========================================================================
-; Destructive modifications
-
-;-------------------------------------------------
-; Helper cloning facilities
-; These are required to avoid circular structures and such as the result of
-; destructive modifications
-
-; Clones the given SXML node
-(define (sxml:clone node)
-  (letrec
-      ((clone-nodeset  ; clones nodeset
-        (lambda (nset)
-          (if (null? nset)
-              nset
-              (cons (sxml:clone (car nset)) (cdr nset))))))
-    (cond
-      ((pair? node)
-       (cons (car node) (clone-nodeset (cdr node))))
-      ; Atomic node
-      ((string? node)
-       (string-copy node))
-      ((number? node)
-       (string->number (number->string node)))
-      (else  ; unknown node type - do not clone it
-       node))))
-
-; Clones all members of the `nodeset', except for the `node', which is not
-; cloned
-(define (sxml:clone-nset-except nodeset node)
-  (letrec
-      ((iter-nset
-        ; encountered? - a boolean value: whether `node' already encountered
-        ; in the head of the nodeset being processed
-        (lambda (nset encountered?)
-          (cond
-            ((null? nset) nset)
-            ((eq? (car nset) node)
-             (cons
-              (if encountered?  ; already encountered before
-                  (sxml:clone (car nset))  ; is to be now cloned
-                  (car nset))
-              (iter-nset (cdr nset) #t)))
-            (else
-             (cons (sxml:clone (car nset))
-                   (iter-nset (cdr nset) encountered?)))))))
-    (iter-nset nodeset #f)))

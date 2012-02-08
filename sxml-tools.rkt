@@ -1,5 +1,7 @@
 #lang racket/base
-(require "ssax/ssax.rkt")
+(require "ssax/sxpathlib.rkt"
+         "ssax/util.rkt"
+         "ssax/myenv.rkt")
 (provide (all-defined-out))
 
 ; This software is in Public Domain.

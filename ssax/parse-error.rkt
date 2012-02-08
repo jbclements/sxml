@@ -1,19 +1,15 @@
 #lang racket/base
-(require racket/contract
-         "myenv.ss"
+(require racket/contract/base
+         syntax/readerr
          "errors-and-warnings.rkt")
-(provide parser-error)
 (provide/contract
+ [parser-error
+  (->* (port?) () #:rest list? any)]
  [ssax:warn
   (->* (port?) () #:rest list? any)])
 
 ; This code provides informative error messages
 ;   for SSAX (S)XML parser.
-;
-;
-; NOTE: PLT-specific ! 
-; It was tested with SSAX version 4.6 / PLT 103
-;
 
 ;==============================================================================
 ; Error handler
@@ -25,15 +21,11 @@
 ;  they are printed to stderr as is.
 
 ;; NB : updated to signal a racket error rather than printing to stdout.
-(define (parser-error arg0 . args)
-  (if (port? arg0)
-      (error 'parser-error
-             "error at position ~s: ~a" 
-             (file-position arg0)
-             (args->display-string args))
-      (error 'parser-error
-             "error in error handler: its first parameter is not a port: ~a"
-             (args->display-string (cons arg0 args)))))
+(define (parser-error p . args)
+  (let-values ([(line col pos) (port-next-location p)])
+    (raise-read-error (format "SXML parser error: ~a" (args->display-string args))
+                      (object-name p)
+                      line col pos #f)))
 
 ;; map args to their display representations, glue them together:
 (define (args->display-string args)

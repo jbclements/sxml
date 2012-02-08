@@ -8,7 +8,7 @@
 @defproc*[([(srl:sxml->xml [sxml-obj sxml?])
             string?]
            [(srl:sxml->xml [sxml-obj sxml?]
-                           [dest (or/c output-port? string?)])
+                           [dest (or/c output-port? path-string?)])
             void?])]{
 
  Serializes the SXML node or nodeset @racket[sxml-obj] into XML, with
@@ -36,7 +36,7 @@
 @defproc*[([(srl:sxml->xml-noindent [sxml-obj sxml?])
             string?]
            [(srl:sxml->xml-noindent [sxml-obj sxml?]
-                                    [dest (or/c output-port? string?)])
+                                    [dest (or/c output-port? path-string?)])
             void?])]{
 
  Like @racket[srl:sxml->xml] but without indentation.
@@ -57,7 +57,7 @@
 @defproc*[([(srl:sxml->html [sxml-obj sxml?])
             string?]
            [(srl:sxml->html [sxml-obj sxml?]
-                            [dest (or/c output-port? string?)])
+                            [dest (or/c output-port? path-string?)])
             void?])]{
 
  Serializes the SXML node or nodeset @racket[sxml-obj] into HTML, with
@@ -101,7 +101,7 @@
 @defproc*[([(srl:sxml->html-noindent [sxml-obj sxml?])
             string?]
            [(srl:sxml->html-noindent [sxml-obj sxml?]
-                                     [dest (or/c output-port? string?)])
+                                     [dest (or/c output-port? path-string?)])
             void?])]{
 
  Like @racket[srl:sxml->html] but without indentation.
