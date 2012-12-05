@@ -2,7 +2,7 @@
 @(require scribble/manual
           "util.rkt"
           #|
-          (for-label (this-package-in main))
+          (for-label sxml)
           |#)
 
 @title{Raw Lists of Exported Identifiers}

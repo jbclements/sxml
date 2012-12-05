@@ -1,16 +1,15 @@
 #lang scribble/doc
 @(require scribble/manual
-          planet/scribble
           "util.rkt"
           (for-label racket/base
-                     (this-package-in main)))
+                     sxml))
 
 @title{SXML: S-Expression Representation of XML}
 @;{@author[(author+email "John Clements" "clements@racket-lang.org")]}
 
-@defmodule/this-package[main]{
+@defmodule[sxml]{
 
- This planet library contains Oleg Kiselyov's SXML 
+ This library contains Oleg Kiselyov's SXML 
  libraries in a Racket-friendly format. It is a direct descendant of 
  Dmitry Lizorkin's PLaneT package.  It's different from that package in that
  

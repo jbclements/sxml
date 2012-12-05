@@ -1,7 +1,7 @@
 #lang scribble/doc
 @(require scribble/manual
           "util.rkt"
-          (for-label (this-package-in main)))
+          (for-label sxml))
 
 @title{Automatically Extracted Comments}
 
