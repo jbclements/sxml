@@ -4,7 +4,7 @@
           "util.rkt"
           scribble/racket
           (for-syntax racket/base)
-          (for-label (this-package-in main)))
+          (for-label sxml))
 
 @title[#:tag "sxpath"]{Search (SXPath)}
 
