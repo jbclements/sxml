@@ -6,7 +6,7 @@
 @title{SXML}
 
 @deftech{SXML} is a representation of XML elements using
-s-expressions. The following grammar describes the structure of SXML:
+unique s-expressions. The following grammar describes the structure of SXML:
 
 @(define ATSIGN (racketidfont "@"))
 
@@ -52,10 +52,6 @@ SXML structure for simplicity:
 [name local-name exp-name |@| *TOP* *PI* *COMMENT* *ENTITY* *NAMESPACES*]
 ]
 
-Refer to @hyperlink["http://okmij.org/ftp/Scheme/SXML.html"]{the
-original SXML specification} for a more detailed explanation of the
-representation, including examples.
-
 In short, an XML element is represented as a list consisting of its
 tag name as a symbol followed by its children nodes. If the XML
 element has attributes, they come immediately after the tag symbol, in
@@ -77,8 +73,20 @@ is represented by the SXML datum
 
 @racket['(customer (|@| (specialness "gazonga")) "Barry White")]
 
+NOTE! Some of the sxml libraries, particularly sxml:modify, depend
+on the fact that sxml elements in a legal document are all "unique";
+as I understand it, the requirement is that no two subtrees of a given
+SXML document can be 'eq?' to each other. This can easily
+occur when rewriting a tree, for instance a pass that inserts `(delete-me)
+in multiple places.
+
 That's the easy part.  Things get more tricky when you start talking
 about documents and namespaces.
+
+Refer to @hyperlink["http://okmij.org/ftp/Scheme/SXML.html"]{the
+original SXML specification} for a more detailed explanation of the
+representation, including examples.
+
 
 @;{ ============================================================ }
 

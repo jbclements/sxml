@@ -33,6 +33,10 @@ absolute, the base node is the root of the document being
 transformed. If the location path is relative, the base node is the
 node selected by the previous @racket[updater].
 
+Note! @racket[sxml:modify] depends on the uniqueness of all subtrees; 
+if an @racket[eq?] subtree occurs more than once, @racket['delete]
+may fail to delete all instances, for example.
+
 The following combinations of @racket[action]s and
 @racket[action-param]s are supported:
                        
