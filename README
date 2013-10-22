@@ -1,6 +1,11 @@
-This repository contains the sources for the SXML family of tools. I believe that
-Oleg Kiselyov is directly or indirectly responsible for nearly all of this code,
-aided by Kirill Lisovsky, Dmitry Lizorkin, Michael Sperber, Neil Van Dyke, and
-probably others that I've forgotten.
+This repository represents a PLT package containing SXML, a family of XML manipulation
+tools designed by Oleg Kiselyov and written by lots of people, including
 
-It's a safe bet that this repository does or will contain Racket-specific code.
+- Oleg Kiselyov,
+- Kirill Lisovsky
+- Dmitry Lizorkin,
+- Michael Sperber,
+- Neil Van Dyke,
+- John Clements,
+
+... and others that I've forgotten (pull requests welcome!).
