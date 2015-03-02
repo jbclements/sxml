@@ -3,7 +3,12 @@
           "util.rkt"
           (for-label sxml))
 
-@title[#:tag "sxslt"]{SXML Transformation}
+@title[#:tag "sxslt"]{SXML Transformation (SXSLT)}
+
+This library provides a means to transform XML elements. It is
+the descendant of the system described by Kiselyov and Krishnamurthi
+in their 2003 PADL paper,
+@link["http://cs.brown.edu/~sk/Publications/Papers/Published/kk-sxslt/"]{"SXSLT: Manipulation Language for SXML"}.
 
 @defproc[(sxml:modify [updater _update-spec] ...)
          (-> _node _node)]{
