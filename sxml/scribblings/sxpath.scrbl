@@ -1,12 +1,52 @@
-#lang scribble/doc
-@(require scribble/manual
-          scribble/core
+#lang scribble/manual
+@(require scribble/core
           "util.rkt"
           scribble/racket
           (for-syntax racket/base)
           (for-label sxml))
 
 @title[#:tag "sxpath"]{Search (SXPath)}
+
+The W3C "XPath" standard describes a standardized way to perform
+searches in XML documents. For instance, the XPath string 
+@racket["/A/B/C"] (thank you, Wikipedia) describes a search for
+a @tt{C} element whose parent is a @tt{B} element whose parent
+is an @tt{A} element that is the root of the document.
+
+The functions in this module perform similar functions. The
+@racket[txpath] function accepts the standard XPath syntax,
+whereas the @racket[sxpath] function is structured in a more
+idiomatic (for Racket) way.
+
+This documentation desperately needs more examples.
+
+Let's consider the following XML document:
+@verbatim{
+"<AAA>
+  <BBB>
+     <CCC/>
+     <www> www content <xxx/><www>
+     <zzz/>
+  </BBB>
+  <XXX>
+     <DDD> content in ccc 
+     </DDD>
+  </XXX>
+</AAA>"}
+
+If we use Neil Van Dyke's html parser, we might parse this into
+the following sxml document:
+
+@interaction[#:eval the-eval
+(define example-doc
+  '(*TOP*
+    (aaa "\n" "  "
+      (bbb "\n" "     "
+        (ccc) "\n" "     "
+        (www " www content " (xxx) (www "\n" "     " (zzz) "\n" "  ")))
+      "\n" "  "
+      (xxx "\n" "     " (ddd " content in ccc \n" "     ") "\n" "  ")
+      "\n")))]
 
 @defproc[(sxpath [path (or/c list? string?)]
                  [ns-bindings (listof (cons/c symbol? string?)) '()])
@@ -80,6 +120,11 @@
       (node-pos _number))
 (line (sxpathr _path)
       (sxml:filter (sxpath _path)))))
+
+To extract the @tt{xxx}'s inside the @tt{aaa} from the example document:
+
+@interaction[#:eval the-eval
+((sxpath '(aaa xxx)) example-doc)]
 
 To extract all cells from an HTML table:
 
@@ -349,6 +394,8 @@ node-trace
   XPath axes and accessors.
 }
 
+The following procedures depend explicitly on the root node.
+
 @deftogether[[
 @defproc[((sxml:parent [pred @#,tech{sxml-converter-as-predicate}])
           [root _node])
@@ -367,13 +414,34 @@ node-trace
 @defproc[((sxml:following-sibling [pred @#,tech{sxml-converter-as-predicate}])
           [root _node])
          @#,tech{sxml-converter}]
+]]{
+   Gosh, I wish these functions were documented.
+}
+
 @defproc[((sxml:preceding [pred @#,tech{sxml-converter-as-predicate}])
           [root _node])
-         @#,tech{sxml-converter}]
+         @#,tech{sxml-converter}]{
+ given a predicate and a root node, returns a procedure that accepts a 
+ nodeset and returns all nodes that appear before the given nodes in
+ document order, filtered using the predicate.
+ 
+ Here's an example:
+ 
+ @interaction[#:eval the-eval
+(((sxml:preceding (ntype?? 'www)) example-doc) ((sxpath `(aaa xxx)) example-doc))]
+ 
+}
+
 @defproc[((sxml:preceding-sibling [pred @#,tech{sxml-converter-as-predicate}])
           [root _node])
-         @#,tech{sxml-converter}]
-]]{
+         @#,tech{sxml-converter}]{
+ given a predicate and a root node, returns a procedure that accepts a
+ nodeset and returns all dones that are preceding siblings (in document
+ order) of the given nodes.
+ 
+@interaction[#:eval the-eval
+(define doc '(*TOP* (div (p "foo") (p "bar")
+                         (img "baz") (p "quux"))))
+(((sxml:preceding-sibling (ntype?? 'p)) doc) ((sxpath '(// img)) doc))]
+                                  }
 
-  XPath axes and accessors that depend on the root node.
-}
