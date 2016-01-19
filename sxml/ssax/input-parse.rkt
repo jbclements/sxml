@@ -259,7 +259,8 @@
                           output-counting-port)])
       (and result
            (let-values ([(_line _col pos) (port-next-location output-counting-port)])
-             (sub1 pos))))))
+             (+ (string-length str)
+                (sub1 pos)))))))
 
 ;; ============================================================
 
