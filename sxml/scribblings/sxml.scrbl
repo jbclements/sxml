@@ -28,6 +28,9 @@
  
  To that end, this code currently lives in a github repository which should
  be fairly easy to find.  Patches gratefully accepted.
+
+ It's perhaps also worth noting that this project currently has less than 23%
+ test case coverage. Bleh.
  
  For Heaven's sake, report lots of bugs!
 
