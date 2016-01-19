@@ -8,14 +8,16 @@
 ; $Id: vSXML-tree-trans.scm,v 1.2 2004/07/07 16:02:31 sperber Exp $
 
 #lang racket/base
+
+(module+ test
 (require racket/port
          rackunit
+         rackunit/text-ui
          "../ssax/SXML-tree-trans.rkt")
-(provide sxml-tree-trans-tests)
 
 ;; STATUS: all tests pass
 
-(define sxml-tree-trans-tests
+(run-tests
   (test-suite "SXML-tree-trans"
     (let* ((tree
             '(root (n1 (n11) "s12" (n13))
@@ -90,4 +92,4 @@
             (n3 
              (n33 (n331) "s332" (n333))
              "s34"))))
-      )))
+      ))))

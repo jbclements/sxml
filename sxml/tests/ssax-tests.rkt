@@ -1,4 +1,5 @@
 #lang racket/base
+
 (require (for-syntax racket/base)
          (only-in racket/port call-with-input-string)
          (only-in racket/pretty [pretty-write pp])
@@ -6,11 +7,12 @@
          (only-in racket/base [quote racket:quote])
          srfi/13/string
          rackunit
+         rackunit/text-ui
          (except-in "../ssax/myenv.ss" assert)
+         "../ssax/errors-and-warnings.rkt"
          "../ssax/parse-error.rkt"
          "../ssax/input-parse.rkt"
          "../ssax/SSAX-code.rkt")
-(provide ssax-tests)
 
 #|
 Current status: all tests pass; some print warnings.
@@ -330,13 +332,14 @@ Current status: all tests pass; some print warnings.
                     (test "TAG1" '((TAG1 PCDATA ((HREF CDATA REQUIRED #f)
                                                     ((A . HREF) CDATA IMPLIED "c"))))
                           "HREF='b'>")))
+    (parameterize ([current-sxml-warning-handler (lambda args void)])
     (assert (equal? `((UA . TAG1)
                       ((HREF . "b") ((UA . HREF) . "c"))
                       ,namespaces PCDATA)
                     (test "A:TAG1" '(((A . TAG1) PCDATA
-                                      ((HREF NMTOKEN REQUIRED #f)
-                                       ((A . HREF) CDATA IMPLIED "c"))))
-                          "HREF='b'>")))
+                                                 ((HREF NMTOKEN REQUIRED #f)
+                                                  ((A . HREF) CDATA IMPLIED "c"))))
+                          "HREF='b'>"))))
     (assert (equal? `((,urn-b . TAG1) ((HREF . "b"))
                       ,(cons `(B ,urn-b . ,urn-b) namespaces) PCDATA)
                     (test "B:TAG1"
@@ -433,7 +436,9 @@ Current status: all tests pass; some print warnings.
                           (*DEFAULT* . ssax:warn))))
 |#
 
-(let ()
+
+;; eat warnings:
+(parameterize ([current-sxml-warning-handler (lambda args void)])
   (define (simple-parser str doctype-fn)
     (call-with-input-string str
       (lambda (port)
@@ -671,7 +676,7 @@ Current status: all tests pass; some print warnings.
                               (#f UA . URI1))))))))
     ))
 
-(let ()
+(parameterize ([current-sxml-warning-handler (lambda args void)])
   (define-check (test str namespace-assig expected-res)
     (let ((result (ssax:xml->sxml (open-input-string str) namespace-assig)))
       (assert (equal_? result expected-res))))
@@ -970,3 +975,5 @@ Current status: all tests pass; some print warnings.
                                      "VRB05KT"))))))
     ))
 ))
+
+  (run-tests ssax-tests)
