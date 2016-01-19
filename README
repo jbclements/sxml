@@ -2,10 +2,11 @@ This repository represents a PLT package containing SXML, a family of XML manipu
 tools designed by Oleg Kiselyov and written by lots of people, including
 
 - Oleg Kiselyov,
-- Kirill Lisovsky
+- Kirill Lisovsky,
 - Dmitry Lizorkin,
 - Michael Sperber,
 - Neil Van Dyke,
+- Ryan Culpepper,
 - John Clements,
 
 ... and others that I've forgotten (pull requests welcome!).
