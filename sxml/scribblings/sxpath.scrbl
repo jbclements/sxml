@@ -7,18 +7,29 @@
 
 @title[#:tag "sxpath"]{Search (SXPath)}
 
-The W3C "XPath" standard describes a standardized way to perform
+The @hyperlink["https://www.w3.org/TR/xpath/"]{W3C "XPath" standard} describes a standardized way to perform
 searches in XML documents. For instance, the XPath string 
 @racket["/A/B/C"] (thank you, Wikipedia) describes a search for
 a @tt{C} element whose parent is a @tt{B} element whose parent
 is an @tt{A} element that is the root of the document.
 
-The functions in this module perform similar functions. The
-@racket[txpath] function accepts the standard XPath syntax,
-whereas the @racket[sxpath] function is structured in a more
-idiomatic (for Racket) way.
+The @racket[sxpath] function performs a similar search over SXML data,
+ using either the standard XPath strings or a list of Racket values.
 
-This documentation desperately needs more examples.
+@interaction[#:eval (make-base-eval)
+  (require sxml/sxpath)
+  ((sxpath "/A/B/C")
+   '(*TOP* (A (B (C)))))
+  ((sxpath '(A B C))
+   '(*TOP* (A (B (C)))))
+  ((sxpath "//p[contains(@class, 'blue')]/text()")
+   '(*TOP*
+     (body
+      (p (|@| (class "blue")) "P1")
+      (p (|@| (class "blue green")) "P2")
+      (p (|@| (class "red")) "P3"))))]
+
+(This documentation desperately needs more examples.)
 
 Let's consider the following XML document:
 @verbatim{
