@@ -61,13 +61,15 @@
                        [(string-prefix? "text/plain" content-type)
                         'plain]
                        [else 'unknown])))))]
-        [else  ; a local file
-         (cond [(not (file-exists? req-uri))  ; file doesn't exist
+        [(string-prefix? "file://" req-uri)
+         (define filename (substring req-uri 7))
+         (cond [(not (file-exists? filename))  ; file doesn't exist
                 #f]
-               [(assoc (filename-extension req-uri)
+               [(assoc (filename-extension filename)
                        '((#"xml" . xml) (#"html" . html) (#"htm" . html)))
                 => cdr]
-               [else 'unknown])]))
+               [else 'unknown])]
+        [else 'unknown]))
 
 ;=========================================================================
 ; Working on absolute/relative URIs

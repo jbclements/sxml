@@ -35,24 +35,24 @@
 
                
 @defproc[(sxml:document [url-string string?] [namespace-prefix-assig any/c]) sxml?]{
+ Given a local file URI, return the corresponding SXML representation.
 
-Obtain a [possibly, remote] document by its URI
+ NOTE: currently, this appears to work only for local documents.
 
-Supported URI formats:  local file and HTTP schema
-
-Supported document formats:  XML and HTML
-
- REQ-URI - a string that contains the URI of the requested document
-
- NAMESPACE-PREFIX-ASSIG - is passed as-is to the SSAX parser: there it is
+  NAMESPACE-PREFIX-ASSIG - is passed as-is to the SSAX parser: there it is
   used for assigning certain user prefixes to certain namespaces.
 
  NAMESPACE-PREFIX-ASSIG is an optional argument and has an effect for an
   XML resource only. For an HTML resource requested, NAMESPACE-PREFIX-ASSIG
   is silently ignored.
-  
- Result: the SXML representation for the requested document
 
+  So, for instance, if the file @filepath{/tmp/foo.xml} contains an XML file,
+  you should be able to call
+
+@racketblock[
+ (sxml:document "file:///tmp/foo")]
+
+(Note the plethora of slashes required by the URI format.)
 
 
 }
