@@ -31,7 +31,8 @@
          "ssax/sxpathlib.rkt"
          "ssax/SXML-tree-trans.rkt"
          "ssax/SSAX-code.rkt")
-(provide ssax:multi-parser
+(provide ssax:make-parser
+         ssax:multi-parser
          (all-from-out "ssax/sxpathlib.rkt")
          pre-post-order
          ssax:xml->sxml)
