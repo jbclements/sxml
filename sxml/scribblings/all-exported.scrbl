@@ -172,21 +172,6 @@ contributing documentation for them.
    sxml:element?
    sxml:attr-list)]
 
-@(section "srfi-12.rkt")
-@racketblock[
-(#%provide
-   signal
-   condition-property-accessor
-   exc:signal
-   exn:exception->condition
-   make-composite-condition
-   make-property-condition
-   handle-exceptions
-   condition?
-   abort
-   condition-predicate
-   with-exception-handler)]
-
 @(section "mime.rkt")
 @racketblock[(#%provide MIME:parse-content-type MIME:read-headers http-token-char?)]
 
