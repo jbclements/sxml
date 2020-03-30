@@ -17,11 +17,12 @@
   (apply append
          (map list reqs pros)))
 
-(call-with-input-file (build-path parent-dir "ssax" "ssax.rkt")
-  (lambda (port)
-    (parameterize ([current-directory (build-path parent-dir "ssax")]
-                   [read-accept-reader #t]
-                   [current-namespace (namespace-anchor->namespace ns-anchor)])
-      (interleave
-       (rest (fourth (syntax->datum (expand (read-syntax "main.rkt" port)))))))))
+(module+ main
+  (call-with-input-file (build-path parent-dir "ssax" "ssax.rkt")
+    (lambda (port)
+      (parameterize ([current-directory (build-path parent-dir "ssax")]
+                     [read-accept-reader #t]
+                     [current-namespace (namespace-anchor->namespace ns-anchor)])
+        (interleave
+         (rest (fourth (syntax->datum (expand (read-syntax "main.rkt" port))))))))))
 
