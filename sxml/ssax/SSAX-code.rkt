@@ -622,8 +622,7 @@
 ; Note, &lt; and &amp; are not specially recognized (and are not expanded)!
 
 (define ssax:read-cdata-body 
-  (let ((cdata-delimiters (list char-return #\newline #\] #\&)))
-
+  (let ((cdata-delimiters (list char-return #\newline #\])))
     (lambda (port str-handler seed)
       (let loop ((seed seed))
 	(let ((fragment (next-token '() cdata-delimiters
@@ -642,22 +641,9 @@
 		((#\]) (check-after-second-braket
 			(str-handler "]" "" seed)))
 		(else (loop (str-handler "]]" "" seed)))))))
-       ((#\&)		; Note that #\& within CDATA may stand for itself
-	(let ((ent-ref 	; it does not have to start an entity ref
-               (next-token-of (lambda (c) 
-		 (and (not (eof-object? c)) (char-alphabetic? c) c)) port)))
-	  (cond		; "&gt;" is to be replaced with #\>
-	   ((and (string=? "gt" ent-ref) (eqv? (peek-char port) #\;))
-	    (read-char port)
-	    (loop (str-handler fragment ">" seed)))
-	   (else
-	    (loop 
-	     (str-handler ent-ref ""
-			  (str-handler fragment "&" seed)))))))
        (else		; Must be CR: if the next char is #\newline, skip it
          (when (eqv? (peek-char port) #\newline) (read-char port))
-         (loop (str-handler fragment nl seed)))
-       ))))))
+         (loop (str-handler fragment nl seed)))))))))
             
 ; procedure+:	ssax:read-char-ref PORT
 ;
