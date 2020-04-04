@@ -618,8 +618,6 @@
 ;	CR, LF, and CRLF are treated as line delimiters, and passed
 ;	as a single #\newline to the STR-HANDLER
 ;	"]]>" combination is the end of the CDATA section.
-;	&gt; is treated as an embedded #\> character
-; Note, &lt; and &amp; are not specially recognized (and are not expanded)!
 
 (define ssax:read-cdata-body 
   (let ((cdata-delimiters (list char-return #\newline #\])))
