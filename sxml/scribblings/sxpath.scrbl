@@ -259,6 +259,82 @@ shortcut is actually the namespace. Thus:
 ]
 
 Ah well.
+
+@section{Trailing Matches}
+
+There's probably a better name for this feature than "trailing matches",
+please let me know what it is (or better yet, make a pull request).
+
+It may sometimes be the case that you're looking for @racket[abc]
+nodes that contain @racket[def] nodes. You could try
+
+@racketblock[(sxpath '(// abc def))]
+
+... but that would give you the inner @racket[def] nodes, not the
+@racket[abc] parent nodes that contain the @racket[def] nodes.
+If you pore over the expansion above, you will discover that you can
+do this, using ... well, essentially, using a pair of nested lists:
+
+@racketblock[
+((sxpath '(// (abc (def))))
+ '(x (x (abc (x)
+             (def "1")))
+     (abc (x) "2")
+     (abc (def) "3")))]
+
+@section{Custom Predicates}
+
+If you take a look at the expansion above, you'll see that you can
+directly embed procedures (essentially a "3D syntax" approach) into
+sxpath terms, to provide more customizable matching. However, you'll
+be hard-pressed to find out exactly what the interface to those procedures
+looks like. I've done some experimentation and some light code-reading,
+and it @emph{appears} to me that such procedures are called with two
+arguments; a list of nodes, and another list ... of ... variable bindings?
+I realize that it's uncommon for documentation to be so wishy-washy,
+but I'm erring on the side of getting the information out there.
+
+Anyhow, suppose (just for instance) that you wanted to be able to use
+sxpath to find divs with a particular classname (e.g. @racket[zzz]),
+ but that—like CSS—you wanted
+to treat the value of the "class" property as being a space-separated
+list of class names, so what you're really looking for is a node whose
+class property contains @racket["zzz"] as part of a space-separated
+list, for instance @racket["yyy zzz aaa"].
+
+Can you do this? Yes you can! Here's some example code:
+
+@codeblock|{
+;; an sxpath matcher for "class" nodes with the given classname
+;; as part of its space-separated list
+(define ((class-str-includes? classname) nodes vars-thingy)
+  (ormap (node-with-class-str classname) nodes))
+
+;; is this a node named "class" with the given classname as
+;; part of its space-separated list?
+(define ((node-with-class-str classname) node)
+  (match node
+    [(list 'class (? string? classnames-str))
+     (member classname
+             (map string-trim (regexp-split #px" " classnames-str)))]))
+
+((sxpath `(// abc (z (@ class ,(class-str-includes? "bar")))))
+ '(*TOP* (x (x (x (abc (y (x))))
+               (abc (z (@ (class "bar tar")) (x) "blorg"))
+               (abc (z (@ (class "car bar")) (x) "blorg3"))
+               (abc (z (@ (class "baz car")) (x) "blorg2"))))))
+}|
+
+There are several clunky things about this solution; it's clunky that I
+repeat "class" in two different places, but abstracting over this would
+probably naturally soak up the @"@" as well, and I wasn't sure I wanted
+to do that. Also, I was surprised to see that the class node was actually
+passed to the matcher, rather than its content. But sure, okay. Also,
+the name @racket[vars-thingy] should strongly suggest that I'm not entirely
+sure what's going on here.
+
+As before: pull requests welcome!
+
 }
 
 @defproc[(txpath [xpath-location-path string?]
