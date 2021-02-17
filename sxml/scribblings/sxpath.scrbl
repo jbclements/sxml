@@ -282,6 +282,20 @@ do this, using ... well, essentially, using a pair of nested lists:
      (abc (x) "2")
      (abc (def) "3")))]
 
+Note that this is also the right way to go if for instance you're looking
+for a @racket[div] with a particular id:
+
+@codeblock|{
+((sxpath '(// (div (@ id (equal? "wanted")))))
+ '(body (foo (div (@ (id "a"))
+                  (div (@ (id "b")) "abc")
+                  "def")
+             (div (@ (id "wanted"))
+                  (div (@ (id "c")) "qq")
+                  "ghi"))))
+}|
+
+
 @section{Custom Predicates}
 
 If you take a look at the expansion above, you'll see that you can
