@@ -110,11 +110,11 @@ can't see a way in defform to describe result.}
 (require racket/string sxml)
 
 (define (remove-markup xml-port)
-  (let* ((parser
+  (let* ([parser
           (ssax:make-parser NEW-LEVEL-SEED remove-markup-nls
                             FINISH-ELEMENT remove-markup-fe
-                            CHAR-DATA-HANDLER remove-markup-cdh))
-         (strings (parser xml-port null)))
+                            CHAR-DATA-HANDLER remove-markup-cdh)]
+         [strings (parser xml-port null)])
     (string-join (reverse strings) "")))
 
 (define (remove-markup-nls gi attributes namespaces expected-content
@@ -125,7 +125,7 @@ can't see a way in defform to describe result.}
   seed)
 
 (define (remove-markup-cdh string-1 string-2 seed)
-  (let ((seed (cons string-1 seed)))
+  (let ([seed (cons string-1 seed)])
     (if (non-empty-string? string-2)
         (cons string-2 seed)
         seed)))
