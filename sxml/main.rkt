@@ -32,6 +32,7 @@
          "ssax/SXML-tree-trans.rkt"
          "ssax/SSAX-code.rkt")
 (provide ssax:make-parser
+         ssax:make-parser/positional-args
          ssax:multi-parser
          (all-from-out "ssax/sxpathlib.rkt")
          pre-post-order
